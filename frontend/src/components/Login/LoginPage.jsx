@@ -1,16 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
+import './LoginPage.css';
 import LoginHeader from './LoginHeader';
 import LoginForm from './LoginForm';
+import LoginSuccessMessage from './LoginSuccessMessage';
 
-function LoginPage() {
+const LoginPage = () => {
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [userData, setUserData] = useState(null);
+
+  const handleLoginSuccess = (formData) => {
+    setUserData(formData);
+    setLoginSuccess(true);
+    console.log("Login completed with data:", formData);
+  };
+
+  if (loginSuccess) {
+    return <LoginSuccessMessage user={userData} />;
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white p-4">
-      <div className="w-full max-w-md">
+    <div className="login-container">
+      <div className="login-form-container">
         <LoginHeader />
-        <LoginForm />
+        <LoginForm onSuccess={handleLoginSuccess} />
       </div>
     </div>
   );
-}
+};
 
 export default LoginPage;
