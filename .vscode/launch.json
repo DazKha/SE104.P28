@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "chrome",  // hoặc "chrome", VS Code vẫn hiểu nếu dùng Chromium
+        "request": "launch",
+        "name": "Launch with Opera",
+        "url": "http://localhost:5173",
+        "webRoot": "${workspaceFolder}",
+        "runtimeExecutable": "C:\\Users\\Admin\\AppData\\Local\\Programs\\Opera\\launcher.exe"
+      }
+    ]
+  }
+  

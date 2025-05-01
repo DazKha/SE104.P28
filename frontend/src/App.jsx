@@ -1,7 +1,7 @@
 import React from 'react';
 import LoginPage from './components/Login/LoginPage';
 import RegisterPage from './components/Register/RegisterPage';
-import { Router } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
   return (
@@ -17,6 +17,6 @@ function App() {
       </div>
     </Router>
   );
-}
+};
 
 export default App;
