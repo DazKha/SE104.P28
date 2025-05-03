@@ -4,8 +4,7 @@ import { Link } from 'react-router-dom';
 const RegisterForm = ({ onSuccess }) => {
   // State for form fields
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    userName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -37,14 +36,9 @@ const RegisterForm = ({ onSuccess }) => {
   const validateForm = () => {
     const newErrors = {};
     
-    // Validate first name
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "Họ không được để trống";
-    }
-    
-    // Validate last name
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = "Tên không được để trống";
+    // Validate user name
+    if (!formData.userName.trim()) {
+      newErrors.userName = "Tên không được để trống";
     }
     
     // Validate email
@@ -102,29 +96,16 @@ const RegisterForm = ({ onSuccess }) => {
       <form onSubmit={handleSubmit} className="register-form">
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="firstName">Họ</label>
-            <input
-              type="text"
-              id="firstName"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              className={errors.firstName ? 'error' : ''}
-            />
-            {errors.firstName && <span className="error-message">{errors.firstName}</span>}
-          </div>
-          
-          <div className="form-group">
             <label htmlFor="lastName">Tên</label>
             <input
               type="text"
-              id="lastName"
-              name="lastName"
-              value={formData.lastName}
+              id="userName"
+              name="userName"
+              value={formData.userName}
               onChange={handleChange}
-              className={errors.lastName ? 'error' : ''}
+              className={errors.userName ? 'error' : ''}
             />
-            {errors.lastName && <span className="error-message">{errors.lastName}</span>}
+            {errors.userName && <span className="error-message">{errors.userName}</span>}
           </div>
         </div>
         
