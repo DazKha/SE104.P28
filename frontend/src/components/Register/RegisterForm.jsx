@@ -96,7 +96,7 @@ const RegisterForm = ({ onSuccess }) => {
       <form onSubmit={handleSubmit} className="register-form">
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="lastName">Tên</label>
+            <label htmlFor="userName">Username</label>
             <input
               type="text"
               id="userName"

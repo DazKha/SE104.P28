@@ -4,12 +4,14 @@
     min-height: 100vh;
     background-color: #f7f9fc;
     font-family: 'Roboto', Arial, sans-serif;
+    justify-content: center;
   }
   
   .login-form-container {
-    flex: 1;
+    flex: 0 1 auto;
     padding: 40px;
     max-width: 500px;
+    width: 100%;
     background-color: #ffffff;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
     display: flex;

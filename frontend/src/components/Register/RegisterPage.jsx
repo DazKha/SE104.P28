@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import RegisterHeader from './RegisterHeader';
 import RegisterForm from './RegisterForm';
 import RegisterSuccessMessage from './RegisterSuccessMessage';
+import './RegisterPage.css';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterPage = () => {
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const navigate = useNavigate();
 
   const handleRegistrationSuccess = (formData) => {
     setRegistrationSuccess(true);
