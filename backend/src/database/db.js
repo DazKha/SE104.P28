@@ -38,10 +38,10 @@ db.serialize(() => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
       amount REAL NOT NULL,
-      date TEXT NOT NULL,
+      date DATETIME NOT NULL,
       category_id INTEGER NOT NULL,
       note TEXT,
-      type TEXT NOT NULL,
+      type TEXT CHECK (type IN ('income', 'outcome')) NOT NULL,
       FOREIGN KEY (user_id) REFERENCES users(id),
       FOREIGN KEY (category_id) REFERENCES categories(id)
     )
@@ -66,7 +66,7 @@ db.serialize(() => {
       user_id INTEGER NOT NULL,
       amount REAL NOT NULL,
       person TEXT NOT NULL,
-      due_date TEXT NOT NULL,
+      due_date DATETIME NOT NULL,
       type TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'pending',
       FOREIGN KEY (user_id) REFERENCES users(id)
@@ -80,6 +80,7 @@ db.serialize(() => {
       user_id INTEGER NOT NULL,
       month TEXT NOT NULL,
       amount REAL NOT NULL,
+      used REAL NOT NULL DEFAULT 0,
       FOREIGN KEY (user_id) REFERENCES users(id)
     )
   `);
