@@ -1,0 +1,56 @@
+/* RecentExpenses.css */
+.expenses-card {
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: 100%;
+  }
+  
+  .expenses-card h2 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    color: #e0e0e0;
+  }
+  
+  .expense-list {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .expense-item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    padding: 1rem 0;
+    border-bottom: 1px solid #333;
+  }
+  
+  .expense-item:last-child {
+    border-bottom: none;
+  }
+  
+  .expense-date {
+    color: #a0a0a0;
+    font-size: 0.9rem;
+  }
+  
+  .expense-description {
+    color: #e0e0e0;
+  }
+  
+  .expense-amount {
+    color: #ffffff;
+    font-weight: 500;
+  }
+  
+  .view-all {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  .view-all a {
+    color: #4CAF50;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }

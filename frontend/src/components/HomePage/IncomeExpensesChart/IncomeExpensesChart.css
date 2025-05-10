@@ -1,0 +1,62 @@
+/* IncomeExpensesChart.css */
+.chart-card {
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: 100%;
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .card-header h2 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #e0e0e0;
+    margin: 0;
+  }
+  
+  .view-toggle {
+    background: transparent;
+    border: none;
+    color: #4CAF50;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .chart-legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+  }
+  
+  .income-color {
+    background-color: #4CAF50;
+  }
+  
+  .expenses-color {
+    background-color: #2196F3;
+  }
+  
+  .chart-container {
+    height: 200px;
+    width: 100%;
+  }

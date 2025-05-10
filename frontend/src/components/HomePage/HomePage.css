@@ -1,0 +1,26 @@
+/* HomePage.css (Updated) */
+.homepage-container {
+    min-height: 100vh;
+    width: 100%;
+  }
+  
+  /* Dashboard Content */
+  .dashboard-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  /* Dashboard Grid */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+  }

@@ -123,19 +123,6 @@ const LoginForm = ({ onSuccess }) => {
         {isSubmitting ? 'Đang xử lý...' : 'Đăng nhập'}
       </button>
       
-      <div className="login-divider">
-        <span>Hoặc đăng nhập với</span>
-      </div>
-      
-      <div className="social-login">
-        <button type="button" className="social-button google">
-          Google
-        </button>
-        <button type="button" className="social-button facebook">
-          Facebook
-        </button>
-      </div>
-      
       <div className="login-footer">
         <p>Chưa có tài khoản? <Link to="/register" className="register-link">Đăng ký</Link></p>
       </div>
