@@ -3,14 +3,13 @@ import './HomePage.css';
 import Navbar from './NavBar';
 import BalanceCard from './BalanceCard';
 import RecentExpenses from './RecentExpenses';
-import IncomeExpensesChart from './IncomeExpensesChart';
+import IncomeExpensesChart from './IncomeExpensesChart/index.jsx';
 import AddTransactionModal from './BalanceCard/AddTransaction/AddTransactionModal';
 
 const HomePage = () => {
   const [transactions, setTransactions] = useState([]);
   const [balance, setBalance] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
@@ -64,7 +63,7 @@ const HomePage = () => {
           {/* Card biểu đồ thu nhập và chi tiêu */}
           <IncomeExpensesChart transactions={transactions} />
         </div>
-
+        
         <AddTransactionModal
           isOpen={isModalOpen}
           onClose={closeModal}
