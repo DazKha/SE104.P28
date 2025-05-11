@@ -1,53 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './HomePage.css';
-import Navbar from './Navbar';
+import Navbar from './NavBar';
 import BalanceCard from './BalanceCard';
 import RecentExpenses from './RecentExpenses';
 import IncomeExpensesChart from './IncomeExpensesChart';
 
 const HomePage = () => {
-  // State và dữ liệu mẫu
-  const [currentBalance] = useState(5000.00);
-  
-  // Dữ liệu mẫu cho chi tiêu gần đây
-  const recentExpenses = [
-    { id: 1, date: '07/16/2024', description: 'Coffee Shop', amount: 50.00 },
-    { id: 2, date: '07/14/2024', description: 'Online Store', amount: 100.00 },
-    { id: 3, date: '07/13/2024', description: 'Gas Station', amount: 75.00 },
-  ];
+  const [transactions, setTransactions] = useState([]);
+  const [balance, setBalance] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Dữ liệu mẫu cho biểu đồ thu nhập và chi tiêu
-  const chartData = [
-    { name: 'Week 1', income: 800, expenses: 650 },
-    { name: 'Week 2', income: 900, expenses: 700 },
-    { name: 'Week 3', income: 950, expenses: 720 },
-    { name: 'Week 4', income: 1020, expenses: 750 },
-  ];
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
-  const handleLogout = () => {
-    onLogout();
-    navigate('/login');
+  // Calculate balance whenever transactions change
+  useEffect(() => {
+    const newBalance = transactions.reduce((total, transaction) => {
+      if (transaction.type === 'Income') {
+        return total + transaction.amount;
+      } else {
+        return total - transaction.amount;
+      }
+    }, 0);
+    
+    setBalance(newBalance);
+  }, [transactions]);
+
+  // Lọc chỉ lấy các giao dịch chi tiêu cho RecentExpenses
+  const expenses = transactions
+    .filter(transaction => transaction.type === 'Expense')
+    .map(expense => ({
+      id: expense.id,
+      date: expense.date,
+      description: expense.description,
+      category: expense.category,
+      amount: expense.amount
+    }))
+    .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sắp xếp theo ngày mới nhất
+
+  // Xử lý thêm giao dịch mới
+  const handleAddTransaction = (newTransaction) => {
+    setTransactions([...transactions, newTransaction]);
+
+    console.log('Transaction added:', newTransaction);
   };
-
   
-
   return (
     <div className="homepage-container">
       {/* Thanh điều hướng */}
       <Navbar />
 
-      <main className="dashboard-content">
+      <div className="dashboard-content">
         {/* Card hiển thị số dư */}
-        <BalanceCard balance={currentBalance} />
+        <BalanceCard balance={balance} 
+        onAddTransaction={handleAddTransaction} 
+        />
 
         <div className="dashboard-grid">
           {/* Card chi tiêu gần đây */}
-          <RecentExpenses expenses={recentExpenses} />
+          <RecentExpenses expenses={expenses} />
 
           {/* Card biểu đồ thu nhập và chi tiêu */}
-          <IncomeExpensesChart data={chartData} />
+          <IncomeExpensesChart transactions={transactions} />
         </div>
-      </main>
+
+        <AddTransactionModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onAddTransaction={handleAddTransaction}
+
+        />
+      </div>
     </div>
   );
 };
