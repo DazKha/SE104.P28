@@ -4,6 +4,7 @@ import Navbar from './NavBar';
 import BalanceCard from './BalanceCard';
 import RecentExpenses from './RecentExpenses';
 import IncomeExpensesChart from './IncomeExpensesChart';
+import AddTransactionModal from './BalanceCard/AddTransaction/AddTransactionModal';
 
 const HomePage = () => {
   const [transactions, setTransactions] = useState([]);

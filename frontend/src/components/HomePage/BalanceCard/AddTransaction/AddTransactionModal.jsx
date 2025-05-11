@@ -87,35 +87,6 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
               <option value="Others">Others</option>
             </select>
           </div>
-          
-          <div className="form-group">
-            <label htmlFor="description">Description</label>
-            <input 
-              type="text" 
-              id="description" 
-              value={description} 
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="date">Date</label>
-            <select 
-              id="date" 
-              value={date} 
-              onChange={(e) => setDate(e.target.value)}
-              required
-            >
-              <option value="" disabled>Select category</option>
-              <option value="Food">Food</option>
-              <option value="Transportation">Transportation</option>
-              <option value="Entertainment">Entertainment</option>
-              <option value="Bills">Bills</option>
-              <option value="Shopping">Shopping</option>
-              <option value="Salary">Salary</option>
-              <option value="Others">Others</option>
-            </select>
-          </div>
 
           <div className="form-group">
             <label htmlFor="description">Description</label>
