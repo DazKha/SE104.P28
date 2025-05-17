@@ -25,21 +25,29 @@ const HomePage = () => {
     setBalance(newBalance);
   }, [transactions]);
 
-  // Lọc chỉ lấy các giao dịch chi tiêu cho RecentExpenses
-  const expenses = transactions
-    .filter(transaction => transaction.type === 'Expense')
-    .map(expense => ({
-      id: expense.id,
-      date: expense.date,
-      description: expense.description,
-      category: expense.category,
-      amount: expense.amount
+  // Lấy tất cả giao dịch gần đây (cả thu nhập và chi tiêu)
+  const recentTransactions = transactions
+    .map(transaction => ({
+      id: transaction.id,
+      date: transaction.date,
+      description: transaction.description,
+      category: transaction.category,
+      amount: transaction.amount,
+      type: transaction.type
     }))
-    .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sắp xếp theo ngày mới nhất
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 5); // Chỉ lấy 5 giao dịch gần nhất
 
   // Xử lý thêm giao dịch mới
   const handleAddTransaction = (newTransaction) => {
-    setTransactions([newTransaction, ...transactions]);
+    // Thêm id cho giao dịch mới
+    const transactionWithId = {
+      ...newTransaction,
+      id: Date.now(), // Sử dụng timestamp làm id
+      date: new Date().toISOString() // Thêm ngày hiện tại nếu chưa có
+    };
+
+    setTransactions([transactionWithId, ...transactions]);
 
     if (newTransaction.type === 'Income') {
       setBalance(balance + parseFloat(newTransaction.amount));
@@ -47,10 +55,9 @@ const HomePage = () => {
       setBalance(balance - parseFloat(newTransaction.amount));
     }
 
-    setShowModal(false);
+    setIsModalOpen(false);
   };
 
-  
   return (
     <div className="homepage-container">
       <div className="dashboard-content">
@@ -60,8 +67,8 @@ const HomePage = () => {
         />
       
         <div className="dashboard-grid">
-          {/* Card chi tiêu gần đây */}
-          <RecentExpenses expenses={expenses} />
+          {/* Card giao dịch gần đây */}
+          <RecentExpenses expenses={recentTransactions} />
 
           {/* Card biểu đồ thu nhập và chi tiêu */}
           <IncomeExpensesChart transactions={transactions} />
@@ -71,7 +78,6 @@ const HomePage = () => {
           isOpen={isModalOpen}
           onClose={closeModal}
           onAddTransaction={handleAddTransaction}
-
         />
       </div>
     </div>
