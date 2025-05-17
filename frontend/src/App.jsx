@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import LoginPage from './components/Login/LoginPage';
 import RegisterPage from './components/Register/RegisterPage';
 import HomePage from './components/HomePage/HomePage';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import NavBar from './components/NavBar/NavBar';
+import { BrowserRouter as Router, Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 
 function App() {
   // State để kiểm tra đăng nhập
@@ -21,7 +22,8 @@ function App() {
   };
 
   return (
-    <Router>
+    <BrowserRouter>
+      {isLoggedIn && <NavBar />}
       <div className="App">
       <Routes>
           {/* Trang mặc định luôn chuyển đến trang đăng nhập */}
@@ -43,7 +45,7 @@ function App() {
           } />
         </Routes>
       </div>
-    </Router>
+    </BrowserRouter>
   );
 };
 

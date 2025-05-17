@@ -1,11 +1,14 @@
 {
   "name": "expense-management-system",
-"scripts": {
-  "client": "npm start --prefix frontend",
-  "server": "npm start --prefix backend",
-  "dev": "concurrently \"npm run server\" \"npm run client\""
-},
+  "scripts": {
+    "client": "npm start --prefix frontend",
+    "server": "npm start --prefix backend",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
   "devDependencies": {
     "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "element-ui": "^2.15.14"
   }
 }

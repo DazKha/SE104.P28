@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import './AddTransactionModal.css';
 
-
 const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
-  const [transactionType, setTransactionType] = useState('Expense');
+  const [transactionType, setTransactionType] = useState('Income');
   const [amount, setAmount] = useState(0);
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
@@ -65,7 +64,6 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
               id="amount" 
               value={amount} 
               onChange={(e) => setAmount(e.target.value)}
-              required
             />
           </div>
           

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './HomePage.css';
-import Navbar from './NavBar';
 import BalanceCard from './BalanceCard';
 import RecentExpenses from './RecentExpenses';
 import IncomeExpensesChart from './IncomeExpensesChart/index.jsx';
@@ -40,22 +39,26 @@ const HomePage = () => {
 
   // Xử lý thêm giao dịch mới
   const handleAddTransaction = (newTransaction) => {
-    setTransactions([...transactions, newTransaction]);
+    setTransactions([newTransaction, ...transactions]);
 
-    console.log('Transaction added:', newTransaction);
+    if (newTransaction.type === 'Income') {
+      setBalance(balance + parseFloat(newTransaction.amount));
+    } else {
+      setBalance(balance - parseFloat(newTransaction.amount));
+    }
+
+    setShowModal(false);
   };
+
   
   return (
     <div className="homepage-container">
-      {/* Thanh điều hướng */}
-      <Navbar />
-
       <div className="dashboard-content">
         {/* Card hiển thị số dư */}
         <BalanceCard balance={balance} 
         onAddTransaction={handleAddTransaction} 
         />
-
+      
         <div className="dashboard-grid">
           {/* Card chi tiêu gần đây */}
           <RecentExpenses expenses={expenses} />

@@ -18,7 +18,7 @@ const RecentExpenses = ({ expenses }) => {
         ))}
       </div>
       <div className="view-all">
-        <Link to="/es">View All</Link>
+        <a href="/all-transactions" className="view-all-button">View All</a>
       </div>
     </div>
   );

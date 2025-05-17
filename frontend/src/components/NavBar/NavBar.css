@@ -1,0 +1,37 @@
+/* NavBar.css */
+.navbar {
+  background-color: #1e1e1e;
+  padding: 15px 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  margin-right: 20px;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.navbar a:hover, .navbar a.active-link {
+  opacity: 1;
+  color: #4caf50;   
+}
+
+.user-section {
+  margin-left: auto;
+}
+
+.user-section a {
+  background-color: #333;
+  padding: 5px 15px;
+  border-radius: 4px;
+}
