@@ -20,6 +20,13 @@
   margin-bottom: 1.5rem;
   padding-bottom: 1.2rem;
   color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(45deg, #ffffff, #cccccc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.5px;
+  text-transform: capitalize;
 }
 
 .expense-list {
@@ -58,6 +65,10 @@
 
 .expense-amount {
   color: #ffffff;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .view-all {
