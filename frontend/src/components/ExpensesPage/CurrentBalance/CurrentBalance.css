@@ -1,0 +1,86 @@
+.current-balance__card {
+  background: #1a1a1a;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+  border: 1px solid #2d2d2d;
+}
+
+.current-balance__card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+}
+
+.current-balance__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #2d2d2d;
+  padding-bottom: 16px;
+}
+
+.current-balance__header h2 {
+  color: #ffffff;
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+.current-balance__header p {
+  color: #a0a0a0;
+  margin: 4px 0 0 0;
+  font-size: 0.875rem;
+}
+
+.current-balance__amount {
+  margin: 24px 0;
+  text-align: center;
+  padding: 16px;
+  background: #2d2d2d;
+  border-radius: 12px;
+}
+
+.current-balance__amount span {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.current-balance__detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.current-balance__stat-card {
+  background: #2d2d2d;
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+  transition: transform 0.2s ease;
+  border: 1px solid #3d3d3d;
+}
+
+.current-balance__stat-card:hover {
+  transform: translateY(-2px);
+  background: #333333;
+}
+
+.current-balance__stat-card p:first-child {
+  color: #a0a0a0;
+  margin: 0 0 8px 0;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.current-balance__stat-card p:last-child {
+  color: #ffffff;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}

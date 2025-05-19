@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import LoginPage from './components/Login/LoginPage';
-import RegisterPage from './components/Register/RegisterPage';
-import HomePage from './components/HomePage/HomePage';
-import NavBar from './components/NavBar/NavBar';
+import LoginPage from './components/Login/LoginPage.jsx';
+import RegisterPage from './components/Register/RegisterPage.jsx';
+import HomePage from './components/HomePage/HomePage.jsx';
+import NavBar from './components/NavBar/NavBar.jsx';
+import ExpensesPage from './components/ExpensesPage/ExpensesPage.jsx';
 import { BrowserRouter as Router, Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
+
 
 function App() {
   // State để kiểm tra đăng nhập
@@ -42,6 +44,10 @@ function App() {
           {/* Trang chủ */}
           <Route path="/home" element={
             isLoggedIn ? <HomePage onLogout={handleLogout} /> : <Navigate to="/login" />
+          } />
+          {/* Trang chi tiêu */}
+          <Route path="/expenses" element={
+            isLoggedIn ? <ExpensesPage /> : <Navigate to="/login" />
           } />
         </Routes>
       </div>

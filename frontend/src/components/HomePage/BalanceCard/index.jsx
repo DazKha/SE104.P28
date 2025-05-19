@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import './BalanceCard.css';
-import AddTransactionModal from './AddTransaction/AddTransactionModal';
+import AddTransactionModal from './AddTransaction/AddTransactionModal.jsx';
 
 const BalanceCard = ({ balance, onAddTransaction }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
