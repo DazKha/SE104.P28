@@ -12,6 +12,7 @@ const LoginForm = ({ onSuccess }) => {
   // State for form validation and submission
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiError, setApiError] = useState('');
 
   // Handle input changes
   const handleChange = (e) => {
@@ -28,6 +29,7 @@ const LoginForm = ({ onSuccess }) => {
         [name]: null
       });
     }
+    setApiError(''); // Clear API error when user types
   };
 
   // Validate form
@@ -51,9 +53,10 @@ const LoginForm = ({ onSuccess }) => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setApiError('');
     
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
@@ -62,18 +65,45 @@ const LoginForm = ({ onSuccess }) => {
       return;
     }
     
-    // Simulate API call for login
-    setTimeout(() => {
-      console.log("Login submitted successfully:", formData);
-      setIsSubmitting(false);
-      if (onSuccess) {
-        onSuccess(formData);
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Đăng nhập thất bại');
       }
-    }, 1000);
+
+      // Store token in localStorage if remember me is checked
+      if (formData.rememberMe) {
+        localStorage.setItem('token', data.token);
+      } else {
+        sessionStorage.setItem('token', data.token);
+      }
+
+      if (onSuccess) {
+        onSuccess(data.user);
+      }
+    } catch (error) {
+      setApiError(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="login-form">
+      {apiError && <div className="api-error-message">{apiError}</div>}
+      
       <div className="form-group">
         <label htmlFor="email">Email</label>
         <input

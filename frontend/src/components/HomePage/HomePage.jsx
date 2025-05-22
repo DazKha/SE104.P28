@@ -3,14 +3,13 @@ import './HomePage.css';
 import BalanceCard from './BalanceCard';
 import RecentExpenses from './RecentExpenses';
 import IncomeExpensesChart from './IncomeExpensesChart/index.jsx';
-import AddTransactionModal from './BalanceCard/AddTransaction/AddTransactionModal';
 
 const HomePage = () => {
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState(() => {
+    const savedTransactions = localStorage.getItem('transactions');
+    return savedTransactions ? JSON.parse(savedTransactions) : [];
+  });
   const [balance, setBalance] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
 
   // Calculate balance whenever transactions change
   useEffect(() => {
@@ -23,6 +22,11 @@ const HomePage = () => {
     }, 0);
     
     setBalance(newBalance);
+  }, [transactions]);
+
+  // Save transactions to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('transactions', JSON.stringify(transactions));
   }, [transactions]);
 
   // Lấy tất cả giao dịch gần đây (cả thu nhập và chi tiêu)
@@ -54,8 +58,6 @@ const HomePage = () => {
     } else {
       setBalance(balance - parseFloat(newTransaction.amount));
     }
-
-    setIsModalOpen(false);
   };
 
   return (
@@ -73,12 +75,6 @@ const HomePage = () => {
           {/* Card biểu đồ thu nhập và chi tiêu */}
           <IncomeExpensesChart transactions={transactions} />
         </div>
-        
-        <AddTransactionModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          onAddTransaction={handleAddTransaction}
-        />
       </div>
     </div>
   );

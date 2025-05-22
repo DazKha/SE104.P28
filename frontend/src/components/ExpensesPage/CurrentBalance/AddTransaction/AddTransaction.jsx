@@ -4,11 +4,17 @@ import './AddTransaction.css';
 const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
   const [transactionType, setTransactionType] = useState('Income');
   const [amount, setAmount] = useState(0);
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState('Không xác định');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(
     new Date().toISOString().split('T')[0]
   );
+
+  const categories = [
+    'Ăn uống', 'Di chuyển', 'Thuê nhà', 'Hoá đơn', 'Du lịch', 'Sức khoẻ',
+    'Giáo dục', 'Mua sắm', 'Vật nuôi', 'Thể dục thể thao', 'Giải trí',
+    'Đầu tư', 'Người thân', 'Không xác định'
+  ];
 
   useEffect(() => {
     if (isOpen) {
@@ -41,7 +47,7 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
   const resetForm = () => {
     setTransactionType('Expense');
     setAmount(0);
-    setCategory('');
+    setCategory('Không xác định');
     setDescription('');
     setDate(new Date().toISOString().split('T')[0]);
   };
@@ -88,14 +94,9 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
               onChange={(e) => setCategory(e.target.value)}
               required
             >
-              <option value="" disabled>Select category</option>
-              <option value="Food">Food</option>
-              <option value="Transportation">Transportation</option>
-              <option value="Entertainment">Entertainment</option>
-              <option value="Bills">Bills</option>
-              <option value="Shopping">Shopping</option>
-              <option value="Salary">Salary</option>
-              <option value="Others">Others</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
             </select>
           </div>
 
