@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const RegisterForm = ({ onSuccess }) => {
   // State for form fields
   const [formData, setFormData] = useState({
-    userName: '',
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -14,6 +14,7 @@ const RegisterForm = ({ onSuccess }) => {
   // State for form validation
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiError, setApiError] = useState('');
 
   // Handle input changes
   const handleChange = (e) => {
@@ -30,15 +31,16 @@ const RegisterForm = ({ onSuccess }) => {
         [name]: null
       });
     }
+    setApiError(''); // Clear API error when user types
   };
 
   // Validate form
   const validateForm = () => {
     const newErrors = {};
     
-    // Validate user name
-    if (!formData.userName.trim()) {
-      newErrors.userName = "Tên không được để trống";
+    // Validate name
+    if (!formData.name.trim()) {
+      newErrors.name = "Tên không được để trống";
     }
     
     // Validate email
@@ -70,9 +72,10 @@ const RegisterForm = ({ onSuccess }) => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setApiError('');
     
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
@@ -81,31 +84,53 @@ const RegisterForm = ({ onSuccess }) => {
       return;
     }
     
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Form submitted successfully:", formData);
-      setIsSubmitting(false);
-      if (onSuccess) {
-        onSuccess(formData);
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Đăng ký thất bại');
       }
-    }, 1500);
+
+      if (onSuccess) {
+        onSuccess(data);
+      }
+    } catch (error) {
+      setApiError(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <>
       <form onSubmit={handleSubmit} className="register-form">
+        {apiError && <div className="api-error-message">{apiError}</div>}
+        
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="userName">Username</label>
+            <label htmlFor="name">Tên</label>
             <input
               type="text"
-              id="userName"
-              name="userName"
-              value={formData.userName}
+              id="name"
+              name="name"
+              value={formData.name}
               onChange={handleChange}
-              className={errors.userName ? 'error' : ''}
+              className={errors.name ? 'error' : ''}
+              placeholder="Nhập tên của bạn"
             />
-            {errors.userName && <span className="error-message">{errors.userName}</span>}
+            {errors.name && <span className="error-message">{errors.name}</span>}
           </div>
         </div>
         
@@ -118,6 +143,7 @@ const RegisterForm = ({ onSuccess }) => {
             value={formData.email}
             onChange={handleChange}
             className={errors.email ? 'error' : ''}
+            placeholder="Nhập email của bạn"
           />
           {errors.email && <span className="error-message">{errors.email}</span>}
         </div>
@@ -131,6 +157,7 @@ const RegisterForm = ({ onSuccess }) => {
             value={formData.password}
             onChange={handleChange}
             className={errors.password ? 'error' : ''}
+            placeholder="Nhập mật khẩu của bạn"
           />
           {errors.password && <span className="error-message">{errors.password}</span>}
         </div>
@@ -144,6 +171,7 @@ const RegisterForm = ({ onSuccess }) => {
             value={formData.confirmPassword}
             onChange={handleChange}
             className={errors.confirmPassword ? 'error' : ''}
+            placeholder="Nhập lại mật khẩu của bạn"
           />
           {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
         </div>

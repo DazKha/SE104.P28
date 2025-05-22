@@ -294,3 +294,13 @@
       padding: 30px 20px;
     }
   }
+  
+  .api-error-message {
+    background-color: #fee2e2;
+    color: #dc2626;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border: 1px solid #fecaca;
+  }
