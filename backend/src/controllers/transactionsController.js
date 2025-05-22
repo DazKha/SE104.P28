@@ -6,15 +6,15 @@ const validateTransactionData = (data) => {
   const errors = [];
   
   if (!data.amount || isNaN(data.amount) || data.amount <= 0) {
-    errors.push('Amount must be a positive number');
+    errors.push('Số tiền phải là số dương');
   }
   
   if (!data.date || isNaN(Date.parse(data.date))) {
-    errors.push('Invalid date format');
+    errors.push('Ngày không hợp lệ');
   }
   
   if (!data.type || !['income', 'outcome'].includes(data.type)) {
-    errors.push("Type must be either 'income' or 'outcome'");
+    errors.push("Loại giao dịch phải là 'thu' hoặc 'chi'");
   }
   
   return errors;
