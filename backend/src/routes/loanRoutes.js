@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const loanController = require('../controllers/loan.controller');
+const loanController = require('../controllers/loanController');
 const authMiddleware = require('../middleware/auth.middleware');
 
 // Apply authentication middleware to all routes

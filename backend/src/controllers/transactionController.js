@@ -1,5 +1,5 @@
-const Transaction = require('../models/transaction.model');
-const budgetController = require('./budget.controller');
+const Transaction = require('../models/transactionsModel');
+const budgetController = require('./budgetController');
 
 // Create a new transaction
 exports.createTransaction = async (req, res) => {

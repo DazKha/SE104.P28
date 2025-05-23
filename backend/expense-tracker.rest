@@ -1,6 +1,4 @@
-GET http://localhost:3000
-
-### register a use POST /AUTH/LOGIN
+### Register user (if not already registered)
 POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
@@ -10,7 +8,7 @@ Content-Type: application/json
     "password": "123456789"
 }
 
-### login a use POST /AUTH/LOGIN
+### Login user and get JWT token
 POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
@@ -18,3 +16,47 @@ Content-Type: application/json
     "email": "khadeptrai@gmail.com",
     "password": "123456789"
 }
+
+### Set token variable from login response
+@token = {{login.response.body.token}}
+
+### Create a new transaction (expense)
+POST http://localhost:3000/api/transactions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "amount": 100000,
+    "date": "2024-06-01T12:00:00Z",
+    "category_id": 1,
+    "note": "Ăn trưa",
+    "type": "outcome"
+}
+
+### Set transactionId variable from create transaction response
+@transactionId = {{create.response.body.id}}
+
+### Get all transactions for user
+GET http://localhost:3000/api/transactions
+Authorization: Bearer {{token}}
+
+### Get a specific transaction by ID
+GET http://localhost:3000/api/transactions/{{transactionId}}
+Authorization: Bearer {{token}}
+
+### Update the transaction
+PUT http://localhost:3000/api/transactions/{{transactionId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "amount": 120000,
+    "date": "2024-06-01T12:00:00Z",
+    "category_id": 1,
+    "note": "Ăn trưa cập nhật",
+    "type": "outcome"
+}
+
+### Delete the transaction
+DELETE http://localhost:3000/api/transactions/{{transactionId}}
+Authorization: Bearer {{token}}
