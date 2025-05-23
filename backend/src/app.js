@@ -15,9 +15,15 @@ app.get('/', (req, res) => {
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
+const budgetRoutes = require('./routes/budgetRoutes');
+const loanRoutes = require('./routes/loanRoutes');
 
 // Mount routes
 app.use('/api/auth', authRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/budgets', budgetRoutes);
+app.use('/api/loans_debts', loanRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;
