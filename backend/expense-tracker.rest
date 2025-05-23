@@ -54,5 +54,5 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3OTY1
 }
 
 ### Delete the transaction
-DELETE http://localhost:3000/api/transactions/3
+DELETE http://localhost:3000/api/transactions/5
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3OTY1Mzg0LCJleHAiOjE3NDgwNTE3ODR9.jlnPCz1HX-mQfKkw_3WrNtFt9NuRGhE_WDF_Ja9qYK0
