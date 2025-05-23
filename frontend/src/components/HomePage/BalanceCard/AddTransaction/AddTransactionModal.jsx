@@ -52,18 +52,6 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="transactionType">Transaction Type</label>
-            <select 
-              id="transactionType" 
-              value={transactionType} 
-              onChange={(e) => setTransactionType(e.target.value)}
-            >
-              <option value="Expense">Expense</option>
-              <option value="Income">Income</option>
-            </select>
-          </div>
-          
-          <div className="form-group">
             <label htmlFor="amount">Amount</label>
             <input 
               type="number" 

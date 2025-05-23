@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import TransactionSection from './TransactionSection/index.jsx';
 import ReportSection from './ReportSection/ReportSection';
 import CurrentBalance from './CurrentBalance/CurrentBalance';
+import expenseService from '../../services/expenseService';
 
 const ExpensesPage = () => {
   const [transactions, setTransactions] = useState([]);

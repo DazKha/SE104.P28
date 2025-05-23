@@ -4,7 +4,14 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
-app.use(cors());
+// Configure CORS
+app.use(cors({
+  origin: 'http://localhost:5173', // Your frontend URL
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 console.log('hello world')
@@ -29,5 +36,5 @@ app.use('/api/savings', savingRoutes);
 app.use('/api/loans_debts', loanRoutes);
 
 // Start server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
