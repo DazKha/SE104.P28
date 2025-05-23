@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const budgetController = require('../controllers/budgetController');
-const authMiddleware = require('../middleware/auth.middleware');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 // Apply authentication middleware to all routes
 router.use(authMiddleware);

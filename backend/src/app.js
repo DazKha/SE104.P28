@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
-const transactionRoutes = require('./routes/transactionRoutes');
+const transactionRoutes = require('./routes/transactionsRoutes');
 const budgetRoutes = require('./routes/budgetRoutes');
 const loanRoutes = require('./routes/loanRoutes');
 
