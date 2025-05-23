@@ -17,12 +17,15 @@ app.get('/', (req, res) => {
 const authRoutes = require('./routes/authRoutes');
 const transactionRoutes = require('./routes/transactionsRoutes');
 const budgetRoutes = require('./routes/budgetRoutes');
+const savingRoutes = require('./routes/savingRoutes');
 const loanRoutes = require('./routes/loanRoutes');
+
 
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/budgets', budgetRoutes);
+app.use('/api/savings', savingRoutes);
 app.use('/api/loans_debts', loanRoutes);
 
 // Start server

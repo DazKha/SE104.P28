@@ -9,6 +9,7 @@ Content-Type: application/json
 }
 
 ### Login user and get JWT token
+# @name login
 POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
@@ -17,13 +18,11 @@ Content-Type: application/json
     "password": "123456789"
 }
 
-### Set token variable from login response
-@token = {{login.response.body.token}}
-
 ### Create a new transaction (expense)
+# @name create
 POST http://localhost:3000/api/transactions
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3OTY1Mzg0LCJleHAiOjE3NDgwNTE3ODR9.jlnPCz1HX-mQfKkw_3WrNtFt9NuRGhE_WDF_Ja9qYK0
 
 {
     "amount": 100000,
@@ -33,21 +32,18 @@ Authorization: Bearer {{token}}
     "type": "outcome"
 }
 
-### Set transactionId variable from create transaction response
-@transactionId = {{create.response.body.id}}
-
 ### Get all transactions for user
 GET http://localhost:3000/api/transactions
-Authorization: Bearer {{token}}
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3OTY1Mzg0LCJleHAiOjE3NDgwNTE3ODR9.jlnPCz1HX-mQfKkw_3WrNtFt9NuRGhE_WDF_Ja9qYK0
 
 ### Get a specific transaction by ID
-GET http://localhost:3000/api/transactions/{{transactionId}}
-Authorization: Bearer {{token}}
+GET http://localhost:3000/api/transactions/2
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3OTY1Mzg0LCJleHAiOjE3NDgwNTE3ODR9.jlnPCz1HX-mQfKkw_3WrNtFt9NuRGhE_WDF_Ja9qYK0
 
 ### Update the transaction
-PUT http://localhost:3000/api/transactions/{{transactionId}}
+PUT http://localhost:3000/api/transactions/1
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3OTY1Mzg0LCJleHAiOjE3NDgwNTE3ODR9.jlnPCz1HX-mQfKkw_3WrNtFt9NuRGhE_WDF_Ja9qYK0
 
 {
     "amount": 120000,
@@ -58,5 +54,5 @@ Authorization: Bearer {{token}}
 }
 
 ### Delete the transaction
-DELETE http://localhost:3000/api/transactions/{{transactionId}}
-Authorization: Bearer {{token}}
+DELETE http://localhost:3000/api/transactions/3
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3OTY1Mzg0LCJleHAiOjE3NDgwNTE3ODR9.jlnPCz1HX-mQfKkw_3WrNtFt9NuRGhE_WDF_Ja9qYK0
