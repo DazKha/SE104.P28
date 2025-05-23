@@ -4,7 +4,7 @@ const Loan = require('../models/loanModel');
 exports.createLoan = async (req, res) => {
   try {
     const { amount, person, due_date, type } = req.body;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     // Validate type
     if (!['loan', 'debt'].includes(type)) {
@@ -36,7 +36,7 @@ exports.createLoan = async (req, res) => {
 // Get all loans/debts for a user
 exports.getLoans = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.userId;
     const { status } = req.query;
 
     const loans = await Loan.findByUser(userId, status);
@@ -55,7 +55,7 @@ exports.updateLoan = async (req, res) => {
   try {
     const { id } = req.params;
     const { amount, person, due_date, type, status } = req.body;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     // Validate type if provided
     if (type && !['loan', 'debt'].includes(type)) {
@@ -101,7 +101,7 @@ exports.updateStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     // Validate status
     if (!['pending', 'paid'].includes(status)) {
@@ -133,7 +133,7 @@ exports.updateStatus = async (req, res) => {
 exports.deleteLoan = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     const deleted = await Loan.delete(id, userId);
 

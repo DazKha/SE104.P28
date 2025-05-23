@@ -22,28 +22,32 @@ Content-Type: application/json
 # @name create
 POST http://localhost:3000/api/transactions
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3OTY1Mzg0LCJleHAiOjE3NDgwNTE3ODR9.jlnPCz1HX-mQfKkw_3WrNtFt9NuRGhE_WDF_Ja9qYK0
+Authorization: Bearer {{login.response.body.token}}
 
 {
     "amount": 100000,
     "date": "2024-06-01T12:00:00Z",
     "category_id": 1,
-    "note": "Ăn trưa",
+    "note": "Ăn trưa", 
     "type": "outcome"
 }
 
 ### Get all transactions for user
 GET http://localhost:3000/api/transactions
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3OTY1Mzg0LCJleHAiOjE3NDgwNTE3ODR9.jlnPCz1HX-mQfKkw_3WrNtFt9NuRGhE_WDF_Ja9qYK0
+Authorization: Bearer {{login.response.body.token}}
 
 ### Get a specific transaction by ID
 GET http://localhost:3000/api/transactions/2
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3OTY1Mzg0LCJleHAiOjE3NDgwNTE3ODR9.jlnPCz1HX-mQfKkw_3WrNtFt9NuRGhE_WDF_Ja9qYK0
+Authorization: Bearer {{login.response.body.token}}
+
+### Get all transactions for user with month filter
+GET http://localhost:3000/api/transactions?month=2024-06
+Authorization: Bearer {{login.response.body.token}}
 
 ### Update the transaction
 PUT http://localhost:3000/api/transactions/1
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3OTY1Mzg0LCJleHAiOjE3NDgwNTE3ODR9.jlnPCz1HX-mQfKkw_3WrNtFt9NuRGhE_WDF_Ja9qYK0
+Authorization: Bearer {{login.response.body.token}}
 
 {
     "amount": 120000,
@@ -55,4 +59,60 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3OTY1
 
 ### Delete the transaction
 DELETE http://localhost:3000/api/transactions/5
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3OTY1Mzg0LCJleHAiOjE3NDgwNTE3ODR9.jlnPCz1HX-mQfKkw_3WrNtFt9NuRGhE_WDF_Ja9qYK0
+Authorization: Bearer {{login.response.body.token}}
+
+### Search transactions by note
+GET http://localhost:3000/api/transactions/search?searchTerm=Ăn trưa
+Authorization: Bearer {{login.response.body.token}}
+
+### Create budget
+POST http://localhost:3000/api/budgets
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+    "amount": 100000,
+    "month": "2024-06"
+}
+
+### Delete budget
+DELETE http://localhost:3000/api/budgets/1
+Authorization: Bearer {{login.response.body.token}}
+
+### Create saving
+POST http://localhost:3000/api/savings
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+    "goal_name": "Mua xe",
+    "target_amount": 50000000
+}
+
+### Get all savings
+GET http://localhost:3000/api/savings
+Authorization: Bearer {{login.response.body.token}}
+
+### Update saving
+PUT http://localhost:3000/api/savings/1
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+### Delete saving
+DELETE http://localhost:3000/api/savings/1
+Authorization: Bearer {{login.response.body.token}}
+
+### Create loan
+POST http://localhost:3000/api/loans_debts
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+    "amount": 1000000,
+    "person": "John Doe",
+    "due_date": "2024-12-31",
+    "type": "loan"
+}
+
+### Get all loans
+

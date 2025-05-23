@@ -1,4 +1,4 @@
-const Transaction = require('../models/transactionsModel');
+const Transaction = require('../models/transactionModel');
 const db = require('../database/db');
 
 // Helper function to validate transaction data
@@ -57,7 +57,14 @@ exports.create = (req, res) => {
 
 // Hàm lấy tất cả transactions của user
 exports.getByUser = (req, res) => {
-  Transaction.getTransactionsByUser(req.userId, (err, rows) => {
+  const { month } = req.query;
+  
+  // Validate month format if provided
+  if (month && !/^\d{4}-\d{2}$/.test(month)) {
+    return res.status(400).json({ error: 'Invalid month format. Use YYYY-MM format' });
+  }
+
+  Transaction.getTransactionsByUser(req.userId, month, (err, rows) => {
     if (err) return res.status(500).json({ error: 'Failed to fetch transactions' });
     res.json(rows);
   });
@@ -115,5 +122,22 @@ exports.delete = (req, res) => {
       if (err) return res.status(500).json({ error: 'Failed to delete transaction' });
       res.json({ message: 'Transaction deleted successfully' });
     });
+  });
+};
+
+// Hàm tìm kiếm giao dịch theo note
+exports.search = (req, res) => {
+  const { searchTerm } = req.query;
+
+  if (!searchTerm) {
+    return res.status(400).json({ error: 'Vui lòng nhập từ khóa tìm kiếm' });
+  }
+
+  Transaction.searchTransactionsByNote(req.userId, searchTerm, (err, transactions) => {
+    if (err) {
+      console.error('Lỗi khi tìm kiếm giao dịch:', err);
+      return res.status(500).json({ error: 'Lỗi server khi tìm kiếm giao dịch' });
+    }
+    res.json(transactions);
   });
 };

@@ -4,7 +4,7 @@ const db = require('../database/db');
 const createSaving = async (req, res) => {
   try {
     const { goal_name, target_amount } = req.body;
-    const user_id = req.user.id;
+    const user_id = req.userId;
 
     if (!goal_name || !target_amount) {
       return res.status(400).json({ message: 'Goal name and target amount are required' });
@@ -39,7 +39,7 @@ const createSaving = async (req, res) => {
 // Get all saving goals for a user
 const getSavings = async (req, res) => {
   try {
-    const user_id = req.user.id;
+    const user_id = req.userId;
 
     const sql = `
       SELECT 
@@ -71,7 +71,7 @@ const updateSaving = async (req, res) => {
   try {
     const { id } = req.params;
     const { current_amount } = req.body;
-    const user_id = req.user.id;
+    const user_id = req.userId;
 
     if (!current_amount) {
       return res.status(400).json({ message: 'Current amount is required' });
@@ -129,7 +129,7 @@ const updateSaving = async (req, res) => {
 const deleteSaving = async (req, res) => {
   try {
     const { id } = req.params;
-    const user_id = req.user.id;
+    const user_id = req.userId;
 
     const sql = 'DELETE FROM savings WHERE id = ? AND user_id = ?';
 

@@ -4,7 +4,7 @@ const Budget = require('../models/budgetModel');
 exports.createBudget = async (req, res) => {
   try {
     const { month, amount } = req.body;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     const budgetId = await Budget.create({
       user: userId,
@@ -27,7 +27,7 @@ exports.createBudget = async (req, res) => {
 // Get budgets for a user in a specific month
 exports.getBudgets = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.userId;
     const { month } = req.query;
 
     const budgets = await Budget.findByUserAndMonth(userId, month || new Date().toISOString().slice(0, 7));
@@ -46,7 +46,7 @@ exports.updateBudget = async (req, res) => {
   try {
     const { id } = req.params;
     const { amount } = req.body;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     const updated = await Budget.update(id, userId, amount);
 
@@ -71,7 +71,7 @@ exports.updateBudget = async (req, res) => {
 exports.deleteBudget = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     const deleted = await Budget.delete(id, userId);
 
