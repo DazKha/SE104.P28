@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { useDataReset } from '../../hooks/useDataReset.js';
+import CurrencyInput from '../common/CurrencyInput.jsx';
 import savingService from '../../services/savingService';
 import styles from './SavingWallet.module.css';
 
@@ -160,9 +161,8 @@ function SavingWallet() {
                   value={formData.goal_name}
                   onChange={(e) => setFormData({ ...formData, goal_name: e.target.value })}
                 />
-                <input
-                  type="number"
-                  placeholder="Target amount (e.g., 50000000 for 50 triệu VNĐ)"
+                <CurrencyInput
+                  placeholder="Target amount (e.g., 50.000.000 cho 50 triệu VNĐ)"
                   value={formData.target_amount}
                   onChange={(e) => setFormData({ ...formData, target_amount: e.target.value })}
                 />
@@ -170,8 +170,7 @@ function SavingWallet() {
             )}
             
             {editingGoal && (
-              <input
-                type="number"
+              <CurrencyInput
                 placeholder="Current amount"
                 value={formData.current_amount}
                 onChange={(e) => setFormData({ ...formData, current_amount: e.target.value })}

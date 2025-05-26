@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { useDataReset } from '../../hooks/useDataReset.js';
+import CurrencyInput from '../common/CurrencyInput.jsx';
 import loanService from '../../services/loanService';
 import LoanDebtItem from './LoanDebtItem';
 import styles from './LoansDebts.module.css';
@@ -97,11 +98,13 @@ function LoansDebts() {
     }
     
     try {
+      const currentItem = items.find(i => i.id === editingItem);
       await loanService.update(editingItem, {
         amount: parseFloat(formData.amount),
         person: formData.person,
         due_date: formData.due_date,
-        type: formData.type
+        type: formData.type,
+        status: currentItem?.status || 'pending'
       });
       setEditingItem(null);
       setFormData({ amount: '', person: '', due_date: '', type: 'debt' });
@@ -126,7 +129,7 @@ function LoansDebts() {
 
   const handleMarkPaid = async (id) => {
     try {
-      await loanService.update(id, { status: 'paid' });
+      await loanService.updateStatus(id, 'paid');
       fetchItems();
     } catch (err) {
       console.error('Error marking as paid:', err);
@@ -174,9 +177,8 @@ function LoansDebts() {
           <div className={styles.modalContent}>
             <h3>{editingItem ? 'Edit Loan/Debt' : 'Add New Loan/Debt'}</h3>
             
-            <input
-              type="number"
-              placeholder="Amount (e.g., 5000000 for 5 triệu VNĐ)"
+            <CurrencyInput
+              placeholder="Amount (e.g., 5.000.000 for 5 triệu VNĐ)"
               value={formData.amount}
               onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
             />

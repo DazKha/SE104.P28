@@ -66,7 +66,42 @@ const loanService = {
       console.log('Loan/debt updated successfully:', res.data);
       return res.data;
     } catch (error) {
-      console.error('Error in loanService.update:', error.response?.data || error.message);
+      console.error('Error in loanService.update:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+        url: `${API_URL}/${id}`,
+        requestData: data
+      });
+      throw error;
+    }
+  },
+
+  updateStatus: async (id, status) => {
+    try {
+      const token = getToken();
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
+      console.log('Updating loan/debt status:', id, status);
+      
+      const res = await axios.patch(`${API_URL}/${id}/status`, { status }, { 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
+      
+      console.log('Loan/debt status updated successfully:', res.data);
+      return res.data;
+    } catch (error) {
+      console.error('Error in loanService.updateStatus:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+        url: `${API_URL}/${id}/status`,
+        requestData: { status }
+      });
       throw error;
     }
   },

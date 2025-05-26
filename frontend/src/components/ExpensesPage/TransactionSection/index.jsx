@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import TransactionList from './TransactionList.jsx';
+import CurrencyInput from '../../common/CurrencyInput.jsx';
 import { PlusIcon } from 'lucide-react';
 import './TransactionSection.css';
 
@@ -188,13 +189,11 @@ const TransactionSection = () => {
             <div className="form-grid">
               <div className="form-group">
                 <label>Amount (đ)</label>
-                <input
-                  type="number"
-                  name="amount"
-                  value={newTransaction.amount}
-                  onChange={handleInputChange}
-                  className="search-input"
+                <CurrencyInput
                   placeholder="Amount"
+                  value={newTransaction.amount}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, amount: e.target.value })}
+                  className="search-input"
                 />
               </div>
               <div className="form-group">

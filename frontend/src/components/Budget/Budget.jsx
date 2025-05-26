@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { useDataReset } from '../../hooks/useDataReset.js';
+import CurrencyInput from '../common/CurrencyInput.jsx';
 import budgetService from '../../services/budgetService';
 import BudgetItem from './BudgetItem';
 import styles from './Budget.module.css';
@@ -162,9 +163,8 @@ function Budget() {
               />
             )}
             
-            <input
-              type="number"
-              placeholder="Số tiền ngân sách (VD: 50000000 cho 50 triệu VNĐ)"
+            <CurrencyInput
+              placeholder="Số tiền ngân sách (VD: 50.000.000 cho 50 triệu VNĐ)"
               value={formData.amount}
               onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
             />

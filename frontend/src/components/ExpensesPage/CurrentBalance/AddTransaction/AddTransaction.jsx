@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import CurrencyInput from '../../../common/CurrencyInput.jsx';
 import './AddTransaction.css';
 
 const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
@@ -65,8 +66,7 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="amount">Amount</label>
-            <input 
-              type="number" 
+            <CurrencyInput
               id="amount" 
               value={amount} 
               onChange={(e) => setAmount(e.target.value)}
