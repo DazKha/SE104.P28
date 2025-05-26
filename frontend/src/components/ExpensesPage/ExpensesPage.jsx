@@ -1,36 +1,55 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../../contexts/AuthContext.jsx';
+import { useDataReset } from '../../hooks/useDataReset.js';
 import TransactionSection from './TransactionSection/index.jsx';
 import ReportSection from './ReportSection/ReportSection';
 import CurrentBalance from './CurrentBalance/CurrentBalance';
 import expenseService from '../../services/expenseService';
 
 const ExpensesPage = () => {
+  const { isLoggedIn } = useAuth();
   const [transactions, setTransactions] = useState([]);
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Load transactions from API
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const data = await expenseService.getAll();
-        setTransactions(data);
-        // Calculate initial balance
-        const totalBalance = data.reduce((sum, transaction) => {
-          return sum + (transaction.type === 'Income' ? transaction.amount : -transaction.amount);
-        }, 0);
-        setBalance(totalBalance);
-      } catch (err) {
-        setError('Failed to fetch transactions');
-        console.error('Error fetching transactions:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchTransactions = useCallback(async () => {
+    if (!isLoggedIn) return;
+    
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await expenseService.getAll();
+      setTransactions(data);
+      // Calculate initial balance
+      const totalBalance = data.reduce((sum, transaction) => {
+        return sum + (transaction.type === 'Income' ? transaction.amount : -transaction.amount);
+      }, 0);
+      setBalance(totalBalance);
+    } catch (err) {
+      setError('Failed to fetch transactions');
+      console.error('Error fetching transactions:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [isLoggedIn]);
 
+  // Reset data chỉ khi user thay đổi hoặc lần đầu đăng nhập
+  const resetData = useCallback(() => {
+    setTransactions([]);
+    setBalance(0);
+    setError(null);
     fetchTransactions();
-  }, []);
+  }, [fetchTransactions]);
+
+  useDataReset(resetData);
+
+  // Fetch data khi component mount hoặc login status thay đổi
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchTransactions();
+    }
+  }, [isLoggedIn, fetchTransactions]);
 
   // Handle adding new transaction
   const handleAddTransaction = async (newTransaction) => {

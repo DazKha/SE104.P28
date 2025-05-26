@@ -1,37 +1,106 @@
 /* NavBar.css */
 .navbar {
-  background-color: #1e1e1e;
-  padding: 15px 0;
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(75, 85, 99, 0.3);
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
 }
 
 .nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+.nav-links {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
 }
 
-.navbar a {
-  color: white;
+.nav-container a {
+  color: #d1d5db;
   text-decoration: none;
-  margin-right: 20px;
-  opacity: 0.7;
-  transition: opacity 0.3s;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
-.navbar a:hover, .navbar a.active-link {
-  opacity: 1;
-  color: #4caf50;   
+.nav-container a:hover {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.1);
+  transform: translateY(-2px);
+}
+
+.active-link {
+  color: #60a5fa !important;
+  background: rgba(96, 165, 250, 0.2) !important;
+  box-shadow: 0 2px 8px rgba(96, 165, 250, 0.3);
 }
 
 .user-section {
-  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-.user-section a {
-  background-color: #333;
-  padding: 5px 15px;
-  border-radius: 4px;
+.user-name {
+  color: #f3f4f6;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  background: rgba(75, 85, 99, 0.3);
+  border-radius: 6px;
+  border: 1px solid rgba(75, 85, 99, 0.5);
+}
+
+.logout-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem;
+  }
+  
+  .nav-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .nav-container a {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .user-section {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
 }

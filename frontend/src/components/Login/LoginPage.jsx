@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext.jsx';
 import './LoginPage.css';
 import LoginHeader from './LoginHeader';
 import LoginForm from './LoginForm';
 import LoginSuccessMessage from './LoginSuccessMessage';
 
-const LoginPage = ({ onLoginSuccess }) => {
+const LoginPage = () => {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [userData, setUserData] = useState(null);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLoginSuccess = (formData) => {
@@ -15,9 +17,8 @@ const LoginPage = ({ onLoginSuccess }) => {
     setLoginSuccess(true);
     console.log("Login completed with data:", formData);
   
-    if (onLoginSuccess) {
-      onLoginSuccess();
-    }
+    // Sử dụng AuthContext login method
+    login(formData);
   };
 
   if (loginSuccess) {

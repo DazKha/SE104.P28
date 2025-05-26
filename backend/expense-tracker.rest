@@ -115,4 +115,14 @@ Authorization: Bearer {{login.response.body.token}}
 }
 
 ### Get all loans
+GET http://localhost:3000/api/loans_debts
+Authorization: Bearer {{login.response.body.token}}
 
+### Update loan
+PUT http://localhost:3000/api/loans_debts/1
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+### Delete loan
+DELETE http://localhost:3000/api/loans_debts/1
+Authorization: Bearer {{login.response.body.token}}
