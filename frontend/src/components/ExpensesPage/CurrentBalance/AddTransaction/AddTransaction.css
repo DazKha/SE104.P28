@@ -4,37 +4,21 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 99999;
-  animation: fadeIn 0.2s ease;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  will-change: opacity;
-  transform: translateZ(0);
-  overflow: hidden;
+  align-items: center;
+  z-index: 1000;
 }
 
 .modal-content {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #1a1a1a;
+  background: white;
   padding: 2rem;
-  border-radius: 16px;
+  border-radius: 8px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.2s ease;
-  border: 1px solid #2d2d2d;
-  will-change: transform;
   max-height: 90vh;
   overflow-y: auto;
-  z-index: 100000;
-  isolation: isolate;
 }
 
 .modal-header {
@@ -42,122 +26,147 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #2d2d2d;
-  position: sticky;
-  top: 0;
-  background: #1a1a1a;
-  z-index: 1;
 }
 
 .modal-header h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #ffffff;
   margin: 0;
+  color: #333;
+  font-size: 1.5rem;
 }
 
 .close-btn {
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: #a0a0a0;
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
+  color: #666;
 }
 
 .close-btn:hover {
-  background-color: #2d2d2d;
-  color: #ffffff;
+  color: #333;
 }
 
 .form-group {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
+  color: #333;
   font-weight: 500;
-  color: #a0a0a0;
 }
 
-.form-group input,
-.form-group select {
+.transaction-type-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.type-btn {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  background: white;
+  color: #666;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.type-btn:hover {
+  border-color: #4CAF50;
+  color: #4CAF50;
+}
+
+.type-btn.active {
+  background: #4CAF50;
+  border-color: #4CAF50;
+  color: white;
+}
+
+input[type="text"],
+input[type="date"],
+select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #2d2d2d;
-  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
   font-size: 1rem;
-  transition: all 0.2s;
-  background-color: #2d2d2d;
-  color: #ffffff;
+  transition: border-color 0.2s ease;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+input[type="text"]:focus,
+input[type="date"]:focus,
+select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-.form-group input::placeholder {
-  color: #666666;
-}
-
-.form-group select option {
-  background-color: #2d2d2d;
-  color: #ffffff;
+  border-color: #4CAF50;
 }
 
 .button-group {
   display: flex;
-  justify-content: flex-end;
   gap: 1rem;
   margin-top: 2rem;
-  position: sticky;
-  bottom: 0;
-  background: #1a1a1a;
-  padding-top: 1rem;
-  z-index: 1;
 }
 
 .cancel-btn,
 .submit-btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 6px;
   font-weight: 500;
-  transition: all 0.2s;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .cancel-btn {
-  background-color: #2d2d2d;
-  color: #a0a0a0;
-  border: 1px solid #3d3d3d;
+  background: white;
+  border: 2px solid #e0e0e0;
+  color: #666;
 }
 
 .cancel-btn:hover {
-  background-color: #3d3d3d;
-  color: #ffffff;
+  border-color: #666;
+  color: #333;
 }
 
 .submit-btn {
-  background-color: #3b82f6;
-  color: white;
+  background: #4CAF50;
   border: none;
+  color: white;
 }
 
 .submit-btn:hover {
-  background-color: #2563eb;
-  transform: translateY(-1px);
+  background: #45a049;
+}
+
+/* Custom select styling */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+}
+
+/* Currency input styling */
+.currency-input {
+  position: relative;
+}
+
+.currency-input input {
+  padding-left: 2rem;
+}
+
+.currency-input::before {
+  content: '₫';
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
 }
 
 /* Animations */
@@ -221,4 +230,95 @@ body.modal-open {
   position: fixed;
   width: 100%;
   height: 100%;
+}
+
+/* Category Select Styles */
+.category-select {
+  position: relative;
+  width: 100%;
+}
+
+.category-select-button {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  background: white;
+  color: #333;
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.category-select-button:hover {
+  border-color: #4CAF50;
+}
+
+.category-arrow {
+  font-size: 0.8rem;
+  color: #666;
+  transition: transform 0.2s ease;
+}
+
+.category-select-button:hover .category-arrow {
+  color: #4CAF50;
+}
+
+.category-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.5rem;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.category-option {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: none;
+  text-align: left;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-option:hover {
+  background: #f5f5f5;
+  color: #4CAF50;
+}
+
+.category-option.selected {
+  background: #4CAF50;
+  color: white;
+}
+
+/* Custom scrollbar for category popup */
+.category-popup::-webkit-scrollbar {
+  width: 6px;
+}
+
+.category-popup::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.category-popup::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.category-popup::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }

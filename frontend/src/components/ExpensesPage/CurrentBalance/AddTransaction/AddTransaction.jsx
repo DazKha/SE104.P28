@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import CurrencyInput from '../../../common/CurrencyInput.jsx';
 import './AddTransaction.css';
 
@@ -10,12 +10,53 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
   const [date, setDate] = useState(
     new Date().toISOString().split('T')[0]
   );
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const categoryRef = useRef(null);
 
-  const categories = [
-    'Ăn uống', 'Di chuyển', 'Thuê nhà', 'Hoá đơn', 'Du lịch', 'Sức khoẻ',
-    'Giáo dục', 'Mua sắm', 'Vật nuôi', 'Thể dục thể thao', 'Giải trí',
-    'Đầu tư', 'Người thân', 'Không xác định'
+  const expenseCategories = [
+    'Ăn uống',
+    'Di chuyển',
+    'Thuê nhà',
+    'Hoá đơn',
+    'Du lịch',
+    'Sức khoẻ',
+    'Giáo dục',
+    'Mua sắm',
+    'Vật nuôi',
+    'Thể dục thể thao',
+    'Giải trí',
+    'Đầu tư',
+    'Người thân',
+    'Khác'
   ];
+
+  const incomeCategories = [
+    'Lương',
+    'Thưởng',
+    'Đầu tư',
+    'Kinh doanh',
+    'Quà tặng',
+    'Khác'
+  ];
+
+  // Update category when transaction type changes
+  useEffect(() => {
+    setCategory(transactionType === 'Income' ? incomeCategories[0] : expenseCategories[0]);
+  }, [transactionType]);
+
+  // Close category popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (categoryRef.current && !categoryRef.current.contains(event.target)) {
+        setIsCategoryOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -48,9 +89,14 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
   const resetForm = () => {
     setTransactionType('Expense');
     setAmount(0);
-    setCategory('Không xác định');
+    setCategory(expenseCategories[0]);
     setDescription('');
     setDate(new Date().toISOString().split('T')[0]);
+  };
+
+  const handleCategorySelect = (selectedCategory) => {
+    setCategory(selectedCategory);
+    setIsCategoryOpen(false);
   };
 
   if (!isOpen) return null;
@@ -59,13 +105,33 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Add New Transaction</h2>
+          <h2>Thêm giao dịch mới</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="amount">Amount</label>
+            <label>Loại giao dịch</label>
+            <div className="transaction-type-buttons">
+              <button
+                type="button"
+                className={`type-btn ${transactionType === 'Income' ? 'active' : ''}`}
+                onClick={() => setTransactionType('Income')}
+              >
+                Thu nhập
+              </button>
+              <button
+                type="button"
+                className={`type-btn ${transactionType === 'Expense' ? 'active' : ''}`}
+                onClick={() => setTransactionType('Expense')}
+              >
+                Chi tiêu
+              </button>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="amount">Số tiền</label>
             <CurrencyInput
               id="amount" 
               value={amount} 
@@ -74,22 +140,36 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
             />
           </div>
           
-          <div className="form-group">
-            <label htmlFor="category">Category</label>
-            <select 
-              id="category" 
-              value={category} 
-              onChange={(e) => setCategory(e.target.value)}
-              required
-            >
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
+          <div className="form-group" ref={categoryRef}>
+            <label htmlFor="category">Danh mục</label>
+            <div className="category-select">
+              <button
+                type="button"
+                className="category-select-button"
+                onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+              >
+                {category}
+                <span className="category-arrow">▼</span>
+              </button>
+              {isCategoryOpen && (
+                <div className="category-popup">
+                  {(transactionType === 'Income' ? incomeCategories : expenseCategories).map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      className={`category-option ${category === cat ? 'selected' : ''}`}
+                      onClick={() => handleCategorySelect(cat)}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="form-group">
-            <label htmlFor="description">Description</label>
+            <label htmlFor="description">Mô tả</label>
             <input 
               type="text" 
               id="description" 
@@ -100,7 +180,7 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="date">Date</label>
+            <label htmlFor="date">Ngày</label>
             <input 
               type="date" 
               id="date" 
@@ -111,8 +191,8 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
           </div>
           
           <div className="button-group">
-            <button type="button" onClick={onClose} className="cancel-btn">Cancel</button>
-            <button type="submit" className="submit-btn">Add Transaction</button>
+            <button type="button" onClick={onClose} className="cancel-btn">Hủy</button>
+            <button type="submit" className="submit-btn">Thêm giao dịch</button>
           </div>
         </form>
       </div>

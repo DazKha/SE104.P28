@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import TransactionList from './TransactionList.jsx';
 import CurrencyInput from '../../common/CurrencyInput.jsx';
 import { PlusIcon } from 'lucide-react';
@@ -49,8 +49,36 @@ const TransactionSection = () => {
     ];
   });
 
+  const expenseCategories = [
+    'Ăn uống',
+    'Di chuyển',
+    'Thuê nhà',
+    'Hoá đơn',
+    'Du lịch',
+    'Sức khoẻ',
+    'Giáo dục',
+    'Mua sắm',
+    'Vật nuôi',
+    'Thể dục thể thao',
+    'Giải trí',
+    'Đầu tư',
+    'Người thân',
+    'Khác'
+  ];
+
+  const incomeCategories = [
+    'Lương',
+    'Thưởng',
+    'Đầu tư',
+    'Kinh doanh',
+    'Quà tặng',
+    'Khác'
+  ];
+
   // Trạng thái cho biểu mẫu thêm giao dịch
   const [isAddingTransaction, setIsAddingTransaction] = useState(false);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const categoryRef = useRef(null);
   const [newTransaction, setNewTransaction] = useState({
     date: new Date().toLocaleDateString('en-GB', {
       day: '2-digit',
@@ -68,6 +96,20 @@ const TransactionSection = () => {
     localStorage.setItem('transactions', JSON.stringify(transactions));
   }, [transactions]);
 
+  // Close category popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (categoryRef.current && !categoryRef.current.contains(event.target)) {
+        setIsCategoryOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   // Xử lý thay đổi input cho giao dịch mới
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -81,8 +123,18 @@ const TransactionSection = () => {
   const handleTypeChange = (e) => {
     setNewTransaction({
       ...newTransaction,
-      type: e.target.value
+      type: e.target.value,
+      category: '' // Reset category when type changes
     });
+  };
+
+  // Xử lý chọn category
+  const handleCategorySelect = (selectedCategory) => {
+    setNewTransaction({
+      ...newTransaction,
+      category: selectedCategory
+    });
+    setIsCategoryOpen(false);
   };
 
   // Xử lý thêm giao dịch mới
@@ -137,13 +189,13 @@ const TransactionSection = () => {
   return (
     <div className="transaction-section">
       <div className="section-header">
-        <h2 className="section-title">Transactions</h2>
+        <h2 className="section-title">Transaction</h2>
         <button 
           onClick={() => setIsAddingTransaction(!isAddingTransaction)}
           className="filter-btn"
         >
           <PlusIcon size={16} />
-          Add Transaction
+          Thêm giao dịch
         </button>
       </div>
 
@@ -152,7 +204,7 @@ const TransactionSection = () => {
           <form onSubmit={handleAddTransaction}>
             <div className="form-grid">
               <div className="form-group">
-                <label>Date</label>
+                <label>Ngày</label>
                 <input
                   type="text"
                   name="date"
@@ -163,41 +215,56 @@ const TransactionSection = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Description</label>
+                <label>Mô tả</label>
                 <input
                   type="text"
                   name="description"
                   value={newTransaction.description}
                   onChange={handleInputChange}
                   className="search-input"
-                  placeholder="Transaction description"
+                  placeholder="Mô tả giao dịch"
                 />
               </div>
-              <div className="form-group">
-                <label>Category</label>
-                <input
-                  type="text"
-                  name="category"
-                  value={newTransaction.category}
-                  onChange={handleInputChange}
-                  className="search-input"
-                  placeholder="Category"
-                />
+              <div className="form-group" ref={categoryRef}>
+                <label>Danh mục</label>
+                <div className="category-select">
+                  <button
+                    type="button"
+                    className="category-select-button"
+                    onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                  >
+                    {newTransaction.category || 'Chọn danh mục'}
+                  </button>
+                  {isCategoryOpen && (
+                    <div className="category-popup">
+                      {(newTransaction.type === 'income' ? incomeCategories : expenseCategories).map((cat) => (
+                        <button
+                          key={cat}
+                          type="button"
+                          className={`category-option ${newTransaction.category === cat ? 'selected' : ''}`}
+                          onClick={() => handleCategorySelect(cat)}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
             <div className="form-grid">
               <div className="form-group">
-                <label>Amount (đ)</label>
+                <label>Số tiền (đ)</label>
                 <CurrencyInput
-                  placeholder="Amount"
+                  placeholder="Số tiền"
                   value={newTransaction.amount}
                   onChange={(e) => setNewTransaction({ ...newTransaction, amount: e.target.value })}
                   className="search-input"
                 />
               </div>
               <div className="form-group">
-                <label>Type</label>
+                <label>Loại</label>
                 <select
                   name="type"
                   value={newTransaction.type}
@@ -216,13 +283,13 @@ const TransactionSection = () => {
                 onClick={() => setIsAddingTransaction(false)}
                 className="filter-btn"
               >
-                Cancel
+                Hủy
               </button>
               <button
                 type="submit"
                 className="filter-btn active"
               >
-                Save Transaction
+                Lưu giao dịch
               </button>
             </div>
           </form>

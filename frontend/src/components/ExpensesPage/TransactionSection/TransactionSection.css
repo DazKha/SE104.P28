@@ -287,4 +287,98 @@
     .form-group label {
         color: #e5e7eb;
     }
+}
+
+/* Category Select Styles */
+.category-select {
+    position: relative;
+    width: 100%;
+    
+}
+
+.category-select-button {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    color: #4b5563;
+    font-size: 1rem;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.category-popup {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 0.5rem;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.category-option {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: none;
+    text-align: left;
+    color: #4b5563;
+    cursor: pointer;
+}
+
+.category-option.selected {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+/* Custom scrollbar for category popup */
+.category-popup::-webkit-scrollbar {
+    width: 6px;
+}
+
+.category-popup::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.category-popup::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.category-popup::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* Dark mode support for category select */
+@media (prefers-color-scheme: dark) {
+    .category-select-button {
+        background: #1f2937;
+        border-color: #374151;
+        color: #e5e7eb;
+    }
+
+    .category-popup {
+        background: #1f2937;
+        border-color: #374151;
+    }
+
+    .category-option {
+        color: #e5e7eb;
+    }
+
+    .category-option.selected {
+        background: #374151;
+        color: #ffffff;
+    }
 } 
