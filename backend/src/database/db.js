@@ -89,7 +89,7 @@ db.serialize(() => {
   const categories = [
     'Ăn uống', 'Di chuyển', 'Thuê nhà', 'Hoá đơn', 'Du lịch', 'Sức khoẻ',
     'Giáo dục', 'Mua sắm', 'Vật nuôi', 'Thể dục thể thao', 'Giải trí',
-    'Đầu tư', 'Người thân', 'Không xác định'
+    'Đầu tư', 'Người thân', 'Không xác định', 'Lương', 'Thưởng', 'Kinh doanh'
   ];
 
   // Kiểm tra xem bảng categories đã có dữ liệu chưa
