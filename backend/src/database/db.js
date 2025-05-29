@@ -2,7 +2,7 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 // Tạo đường dẫn tuyệt đối đến finance.db
-const dbPath = path.resolve(__dirname, '../../test_db/expenses.db');
+const dbPath = path.resolve(__dirname, '../../expenses.db');
 
 // Kết nối đến SQLite
 const db = new sqlite3.Database(dbPath, (err) => {

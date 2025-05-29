@@ -7,7 +7,7 @@ import BudgetItem from './BudgetItem';
 import styles from './Budget.module.css';
 
 function Budget() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, authKey } = useAuth();
   const [budgets, setBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -56,12 +56,12 @@ function Budget() {
 
   useDataReset(resetData);
 
-  // Fetch data khi component mount hoặc login status thay đổi
+  // Fetch data khi component mount, login status hoặc authKey thay đổi
   useEffect(() => {
     if (isLoggedIn) {
       fetchBudgets();
     }
-  }, [isLoggedIn, fetchBudgets]);
+  }, [isLoggedIn, fetchBudgets, authKey]);
 
   const handleAddBudget = async () => {
     if (!formData.month || !formData.amount) {

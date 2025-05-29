@@ -13,7 +13,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [authKey, setAuthKey] = useState(0); // Key để force re-render components
+  const [authKey, setAuthKey] = useState(0); // Key để force re-render components hoặc trigger data refresh
   const [currentUserId, setCurrentUserId] = useState(null); // Track current user ID
 
   // Kiểm tra token khi app khởi động
@@ -83,15 +83,21 @@ export const AuthProvider = ({ children }) => {
     setAuthKey(prev => prev + 1);
   };
 
+  // Method để trigger làm mới dữ liệu
+  const triggerDataRefresh = () => {
+    setAuthKey(prev => prev + 1);
+  };
+
   const value = {
     isLoggedIn,
     user,
-    authKey, // Expose authKey để components có thể sử dụng
+    authKey, // Expose authKey để components có thể sử dụng hoặc lắng nghe sự thay đổi
     currentUserId,
     login,
     logout,
     clearUserData,
-    forceClearData
+    forceClearData,
+    triggerDataRefresh // Expose hàm trigger làm mới dữ liệu
   };
 
   return (

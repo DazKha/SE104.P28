@@ -17,7 +17,12 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
+<<<<<<< Updated upstream
     "sqlite3": "^5.0.2"
+=======
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
+>>>>>>> Stashed changes
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

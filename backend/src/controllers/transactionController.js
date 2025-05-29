@@ -1,5 +1,6 @@
 const Transaction = require('../models/transactionModel');
 const db = require('../database/db');
+const budgetController = require('./budgetController');
 
 // Helper function to validate transaction data
 const validateTransactionData = (data) => {
@@ -44,12 +45,34 @@ exports.create = (req, res) => {
         data.category_id = defaultId;
         Transaction.createTransaction(data, (err) => {
           if (err) return res.status(500).json({ error: 'Failed to create transaction' });
+          
+          // Nếu là giao dịch chi tiêu, cập nhật cột 'used' trong budget
+          if (data.type === 'outcome') {
+              // Gọi hàm updateBudgetUsed từ budgetController
+              budgetController.updateBudgetUsed({
+                  user: data.user_id,
+                  amount: data.amount,
+                  month: new Date(data.date).toISOString().slice(0, 7) // Extract YYYY-MM from date
+              });
+          }
+          
           res.status(201).json({ message: 'Transaction created successfully' });
         });
       });
     } else {
       Transaction.createTransaction(data, (err) => {
         if (err) return res.status(500).json({ error: 'Failed to create transaction' });
+
+        // Nếu là giao dịch chi tiêu, cập nhật cột 'used' trong budget
+        if (data.type === 'outcome') {
+            // Gọi hàm updateBudgetUsed từ budgetController
+            budgetController.updateBudgetUsed({
+                user: data.user_id,
+                amount: data.amount,
+                month: new Date(data.date).toISOString().slice(0, 7) // Extract YYYY-MM from date
+            });
+        }
+
         res.status(201).json({ message: 'Transaction created successfully' });
       });
     }

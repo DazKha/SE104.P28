@@ -48,96 +48,169 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: fadeIn 0.3s ease;
 }
 
 .modalContent {
-  background: #181c24;
+  background: #23272f;
   border-radius: 12px;
   padding: 32px;
-  min-width: 400px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-}
-
-.modalContent h3 {
-  margin-bottom: 24px;
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.modalContent input,
-.modalContent select {
-  width: 100%;
-  background: #23272f;
-  border: 1px solid #333;
+  animation: slideIn 0.3s ease;
   color: #fff;
-  border-radius: 6px;
-  padding: 12px 16px;
-  font-size: 1rem;
-  margin-bottom: 16px;
-  box-sizing: border-box;
 }
 
-.modalActions {
+.modalHeader {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #444;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #aaa;
+  padding: 5px;
+  transition: color 0.2s;
+}
+
+.closeBtn:hover {
+  color: #fff;
+}
+
+.transactionList {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.transactionItem {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #444;
   gap: 12px;
-  margin-top: 24px;
+  transition: background-color 0.2s;
 }
 
-.saveBtn {
-  background: #2d7dff;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-  flex: 1;
-}
-.saveBtn:hover {
-  background: #155ab6;
+.transactionItem:hover {
+  background-color: #2a2f3a;
 }
 
-.cancelBtn {
-  background: #444;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-  flex: 1;
-}
-.cancelBtn:hover {
-  background: #555;
+.transactionItem:last-child {
+  border-bottom: none;
 }
 
-.budgetSection {
-  background: #181c24;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
-}
-
-.sectionHeader h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 24px;
-}
-
-.budgetsList {
+.transactionIcon {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  background: #2a2f3a;
+  border-radius: 50%;
+}
+
+.transactionInfo {
+  flex: 1;
+}
+
+.transactionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.categoryName {
+  font-weight: 500;
+  color: #fff;
+}
+
+.date {
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+.note {
+  font-size: 0.9em;
+  color: #aaa;
+  margin-top: 2px;
+}
+
+.amount {
+  font-weight: 500;
+  font-size: 1.1em;
+}
+
+.expense {
+  color: #ff6b6b;
+}
+
+.income {
+  color: #2dffb6;
+}
+
+.summary {
+  background: #2a2f3a;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.summaryItem:last-child {
+  margin-bottom: 0;
+  padding-top: 12px;
+  border-top: 1px solid #444;
+}
+
+.label {
+  color: #aaa;
+}
+
+.budget {
+  color: #2d7dff;
+}
+
+.remaining {
+  color: #2dffb6;
+}
+
+.overBudget {
+  color: #ff6b6b;
+}
+
+.error {
+  color: #ff6b6b;
+  text-align: center;
+  padding: 20px;
 }
 
 .loading {
   text-align: center;
   color: #aaa;
-  font-size: 1.1rem;
   padding: 40px;
 }
 
@@ -147,9 +220,24 @@
   padding: 40px;
 }
 
-.emptyState p {
-  margin-bottom: 8px;
-  font-size: 1.1rem;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Card Styles */
@@ -196,7 +284,8 @@
 }
 
 .editBtn,
-.deleteBtn {
+.deleteBtn,
+.viewBtn {
   background: transparent;
   border: none;
   color: #aaa;
@@ -205,6 +294,11 @@
   border-radius: 4px;
   transition: background 0.2s, color 0.2s;
   font-size: 1.1rem;
+}
+
+.viewBtn:hover {
+  background: #2d7dff;
+  color: #fff;
 }
 
 .editBtn:hover {
@@ -227,11 +321,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.label {
-  color: #aaa;
-  font-size: 0.95rem;
 }
 
 .normalText {
@@ -290,4 +379,48 @@
   .actions {
     justify-content: flex-end;
   }
+}
+
+.modalContent input,
+.modalContent select {
+  width: 100%;
+  background: #23272f;
+  border: 1px solid #333;
+  color: #fff;
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+
+.modalContent input[type="month"] {
+  background: #fff;
+  color: #000;
+}
+
+.modalActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.saveBtn,
+.cancelBtn {
+  background: #2a2f3a; /* Darker background */
+  color: #fff;
+  border: 1px solid #444; /* Add border */
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  flex: 1;
+}
+
+.saveBtn:hover,
+.cancelBtn:hover {
+  background: #3a404b; /* Slightly lighter on hover */
+  border-color: #555; /* Darker border on hover */
 } 
