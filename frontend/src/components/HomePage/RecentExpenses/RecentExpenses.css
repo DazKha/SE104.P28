@@ -38,7 +38,9 @@
 
 .expense-item {
   display: grid;
-  grid-template-columns: 80px 1fr auto;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
   padding: 0.8rem 1.2rem;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -58,17 +60,9 @@
   font-weight: 500;
 }
 
-.expense-description {
-  color: #e0e0e0;
-  font-weight: 500;
-}
-
 .expense-amount {
   color: #ffffff;
   font-weight: 500;
-  padding: 4px 12px;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .view-all {

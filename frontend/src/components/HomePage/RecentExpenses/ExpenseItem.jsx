@@ -18,10 +18,8 @@ const ExpenseItem = ({ date, description, amount, category, type }) => {
     <div className="expense-item">
       <div className="expense-info">
         <div className="expense-date">{formattedDate}</div>
-        <div className="expense-description">
-          <span className="expense-category">{category}</span>
-          <span className="expense-title">{description}</span>
-        </div>
+        <div className="expense-category">{category}</div>
+        <div className="expense-title">{description}</div>
       </div>
       <div className={`expense-amount ${type.toLowerCase()}`}>
         {type === 'Income' ? '+' : '-'}{formattedAmount}

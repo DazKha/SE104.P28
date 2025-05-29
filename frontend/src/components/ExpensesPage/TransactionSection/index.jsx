@@ -12,41 +12,6 @@ const TransactionSection = () => {
     if (savedTransactions) {
       return JSON.parse(savedTransactions);
     }
-    // Dữ liệu mặc định nếu không có dữ liệu lưu trữ
-    return [
-      {
-        id: 1,
-        date: '25/07/2024',
-        description: 'July Salary',
-        category: 'Lương',
-        amount: 25000000,
-        type: 'income'
-      },
-      {
-        id: 2,
-        date: '26/07/2024',
-        description: 'Gas refill',
-        category: 'Di chuyển',
-        amount: -500000,
-        type: 'expense'
-      },
-      {
-        id: 3,
-        date: '27/07/2024',
-        description: 'Monthly rent',
-        category: 'Thuê nhà',
-        amount: -5000000,
-        type: 'expense'
-      },
-      {
-        id: 4,
-        date: '29/07/2024',
-        description: 'Lunch with colleagues',
-        category: 'Ăn uống',
-        amount: -1200000,
-        type: 'expense'
-      }
-    ];
   });
 
   const expenseCategories = [

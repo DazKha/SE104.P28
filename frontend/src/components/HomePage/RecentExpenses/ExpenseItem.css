@@ -29,12 +29,6 @@
   font-weight: 500;
 }
 
-.expense-description {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
 .expense-category {
   font-size: 0.75rem;
   color: #888;
