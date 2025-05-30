@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { expenseCategories, incomeCategories } from '../../../../constants/categories';
 import CurrencyInput from '../../../common/CurrencyInput.jsx';
 import './AddTransaction.css';
 
 const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
-  const [transactionType, setTransactionType] = useState('Income');
+  const [transactionType, setTransactionType] = useState('Expense');
   const [amount, setAmount] = useState(0);
-  const [category, setCategory] = useState('Không xác định');
+  const [category, setCategory] = useState(expenseCategories[0]); // Default to first expense category
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(
     new Date().toISOString().split('T')[0]
@@ -13,35 +14,11 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const categoryRef = useRef(null);
 
-  const expenseCategories = [
-    'Ăn uống',
-    'Di chuyển',
-    'Thuê nhà',
-    'Hoá đơn',
-    'Du lịch',
-    'Sức khoẻ',
-    'Giáo dục',
-    'Mua sắm',
-    'Vật nuôi',
-    'Thể dục thể thao',
-    'Giải trí',
-    'Đầu tư',
-    'Người thân',
-    'Khác'
-  ];
-
-  const incomeCategories = [
-    'Lương',
-    'Thưởng',
-    'Đầu tư',
-    'Kinh doanh',
-    'Quà tặng',
-    'Khác'
-  ];
-
   // Update category when transaction type changes
   useEffect(() => {
-    setCategory(transactionType === 'Income' ? incomeCategories[0] : expenseCategories[0]);
+    // Reset category to first item of the new type
+    const newCategory = transactionType === 'Income' ? incomeCategories[0] : expenseCategories[0];
+    setCategory(newCategory);
   }, [transactionType]);
 
   // Close category popup when clicking outside
@@ -99,6 +76,9 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
     setIsCategoryOpen(false);
   };
 
+  // Get current categories based on transaction type
+  const currentCategories = transactionType === 'Income' ? incomeCategories : expenseCategories;
+
   if (!isOpen) return null;
 
   return (
@@ -139,7 +119,7 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
               required
             />
           </div>
-          
+
           <div className="form-group" ref={categoryRef}>
             <label htmlFor="category">Danh mục</label>
             <div className="category-select">
@@ -153,7 +133,7 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
               </button>
               {isCategoryOpen && (
                 <div className="category-popup">
-                  {(transactionType === 'Income' ? incomeCategories : expenseCategories).map((cat) => (
+                  {currentCategories.map((cat) => (
                     <button
                       key={cat}
                       type="button"
@@ -170,8 +150,8 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
 
           <div className="form-group">
             <label htmlFor="description">Mô tả</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               id="description" 
               value={description} 
               onChange={(e) => setDescription(e.target.value)}
@@ -181,15 +161,15 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
 
           <div className="form-group">
             <label htmlFor="date">Ngày</label>
-            <input 
-              type="date" 
+            <input
+              type="date"
               id="date" 
               value={date} 
               onChange={(e) => setDate(e.target.value)}
               required
             />
           </div>
-          
+
           <div className="button-group">
             <button type="button" onClick={onClose} className="cancel-btn">Hủy</button>
             <button type="submit" className="submit-btn">Thêm giao dịch</button>

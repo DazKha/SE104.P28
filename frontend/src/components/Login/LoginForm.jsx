@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LoginForm = ({ onSuccess }) => {
+  const navigate = useNavigate();
   // State for form fields
   const [formData, setFormData] = useState({
     email: '',
@@ -73,7 +74,6 @@ const LoginForm = ({ onSuccess }) => {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({
           email: formData.email,
           password: formData.password
@@ -87,18 +87,30 @@ const LoginForm = ({ onSuccess }) => {
         throw new Error(data.message || 'Đăng nhập thất bại');
       }
 
-      // Store token in localStorage if remember me is checked
+      // Store token and user data
+      const token = data.token;
       if (formData.rememberMe) {
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(data.user));
       } else {
-        sessionStorage.setItem('token', data.token);
+        sessionStorage.setItem('token', token);
+        sessionStorage.setItem('user', JSON.stringify(data.user));
+      }
+
+      // Set up axios interceptor for future requests
+      if (window.axios) {
+        window.axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       }
 
       if (onSuccess) {
         onSuccess(data.user);
       }
+
+      // Redirect to dashboard or home page
+      navigate('/dashboard');
     } catch (error) {
-      setApiError(error.message);
+      console.error('Login error:', error);
+      setApiError(error.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
     } finally {
       setIsSubmitting(false);
     }

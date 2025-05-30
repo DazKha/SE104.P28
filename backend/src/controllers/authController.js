@@ -48,7 +48,7 @@ exports.login = (req, res) => {
         const isPasswordValid = bcrypt.compareSync(password, user.password);
         if (!isPasswordValid) return res.status(401).json({ message: 'Mật khẩu không đúng' });
 
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: 86400 });
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
         res.json({
             token,

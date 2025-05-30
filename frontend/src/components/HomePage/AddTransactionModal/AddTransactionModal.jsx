@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { expenseCategories, incomeCategories } from '../../../../constants/categories';
-import CurrencyInput from '../../../common/CurrencyInput.jsx';
+import { expenseCategories, incomeCategories } from '../../../constants/categories';
+import CurrencyInput from '../../common/CurrencyInput.jsx';
 import './AddTransactionModal.css';
 
 const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
@@ -179,4 +179,4 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
   );
 };
 
-export default AddTransactionModal;
+export default AddTransactionModal; 

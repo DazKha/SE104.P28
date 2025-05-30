@@ -1,4 +1,5 @@
 import React from 'react';
+import { categoryLabels } from '../../../constants/categories';
 import './ExpenseItem.css';
 
 const ExpenseItem = ({ date, description, amount, category, type }) => {
@@ -14,11 +15,14 @@ const ExpenseItem = ({ date, description, amount, category, type }) => {
     currency: 'VND'
   }).format(amount);
 
+  // Get category label
+  const categoryLabel = categoryLabels[category] || category;
+
   return (
     <div className="expense-item">
       <div className="expense-info">
         <div className="expense-date">{formattedDate}</div>
-        <div className="expense-category">{category}</div>
+        <div className="expense-category">{categoryLabel}</div>
         <div className="expense-title">{description}</div>
       </div>
       <div className={`expense-amount ${type.toLowerCase()}`}>
