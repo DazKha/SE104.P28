@@ -2,11 +2,11 @@
 .currency-input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: none;
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.2s ease;
-  background-color: white;
+  background-color: transparent;
   color: #374151;
   font-family: inherit;
 }
@@ -14,7 +14,7 @@
 .currency-input:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: none;
 }
 
 .currency-input::placeholder {
@@ -24,14 +24,14 @@
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .currency-input {
-    background-color: #1f2937;
-    border-color: #374151;
+    background-color: transparent;
+    border-color: transparent;
     color: #f3f4f6;
   }
 
   .currency-input:focus {
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+    border-color: transparent;
+    box-shadow: none;
   }
 
   .currency-input::placeholder {
@@ -42,7 +42,7 @@
 /* Mobile optimization */
 @media (max-width: 768px) {
   .currency-input {
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px;
     padding: 0.875rem;
   }
 } 

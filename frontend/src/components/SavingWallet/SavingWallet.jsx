@@ -3,7 +3,8 @@ import { useAuth } from '../../contexts/AuthContext.jsx';
 import { useDataReset } from '../../hooks/useDataReset.js';
 import CurrencyInput from '../common/CurrencyInput.jsx';
 import savingService from '../../services/savingService';
-import styles from './SavingWallet.module.css';
+import SavingWalletModal from './SavingWalletModal';
+import './SavingWallet.css';
 
 function SavingWallet() {
   const { isLoggedIn } = useAuth();
@@ -11,16 +12,7 @@ function SavingWallet() {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
-  const [formData, setFormData] = useState({
-    goal_name: '',
-    icon: '💰',
-    target_amount: '',
-    current_amount: '0',
-    target_date: '',
-    monthly_goal: '',
-    priority: 'medium',
-    description: ''
-  });
+  const [editingGoalData, setEditingGoalData] = useState(null);
 
   const fetchGoals = useCallback(async () => {
     if (!isLoggedIn) return;
@@ -56,16 +48,7 @@ function SavingWallet() {
     setGoals([]);
     setShowAddForm(false);
     setEditingGoal(null);
-    setFormData({
-      goal_name: '',
-      icon: '💰',
-      target_amount: '',
-      current_amount: '0',
-      target_date: '',
-      monthly_goal: '',
-      priority: 'medium',
-      description: ''
-    });
+    setEditingGoalData(null);
     fetchGoals();
   }, [fetchGoals]);
 
@@ -77,52 +60,17 @@ function SavingWallet() {
     }
   }, [isLoggedIn, fetchGoals]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleIconSelect = (icon) => {
-    setFormData(prev => ({
-      ...prev,
-      icon
-    }));
-  };
-
-  const handlePrioritySelect = (priority) => {
-    setFormData(prev => ({
-      ...prev,
-      priority
-    }));
-  };
-
-  const handleAddGoal = async () => {
-    if (!formData.goal_name || !formData.target_amount) {
-      alert('Please fill in all required fields');
-      return;
-    }
-    
+  const handleAddGoal = async (formData) => {
+    // Convert currency fields to numbers
+    const dataToSend = {
+      ...formData,
+      target_amount: parseFloat(formData.target_amount) || 0,
+      current_amount: parseFloat(formData.current_amount) || 0,
+      monthly_goal: parseFloat(formData.monthly_goal) || 0,
+    };
     try {
-      await savingService.create({
-        ...formData,
-        target_amount: parseFloat(formData.target_amount),
-        current_amount: parseFloat(formData.current_amount),
-        monthly_goal: parseFloat(formData.monthly_goal) || 0
-      });
+      await savingService.create(dataToSend);
       setShowAddForm(false);
-      setFormData({
-        goal_name: '',
-        icon: '💰',
-        target_amount: '',
-        current_amount: '0',
-        target_date: '',
-        monthly_goal: '',
-        priority: 'medium',
-        description: ''
-      });
       fetchGoals();
     } catch (err) {
       console.error('Error adding goal:', err);
@@ -130,28 +78,18 @@ function SavingWallet() {
     }
   };
 
-  const handleEditGoal = async () => {
-    if (!formData.current_amount) {
-      alert('Please enter current amount');
-      return;
-    }
-    
+  const handleEditGoal = async (formData) => {
+    // Convert currency fields to numbers
+    const dataToSend = {
+      ...formData,
+      target_amount: parseFloat(formData.target_amount) || 0,
+      current_amount: parseFloat(formData.current_amount) || 0,
+      monthly_goal: parseFloat(formData.monthly_goal) || 0,
+    };
     try {
-      await savingService.update(editingGoal, {
-        ...formData,
-        current_amount: parseFloat(formData.current_amount)
-      });
+      await savingService.update(editingGoal, dataToSend);
       setEditingGoal(null);
-      setFormData({
-        goal_name: '',
-        icon: '💰',
-        target_amount: '',
-        current_amount: '0',
-        target_date: '',
-        monthly_goal: '',
-        priority: 'medium',
-        description: ''
-      });
+      setEditingGoalData(null);
       fetchGoals();
     } catch (err) {
       console.error('Error updating goal:', err);
@@ -175,32 +113,14 @@ function SavingWallet() {
     const goal = goals.find(g => g.id === goalId);
     if (goal) {
       setEditingGoal(goalId);
-      setFormData({
-        goal_name: goal.goal_name,
-        icon: goal.icon || '💰',
-        target_amount: goal.target_amount.toString(),
-        current_amount: goal.current_amount.toString(),
-        target_date: goal.target_date || '',
-        monthly_goal: goal.monthly_goal?.toString() || '',
-        priority: goal.priority || 'medium',
-        description: goal.description || ''
-      });
+      setEditingGoalData(goal);
     }
   };
 
   const closeForm = () => {
     setShowAddForm(false);
     setEditingGoal(null);
-    setFormData({
-      goal_name: '',
-      icon: '💰',
-      target_amount: '',
-      current_amount: '0',
-      target_date: '',
-      monthly_goal: '',
-      priority: 'medium',
-      description: ''
-    });
+    setEditingGoalData(null);
   };
 
   const formatCurrency = (value) =>
@@ -210,240 +130,42 @@ function SavingWallet() {
     }).format(value);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Savings Goals</h1>
+    <div className="container">
+      <div className="header">
+        <h1 className="title">Savings Goals</h1>
         <button 
-          className={styles.addBtn}
+          className="addBtn"
           onClick={() => setShowAddForm(true)}
         >
           ➕ Add Saving Goal
         </button>
       </div>
 
-      {(showAddForm || editingGoal) && (
-  <div className={styles.modalOverlay}>
-    <div className={styles.modal}>
-      <div className={styles.modalHeader}>
-        <h2 className={styles.modalTitle}>
-          {editingGoal ? 'Cập nhật mục tiêu' : 'Tạo mục tiêu tiết kiệm mới'}
-        </h2>
-        <button className={styles.closeBtn} onClick={closeForm}>×</button>
-      </div>
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-          editingGoal ? handleEditGoal() : handleAddGoal();
-        }}
-      >
-        {/* Goal Name */}
-        <div className="form-group">
-          <label className="form-label">Tên mục tiêu *</label>
-          <input
-            type="text"
-            name="goal_name"
-            className="form-input"
-            placeholder="Ví dụ: Mua xe, Du lịch, ..."
-            value={formData.goal_name}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
+      <SavingWalletModal
+        isOpen={showAddForm || editingGoal}
+        onClose={closeForm}
+        onSave={editingGoal ? handleEditGoal : handleAddGoal}
+        editingGoal={editingGoal}
+        initialData={editingGoalData}
+      />
 
-        {/* Goal Icon */}
-        <div className="form-group">
-          <label className="form-label">Chọn biểu tượng</label>
-          <div className="goal-icons">
-            {['🚗','🏠','✈️','💍','🎓','💻','📱','🎸','👗','🎮','📚','💰'].map(icon => (
-              <div
-                key={icon}
-                className={`icon-option${formData.icon === icon ? ' selected' : ''}`}
-                onClick={() => handleIconSelect(icon)}
-                style={{ display: 'inline-block', cursor: 'pointer', fontSize: '1.5rem', margin: 4 }}
-              >
-                {icon}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Target Amount */}
-        <div className="form-group">
-          <label className="form-label">Số tiền mục tiêu *</label>
-          <div className="currency-input">
-            <input
-              type="number"
-              name="target_amount"
-              className="form-input"
-              placeholder="500000000"
-              value={formData.target_amount}
-              onChange={handleInputChange}
-              required
-            />
-            <span className="currency-symbol">VNĐ</span>
-          </div>
-        </div>
-
-        {/* Current Amount */}
-        <div className="form-group">
-          <label className="form-label">Số tiền hiện tại</label>
-          <div className="currency-input">
-            <input
-              type="number"
-              name="current_amount"
-              className="form-input"
-              placeholder="0"
-              value={formData.current_amount}
-              onChange={handleInputChange}
-            />
-            <span className="currency-symbol">VNĐ</span>
-          </div>
-        </div>
-
-        {/* Target Date */}
-        <div className="form-group">
-          <label className="form-label">Ngày dự kiến hoàn thành</label>
-          <input
-            type="date"
-            name="target_date"
-            className="form-input date-input"
-            value={formData.target_date}
-            onChange={handleInputChange}
-            min={new Date().toISOString().split('T')[0]}
-          />
-        </div>
-
-        {/* Monthly Saving Goal */}
-        <div className="form-group">
-          <label className="form-label">Mục tiêu tiết kiệm hàng tháng</label>
-          <div className="currency-input">
-            <input
-              type="number"
-              name="monthly_goal"
-              className="form-input"
-              placeholder="5000000"
-              value={formData.monthly_goal}
-              onChange={handleInputChange}
-            />
-            <span className="currency-symbol">VNĐ</span>
-          </div>
-        </div>
-
-        {/* Priority Level */}
-        <div className="form-group">
-          <label className="form-label">Mức độ ưu tiên</label>
-          <div className="priority-levels">
-            {[
-              { value: 'low', label: 'Thấp', icon: '🟢', desc: 'Không vội' },
-              { value: 'medium', label: 'Trung bình', icon: '🟡', desc: 'Bình thường' },
-              { value: 'high', label: 'Cao', icon: '🔴', desc: 'Khẩn cấp' }
-            ].map(({ value, label, icon, desc }) => (
-              <div
-                key={value}
-                className={`priority-option priority-${value}${formData.priority === value ? ' selected' : ''}`}
-                onClick={() => handlePrioritySelect(value)}
-                style={{ cursor: 'pointer', padding: 8, borderRadius: 8, marginRight: 8 }}
-              >
-                <div>{icon} {label}</div>
-                <small>{desc}</small>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Description */}
-        <div className="form-group">
-          <label className="form-label">Mô tả (tùy chọn)</label>
-          <textarea
-            className="form-input"
-            name="description"
-            rows="3"
-            placeholder="Mô tả chi tiết về mục tiêu của bạn..."
-            value={formData.description}
-            onChange={handleInputChange}
-          />
-        </div>
-
-        {/* Form Actions */}
-        <div className={styles.modalActions}>
-          <button
-            type="submit"
-            className={styles.saveBtn}
-          >
-            {editingGoal ? 'Update' : 'Save'}
-          </button>
-          <button type="button" onClick={closeForm} className={styles.cancelBtn}>
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
-
-      <div className={styles.goalsSection}>
-        <div className={styles.sectionHeader}>
+      <div className="goalsSection">
+        <div className="sectionHeader">
           <h2>Your Goals</h2>
         </div>
         
-        <div className={styles.goalsGrid}>
+        <div className="goalsGrid">
           {loading ? (
-            <div className={styles.loading}>Loading your savings goals...</div>
+            <div className="loading">Loading your savings goals...</div>
           ) : goals.length > 0 ? (
             goals.map((goal) => {
               const progressPercentage = goal.completion_percentage || 
                 (goal.target_amount > 0 ? (goal.current_amount / goal.target_amount) * 100 : 0);
               const remaining = Math.max(0, goal.target_amount - goal.current_amount);
               const isComplete = progressPercentage >= 100;
-
-              return (
-                <div key={goal.id} className={styles.card}>
-                  <div className={styles.cardHeader}>
-                    <div>
-                      <h3>{goal.goal_name}</h3>
-                      <div className={styles.target}>
-                        🎯 Target: {formatCurrency(goal.target_amount)}
-                      </div>
-                    </div>
-                    <div className={styles.actions}>
-                      <button onClick={() => openEditForm(goal.id)} title="Edit">
-                        ✏️
-                      </button>
-                      <button onClick={() => handleDelete(goal.id)} title="Delete">
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className={styles.cardContent}>
-                    <div className={styles.amountSection}>
-                      <div className={styles.amount}>
-                        🐷 {formatCurrency(goal.current_amount)}
-                      </div>
-                      
-                      <div className={styles.progressBar}>
-                        <div
-                          className={isComplete ? `${styles.progress} ${styles.complete}` : styles.progress}
-                          style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-                        />
-                      </div>
-                      
-                      <div className={styles.progressInfo}>
-                        <span className={styles.percent}>{progressPercentage.toFixed(0)}% Complete</span>
-                        {!isComplete && (
-                          <span className={styles.left}>{formatCurrency(remaining)} Left</span>
-                        )}
-                        {isComplete && (
-                          <span className={styles.achieved}>Goal Achieved! 🎉</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
             })
           ) : (
-            <div className={styles.emptyState}>
+            <div className="emptyState">
               <p>No savings goals set yet.</p>
               <p>Click 'Add Saving Goal' to create your first one!</p>
             </div>
