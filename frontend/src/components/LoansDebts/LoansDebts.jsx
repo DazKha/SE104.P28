@@ -128,6 +128,8 @@ function LoansDebts() {
   };
 
   const handleMarkPaid = async (id) => {
+    if (!window.confirm('Congratulation. You did it !!!'))
+      closeForm
     try {
       await loanService.updateStatus(id, 'paid');
       fetchItems();
@@ -136,6 +138,8 @@ function LoansDebts() {
       alert('Error marking as paid. Please try again.');
     }
   };
+
+
 
   const openEditForm = (itemId) => {
     const item = items.find(i => i.id === itemId);

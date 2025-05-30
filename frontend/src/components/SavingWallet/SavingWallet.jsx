@@ -222,153 +222,164 @@ function SavingWallet() {
       </div>
 
       {(showAddForm || editingGoal) && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h2>{editingGoal ? 'Cập nhật mục tiêu' : 'Tạo mục tiêu tiết kiệm mới'}</h2>
-            
-            {!editingGoal && (
-              <div className="form-container">
-                {/* Goal name */}
-                <div className="form-group">
-                  <label className="form-label">Tên mục tiêu</label>
-                  <input 
-                    type="text" 
-                    name="goal_name"
-                    className="form-input" 
-                    placeholder="Ví dụ: Mua xe, Du lịch, ..." 
-                    value={formData.goal_name}
-                    onChange={handleInputChange}
-                    required 
-                  />
-                </div>
+  <div className={styles.modalOverlay}>
+    <div className={styles.modal}>
+      <div className={styles.modalHeader}>
+        <h2 className={styles.modalTitle}>
+          {editingGoal ? 'Cập nhật mục tiêu' : 'Tạo mục tiêu tiết kiệm mới'}
+        </h2>
+        <button className={styles.closeBtn} onClick={closeForm}>×</button>
+      </div>
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          editingGoal ? handleEditGoal() : handleAddGoal();
+        }}
+      >
+        {/* Goal Name */}
+        <div className="form-group">
+          <label className="form-label">Tên mục tiêu *</label>
+          <input
+            type="text"
+            name="goal_name"
+            className="form-input"
+            placeholder="Ví dụ: Mua xe, Du lịch, ..."
+            value={formData.goal_name}
+            onChange={handleInputChange}
+            required
+          />
+        </div>
 
-                {/* Target amount */}
-                <div className="form-group">
-                  <label className="form-label">Số tiền mục tiêu *</label>
-                  <div className="currency-input">
-                    <input 
-                      type="number" 
-                      name="target_amount"
-                      className="form-input" 
-                      id="targetAmount" 
-                      placeholder="500000000" 
-                      value={formData.target_amount}
-                      onChange={handleInputChange}
-                      required 
-                    />
-                    <span className="currency-symbol">VNĐ</span>
-                  </div>
-                </div>
-
-                {/* Current money */}
-                <div className="form-group">
-                  <label className="form-label">Số tiền hiện tại</label>
-                  <div className="currency-input">
-                    <input 
-                      type="number" 
-                      name="current_amount"
-                      className="form-input" 
-                      id="currentAmount" 
-                      placeholder="0" 
-                      value={formData.current_amount}
-                      onChange={handleInputChange}
-                    />
-                    <span className="currency-symbol">VNĐ</span>
-                  </div>
-                </div>
-
-                {/* Target Date */}
-                <div className="form-group">
-                  <label className="form-label">Ngày dự kiến hoàn thành</label>
-                  <input 
-                    type="date" 
-                    name="target_date"
-                    className="form-input date-input" 
-                    id="targetDate"
-                    value={formData.target_date}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                {/* Monthly Saving Goal */}
-                <div className="form-group">
-                  <label className="form-label">Mục tiêu tiết kiệm hàng tháng</label>
-                  <div className="currency-input">
-                    <input 
-                      type="number" 
-                      name="monthly_goal"
-                      className="form-input" 
-                      id="monthlyGoal" 
-                      placeholder="5000000"
-                      value={formData.monthly_goal}
-                      onChange={handleInputChange}
-                    />
-                    <span className="currency-symbol">VNĐ</span>
-                  </div>
-                  <div className="calculation-preview" id="calculationPreview" style={{ display: 'none' }}>
-                    <div className="calculation-title">Dự kiến hoàn thành:</div>
-                    <div className="calculation-value" id="completionEstimate"></div>
-                  </div>
-                </div>
-
-                {/* Priority Level */}
-                <div className="form-group">
-                  <label className="form-label">Mức độ ưu tiên</label>
-                  <div className="priority-levels">
-                    {[
-                      { value: 'low', label: 'Thấp', icon: '🟢', desc: 'Không vội' },
-                      { value: 'medium', label: 'Trung bình', icon: '🟡', desc: 'Bình thường' },
-                      { value: 'high', label: 'Cao', icon: '🔴', desc: 'Khẩn cấp' }
-                    ].map(({ value, label, icon, desc }) => (
-                      <div 
-                        key={value}
-                        className={`priority-option priority-${value} ${formData.priority === value ? 'selected' : ''}`}
-                        onClick={() => handlePrioritySelect(value)}
-                      >
-                        <div>{icon} {label}</div>
-                        <small>{desc}</small>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div className="form-group">
-                  <label className="form-label">Mô tả (tùy chọn)</label>
-                  <textarea 
-                    className="form-input" 
-                    name="description"
-                    rows="3" 
-                    placeholder="Mô tả chi tiết về mục tiêu của bạn..."
-                    value={formData.description}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-            )}
-            
-            {editingGoal && (
-              <CurrencyInput
-                placeholder="Current amount"
-                value={formData.current_amount}
-                onChange={(e) => setFormData(prev => ({ ...prev, current_amount: e.target.value }))}
-              />
-            )}
-            
-            <div className={styles.modalActions}>
-              <button 
-                onClick={editingGoal ? handleEditGoal : handleAddGoal}
-                className={styles.saveBtn}
+        {/* Goal Icon */}
+        <div className="form-group">
+          <label className="form-label">Chọn biểu tượng</label>
+          <div className="goal-icons">
+            {['🚗','🏠','✈️','💍','🎓','💻','📱','🎸','👗','🎮','📚','💰'].map(icon => (
+              <div
+                key={icon}
+                className={`icon-option${formData.icon === icon ? ' selected' : ''}`}
+                onClick={() => handleIconSelect(icon)}
+                style={{ display: 'inline-block', cursor: 'pointer', fontSize: '1.5rem', margin: 4 }}
               >
-                {editingGoal ? 'Update' : 'Save'}
-              </button>
-              <button onClick={closeForm} className={styles.cancelBtn}>
-                Cancel
-              </button>
-            </div>
+                {icon}
+              </div>
+            ))}
           </div>
         </div>
-      )}
+
+        {/* Target Amount */}
+        <div className="form-group">
+          <label className="form-label">Số tiền mục tiêu *</label>
+          <div className="currency-input">
+            <input
+              type="number"
+              name="target_amount"
+              className="form-input"
+              placeholder="500000000"
+              value={formData.target_amount}
+              onChange={handleInputChange}
+              required
+            />
+            <span className="currency-symbol">VNĐ</span>
+          </div>
+        </div>
+
+        {/* Current Amount */}
+        <div className="form-group">
+          <label className="form-label">Số tiền hiện tại</label>
+          <div className="currency-input">
+            <input
+              type="number"
+              name="current_amount"
+              className="form-input"
+              placeholder="0"
+              value={formData.current_amount}
+              onChange={handleInputChange}
+            />
+            <span className="currency-symbol">VNĐ</span>
+          </div>
+        </div>
+
+        {/* Target Date */}
+        <div className="form-group">
+          <label className="form-label">Ngày dự kiến hoàn thành</label>
+          <input
+            type="date"
+            name="target_date"
+            className="form-input date-input"
+            value={formData.target_date}
+            onChange={handleInputChange}
+            min={new Date().toISOString().split('T')[0]}
+          />
+        </div>
+
+        {/* Monthly Saving Goal */}
+        <div className="form-group">
+          <label className="form-label">Mục tiêu tiết kiệm hàng tháng</label>
+          <div className="currency-input">
+            <input
+              type="number"
+              name="monthly_goal"
+              className="form-input"
+              placeholder="5000000"
+              value={formData.monthly_goal}
+              onChange={handleInputChange}
+            />
+            <span className="currency-symbol">VNĐ</span>
+          </div>
+        </div>
+
+        {/* Priority Level */}
+        <div className="form-group">
+          <label className="form-label">Mức độ ưu tiên</label>
+          <div className="priority-levels">
+            {[
+              { value: 'low', label: 'Thấp', icon: '🟢', desc: 'Không vội' },
+              { value: 'medium', label: 'Trung bình', icon: '🟡', desc: 'Bình thường' },
+              { value: 'high', label: 'Cao', icon: '🔴', desc: 'Khẩn cấp' }
+            ].map(({ value, label, icon, desc }) => (
+              <div
+                key={value}
+                className={`priority-option priority-${value}${formData.priority === value ? ' selected' : ''}`}
+                onClick={() => handlePrioritySelect(value)}
+                style={{ cursor: 'pointer', padding: 8, borderRadius: 8, marginRight: 8 }}
+              >
+                <div>{icon} {label}</div>
+                <small>{desc}</small>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="form-group">
+          <label className="form-label">Mô tả (tùy chọn)</label>
+          <textarea
+            className="form-input"
+            name="description"
+            rows="3"
+            placeholder="Mô tả chi tiết về mục tiêu của bạn..."
+            value={formData.description}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        {/* Form Actions */}
+        <div className={styles.modalActions}>
+          <button
+            type="submit"
+            className={styles.saveBtn}
+          >
+            {editingGoal ? 'Update' : 'Save'}
+          </button>
+          <button type="button" onClick={closeForm} className={styles.cancelBtn}>
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
 
       <div className={styles.goalsSection}>
         <div className={styles.sectionHeader}>

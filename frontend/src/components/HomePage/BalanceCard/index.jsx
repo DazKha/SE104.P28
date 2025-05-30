@@ -27,7 +27,7 @@ const BalanceCard = ({ balance, onAddTransaction }) => {
     <div className="balance-card">
       <div className="card-header">
         <h2>Current Balance</h2>
-        <button className="add-btn" onClick={openModal}>+ Add Expense</button> 
+        <button className="add-btn" onClick={openModal}>➕ Add Loan/Debt</button> 
       </div>
       <div className="balance-amount">
         {formattedBalance}

@@ -176,20 +176,6 @@ const RegisterForm = ({ onSuccess }) => {
           {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
         </div>
         
-        <div className="form-group checkbox-group">
-          <input
-            type="checkbox"
-            id="agreeTerms"
-            name="agreeTerms"
-            checked={formData.agreeTerms}
-            onChange={handleChange}
-          />
-          <label htmlFor="agreeTerms">
-            Tôi đồng ý với <Link to="/terms" className="terms-link">Điều khoản sử dụng</Link> và <Link to="/privacy" className="terms-link">Chính sách bảo mật</Link>
-          </label>
-          {errors.agreeTerms && <span className="error-message">{errors.agreeTerms}</span>}
-        </div>
-        
         <button type="submit" className="submit-button" disabled={isSubmitting}>
           {isSubmitting ? 'Đang xử lý...' : 'Đăng ký'}
         </button>
