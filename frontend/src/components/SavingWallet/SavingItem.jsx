@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './SavingWallet.module.css';
+import styles from './SavingWallet.css';
 
 function SavingItem({ saving, onEdit, onDelete }) {
   const progressPercentage = saving.target_amount > 0 

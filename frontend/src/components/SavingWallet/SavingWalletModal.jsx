@@ -80,8 +80,17 @@ function SavingWalletModal({ isOpen, onClose, onSave, editingGoal, initialData }
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // Ensure value is a string for parsing if needed later, though CurrencyInput should provide digit string
-    const processedValue = String(value);
+    // For CurrencyInput, value might be a formatted string, we need to clean it
+    let processedValue = value;
+    if (name === 'target_amount' || name === 'current_amount' || name === 'monthly_goal') {
+        // Remove any non-digit characters except decimal point
+        processedValue = value.replace(/[^\d.]/g, '');
+        // Ensure only one decimal point
+        const parts = processedValue.split('.');
+        if (parts.length > 2) {
+            processedValue = parts[0] + '.' + parts.slice(1).join('');
+        }
+    }
 
     setFormData(prev => ({
       ...prev,
