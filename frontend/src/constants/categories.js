@@ -1,4 +1,4 @@
-export const expenseCategories = [
+export const outcomeCategories = [
   'Ăn uống',
   'Di chuyển',
   'Thuê nhà',
@@ -26,7 +26,7 @@ export const incomeCategories = [
 
 // Map categories to their Vietnamese names
 export const categoryLabels = {
-  // Expense categories
+  // Outcome categories
   'Ăn uống': 'Ăn uống',
   'Di chuyển': 'Di chuyển',
   'Thuê nhà': 'Thuê nhà',

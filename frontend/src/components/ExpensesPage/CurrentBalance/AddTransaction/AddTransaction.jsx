@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { expenseCategories, incomeCategories } from '../../../../constants/categories';
+import { outcomeCategories, incomeCategories } from '../../../../constants/categories';
 import CurrencyInput from '../../../common/CurrencyInput.jsx';
 import './AddTransaction.css';
 
 const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
-  const [transactionType, setTransactionType] = useState('Expense');
+  const [transactionType, setTransactionType] = useState('Outcome');
   const [amount, setAmount] = useState(0);
-  const [category, setCategory] = useState(expenseCategories[0]); // Default to first expense category
+  const [category, setCategory] = useState(outcomeCategories[0]); // Default to first outcome category
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(
     new Date().toISOString().split('T')[0]
@@ -17,7 +17,7 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
   // Update category when transaction type changes
   useEffect(() => {
     // Reset category to first item of the new type
-    const newCategory = transactionType === 'Income' ? incomeCategories[0] : expenseCategories[0];
+    const newCategory = transactionType === 'Income' ? incomeCategories[0] : outcomeCategories[0];
     setCategory(newCategory);
   }, [transactionType]);
 
@@ -66,7 +66,7 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
   const resetForm = () => {
     setTransactionType('Outcome');
     setAmount(0);
-    setCategory(expenseCategories[0]);
+    setCategory(outcomeCategories[0]);
     setDescription('');
     setDate(new Date().toISOString().split('T')[0]);
   };
@@ -77,7 +77,7 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
   };
 
   // Get current categories based on transaction type
-  const currentCategories = transactionType === 'Income' ? incomeCategories : expenseCategories;
+  const currentCategories = transactionType === 'Income' ? incomeCategories : outcomeCategories;
 
   if (!isOpen) return null;
 

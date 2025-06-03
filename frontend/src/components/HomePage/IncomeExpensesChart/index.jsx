@@ -31,14 +31,14 @@ const IncomeExpensesChart = ({ transactions }) => {
           .filter(t => t.type === 'income')
           .reduce((sum, t) => sum + Math.abs(parseFloat(t.amount)), 0);
 
-        const expenses = dayTransactions
+        const outcome = dayTransactions
           .filter(t => t.type === 'outcome')
           .reduce((sum, t) => sum + Math.abs(parseFloat(t.amount)), 0);
 
         data.push({
           name: dayName,
           income,
-          expenses
+          outcome
         });
       }
     } else {
@@ -58,14 +58,14 @@ const IncomeExpensesChart = ({ transactions }) => {
           .filter(t => t.type === 'income')
           .reduce((sum, t) => sum + Math.abs(parseFloat(t.amount)), 0);
 
-        const expenses = monthTransactions
+        const outcome = monthTransactions
           .filter(t => t.type === 'outcome')
           .reduce((sum, t) => sum + Math.abs(parseFloat(t.amount)), 0);
 
         data.push({
           name: monthName,
           income,
-          expenses
+          outcome
         });
       }
     }
@@ -97,7 +97,7 @@ const IncomeExpensesChart = ({ transactions }) => {
   return (
     <div className="card chart-card">
       <div className="card-header">
-        <h2>Income vs Expenses ({viewType})</h2>
+        <h2>Income vs Outcome ({viewType})</h2>
         <button className="view-toggle" onClick={toggleView}>
           Show {viewType === 'weekly' ? 'Monthly' : 'Weekly'}
         </button>
@@ -108,8 +108,8 @@ const IncomeExpensesChart = ({ transactions }) => {
           <span>Income</span>
         </div>
         <div className="legend-item">
-          <span className="legend-color expenses-color"></span>
-          <span>Expenses</span>
+          <span className="legend-color outcome-color"></span>
+          <span>Outcome</span>
         </div>
       </div>
       <div className="chart-container">
@@ -146,10 +146,10 @@ const IncomeExpensesChart = ({ transactions }) => {
                   animationDuration={500}
                 />
                 <Bar 
-                  dataKey="expenses" 
+                  dataKey="outcome" 
                   fill="#2196F3" 
                   radius={[4, 4, 0, 0]}
-                  name="Expenses"
+                  name="Outcome"
                   animationDuration={500}
                 />
               </BarChart>

@@ -88,11 +88,11 @@
 }
 
 .income-color {
-  background: linear-gradient(135deg, #4CAF50, #45a049);
+  background-color: #4CAF50;
 }
 
-.expenses-color {
-  background: linear-gradient(135deg, #2196F3, #1e88e5);
+.outcome-color {
+  background-color: #2196F3;
 }
 
 .chart-container {

@@ -16,10 +16,11 @@ const HomePage = () => {
     const newBalance = transactions.reduce((total, transaction) => {
       const amount = parseFloat(transaction.amount);
       if (transaction.type === 'income') {
-        return total + amount;
-      } else {
-        return total - amount;
+        return total + amount; // Cộng thêm số tiền thu nhập
+      } else if (transaction.type === 'outcome') {
+        return total - amount; // Trừ đi số tiền chi tiêu
       }
+      return total;
     }, 0);
     
     setBalance(newBalance);
@@ -49,7 +50,8 @@ const HomePage = () => {
     const transactionWithId = {
       ...newTransaction,
       id: Date.now(), // Sử dụng timestamp làm id
-      date: new Date().toISOString() // Thêm ngày hiện tại nếu chưa có
+      date: new Date().toISOString(), // Thêm ngày hiện tại nếu chưa có
+      amount: Math.abs(parseFloat(newTransaction.amount)) // Đảm bảo số tiền luôn là số dương
     };
 
     setTransactions([transactionWithId, ...transactions]);
