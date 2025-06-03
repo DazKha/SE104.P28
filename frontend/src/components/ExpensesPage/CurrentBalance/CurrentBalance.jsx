@@ -43,7 +43,7 @@ const CurrentBalance = ({ onAddTransaction }) => {
 
     transactions.forEach(tx => {
       if (tx.type === 'income') income += tx.amount;
-      else if (tx.type === 'expense') outcome += tx.amount;
+      else if (tx.type === 'outcome') outcome += tx.amount;
     });
 
     setTotalIncome(income);

@@ -12,6 +12,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
     console.log('Connected to SQLite database');
   }
 });
+
 // Tạo schema và chèn dữ liệu mẫu
 db.serialize(() => {
   // 1. Tạo bảng users

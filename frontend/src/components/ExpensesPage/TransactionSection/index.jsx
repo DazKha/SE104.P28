@@ -114,7 +114,7 @@ const TransactionSection = () => {
 
     // Tạo giao dịch mới với ID duy nhất
     const amount = Number(newTransaction.amount);
-    const finalAmount = newTransaction.type === 'expense' ? -Math.abs(amount) : Math.abs(amount);
+    const finalAmount = newTransaction.type === 'income' ? Math.abs(amount) : -Math.abs(amount);
     
     const transaction = {
       id: Date.now(),

@@ -3,7 +3,7 @@ import CurrencyInput from '../../../common/CurrencyInput.jsx';
 import './AddTransaction.css';
 
 const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
-  const [transactionType, setTransactionType] = useState('Income');
+  const [transactionType, setTransactionType] = useState('income');
   const [amount, setAmount] = useState(0);
   const [category, setCategory] = useState('Không xác định');
   const [description, setDescription] = useState('');
@@ -41,7 +41,7 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
 
   // Update category when transaction type changes
   useEffect(() => {
-    setCategory(transactionType === 'Income' ? incomeCategories[0] : expenseCategories[0]);
+    setCategory(transactionType === 'income' ? incomeCategories[0] : expenseCategories[0]);
   }, [transactionType]);
 
   // Close category popup when clicking outside
@@ -87,7 +87,7 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
   };
 
   const resetForm = () => {
-    setTransactionType('Expense');
+    setTransactionType('outcome');
     setAmount(0);
     setCategory(expenseCategories[0]);
     setDescription('');
@@ -115,15 +115,15 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
             <div className="transaction-type-buttons">
               <button
                 type="button"
-                className={`type-btn ${transactionType === 'Income' ? 'active' : ''}`}
-                onClick={() => setTransactionType('Income')}
+                className={`type-btn ${transactionType === 'income' ? 'active' : ''}`}
+                onClick={() => setTransactionType('income')}
               >
                 Thu nhập
               </button>
               <button
                 type="button"
-                className={`type-btn ${transactionType === 'Expense' ? 'active' : ''}`}
-                onClick={() => setTransactionType('Expense')}
+                className={`type-btn ${transactionType === 'outcome' ? 'active' : ''}`}
+                onClick={() => setTransactionType('outcome')}
               >
                 Chi tiêu
               </button>
@@ -140,9 +140,9 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
             />
           </div>
           
-          <div className="form-group" ref={categoryRef}>
-            <label htmlFor="category">Danh mục</label>
-            <div className="category-select">
+          <div className="form-group">
+            <label>Danh mục</label>
+            <div className="category-select" ref={categoryRef}>
               <button
                 type="button"
                 className="category-select-button"
@@ -153,7 +153,7 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
               </button>
               {isCategoryOpen && (
                 <div className="category-popup">
-                  {(transactionType === 'Income' ? incomeCategories : expenseCategories).map((cat) => (
+                  {(transactionType === 'income' ? incomeCategories : expenseCategories).map((cat) => (
                     <button
                       key={cat}
                       type="button"
@@ -170,29 +170,34 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
 
           <div className="form-group">
             <label htmlFor="description">Mô tả</label>
-            <input 
-              type="text" 
-              id="description" 
-              value={description} 
+            <input
+              type="text"
+              id="description"
+              value={description}
               onChange={(e) => setDescription(e.target.value)}
+              placeholder="Nhập mô tả giao dịch"
               required
             />
           </div>
 
           <div className="form-group">
             <label htmlFor="date">Ngày</label>
-            <input 
-              type="date" 
-              id="date" 
-              value={date} 
+            <input
+              type="date"
+              id="date"
+              value={date}
               onChange={(e) => setDate(e.target.value)}
               required
             />
           </div>
-          
+
           <div className="button-group">
-            <button type="button" onClick={onClose} className="cancel-btn">Hủy</button>
-            <button type="submit" className="submit-btn">Thêm giao dịch</button>
+            <button type="button" className="cancel-btn" onClick={onClose}>
+              Hủy
+            </button>
+            <button type="submit" className="submit-btn">
+              Thêm giao dịch
+            </button>
           </div>
         </form>
       </div>

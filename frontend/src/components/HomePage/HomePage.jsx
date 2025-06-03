@@ -14,10 +14,11 @@ const HomePage = () => {
   // Calculate balance whenever transactions change
   useEffect(() => {
     const newBalance = transactions.reduce((total, transaction) => {
-      if (transaction.type === 'Income') {
-        return total + transaction.amount;
+      const amount = parseFloat(transaction.amount);
+      if (transaction.type === 'income') {
+        return total + amount;
       } else {
-        return total - transaction.amount;
+        return total - amount;
       }
     }, 0);
     
@@ -52,12 +53,6 @@ const HomePage = () => {
     };
 
     setTransactions([transactionWithId, ...transactions]);
-
-    if (newTransaction.type === 'Income') {
-      setBalance(balance + parseFloat(newTransaction.amount));
-    } else {
-      setBalance(balance - parseFloat(newTransaction.amount));
-    }
   };
 
   return (

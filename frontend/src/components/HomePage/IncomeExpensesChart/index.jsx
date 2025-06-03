@@ -9,7 +9,7 @@ const IncomeExpensesChart = ({ transactions }) => {
   // Memoize the processed data to avoid unnecessary recalculations
   const chartData = useMemo(() => {
     if (!transactions) {
-        return [];
+      return [];
     }
 
     const now = new Date();
@@ -28,12 +28,12 @@ const IncomeExpensesChart = ({ transactions }) => {
         });
 
         const income = dayTransactions
-          .filter(t => t.type === 'Income')
-          .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+          .filter(t => t.type === 'income')
+          .reduce((sum, t) => sum + Math.abs(parseFloat(t.amount)), 0);
 
         const expenses = dayTransactions
-          .filter(t => t.type === 'Expense')
-          .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+          .filter(t => t.type === 'outcome')
+          .reduce((sum, t) => sum + Math.abs(parseFloat(t.amount)), 0);
 
         data.push({
           name: dayName,
@@ -55,12 +55,12 @@ const IncomeExpensesChart = ({ transactions }) => {
         });
 
         const income = monthTransactions
-          .filter(t => t.type === 'Income')
-          .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+          .filter(t => t.type === 'income')
+          .reduce((sum, t) => sum + Math.abs(parseFloat(t.amount)), 0);
 
         const expenses = monthTransactions
-          .filter(t => t.type === 'Expense')
-          .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+          .filter(t => t.type === 'outcome')
+          .reduce((sum, t) => sum + Math.abs(parseFloat(t.amount)), 0);
 
         data.push({
           name: monthName,

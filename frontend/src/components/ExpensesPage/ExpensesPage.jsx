@@ -21,10 +21,12 @@ const ExpensesPage = () => {
     try {
       const data = await expenseService.getAll();
       setTransactions(data);
-      // Calculate initial balance
+      
+      // Calculate balance from API data
       const totalBalance = data.reduce((sum, transaction) => {
-        return sum + (transaction.type === 'Income' ? transaction.amount : -transaction.amount);
+        return sum + (transaction.type === 'income' ? transaction.amount : -transaction.amount);
       }, 0);
+      
       setBalance(totalBalance);
     } catch (err) {
       setError('Failed to fetch transactions');
@@ -54,9 +56,14 @@ const ExpensesPage = () => {
   // Handle adding new transaction
   const handleAddTransaction = async (newTransaction) => {
     try {
+      // Save to API
       const savedTransaction = await expenseService.create(newTransaction);
+      
+      // Update local state
       setTransactions(prev => [...prev, savedTransaction]);
-      setBalance(prev => prev + (savedTransaction.type === 'Income' ? savedTransaction.amount : -savedTransaction.amount));
+      
+      // Update balance
+      setBalance(prev => prev + (savedTransaction.type === 'income' ? savedTransaction.amount : -savedTransaction.amount));
     } catch (err) {
       setError('Failed to add transaction');
       console.error('Error adding transaction:', err);
@@ -67,13 +74,17 @@ const ExpensesPage = () => {
   const handleUpdateTransaction = async (id, updatedData) => {
     try {
       const updatedTransaction = await expenseService.update(id, updatedData);
+      
+      // Update local state
       setTransactions(prev => prev.map(transaction => 
         transaction._id === id ? updatedTransaction : transaction
       ));
+      
       // Recalculate balance
       const newBalance = transactions.reduce((sum, transaction) => {
-        return sum + (transaction.type === 'Income' ? transaction.amount : -transaction.amount);
+        return sum + (transaction.type === 'income' ? transaction.amount : -transaction.amount);
       }, 0);
+      
       setBalance(newBalance);
     } catch (err) {
       setError('Failed to update transaction');
@@ -85,11 +96,15 @@ const ExpensesPage = () => {
   const handleDeleteTransaction = async (id) => {
     try {
       await expenseService.delete(id);
+      
+      // Update local state
       setTransactions(prev => prev.filter(transaction => transaction._id !== id));
+      
       // Recalculate balance
       const newBalance = transactions.reduce((sum, transaction) => {
-        return sum + (transaction.type === 'Income' ? transaction.amount : -transaction.amount);
+        return sum + (transaction.type === 'income' ? transaction.amount : -transaction.amount);
       }, 0);
+      
       setBalance(newBalance);
     } catch (err) {
       setError('Failed to delete transaction');

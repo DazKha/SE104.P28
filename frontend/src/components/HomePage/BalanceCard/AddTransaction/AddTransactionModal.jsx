@@ -3,7 +3,7 @@ import CurrencyInput from '../../../common/CurrencyInput.jsx';
 import './AddTransactionModal.css';
 
 const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
-  const [transactionType, setTransactionType] = useState('Income');
+  const [transactionType, setTransactionType] = useState('income');
   const [amount, setAmount] = useState(0);
   const [category, setCategory] = useState('Không xác định');
   const [description, setDescription] = useState('');
@@ -34,7 +34,7 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
   };
 
   const resetForm = () => {
-    setTransactionType('Expense');
+    setTransactionType('outcome');
     setAmount(0);
     setCategory('Không xác định');
     setDescription('');
@@ -60,8 +60,8 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
               onChange={(e) => setTransactionType(e.target.value)}
               required
             >
-              <option value="Income">Income</option>
-              <option value="Expense">Expense</option>
+              <option value="income">Income</option>
+              <option value="outcome">Expense</option>
             </select>
           </div>
 
