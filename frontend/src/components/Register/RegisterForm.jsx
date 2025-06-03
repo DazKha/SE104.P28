@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from '../../axiosConfig';
 
 const RegisterForm = ({ onSuccess }) => {
+  const navigate = useNavigate();
   // State for form fields
   const [formData, setFormData] = useState({
     name: '',
@@ -85,29 +87,21 @@ const RegisterForm = ({ onSuccess }) => {
     }
     
     try {
-      const response = await fetch('http://localhost:3000/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password
-        })
+      const response = await axios.post('/auth/register', {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Đăng ký thất bại');
-      }
-
       if (onSuccess) {
-        onSuccess(data);
+        onSuccess(response.data);
       }
+
+      // Redirect to login page after successful registration
+      navigate('/login');
     } catch (error) {
-      setApiError(error.message);
+      console.error('Registration error:', error);
+      setApiError(error.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.');
     } finally {
       setIsSubmitting(false);
     }
@@ -174,20 +168,6 @@ const RegisterForm = ({ onSuccess }) => {
             placeholder="Nhập lại mật khẩu của bạn"
           />
           {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
-        </div>
-        
-        <div className="form-group checkbox-group">
-          <input
-            type="checkbox"
-            id="agreeTerms"
-            name="agreeTerms"
-            checked={formData.agreeTerms}
-            onChange={handleChange}
-          />
-          <label htmlFor="agreeTerms">
-            Tôi đồng ý với <Link to="/terms" className="terms-link">Điều khoản sử dụng</Link> và <Link to="/privacy" className="terms-link">Chính sách bảo mật</Link>
-          </label>
-          {errors.agreeTerms && <span className="error-message">{errors.agreeTerms}</span>}
         </div>
         
         <button type="submit" className="submit-button" disabled={isSubmitting}>
