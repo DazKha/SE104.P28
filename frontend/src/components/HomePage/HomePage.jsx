@@ -3,6 +3,7 @@ import './HomePage.css';
 import BalanceCard from './BalanceCard';
 import RecentExpenses from './RecentExpenses';
 import IncomeExpensesChart from './IncomeExpensesChart/index.jsx';
+import transactionService from '../../services/transactionService';
 
 const HomePage = () => {
   const [transactions, setTransactions] = useState(() => {

@@ -4,7 +4,7 @@
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  background-color: rgba(0, 0, 0, 0.5) !important;
+  background-color: rgba(0, 0, 0, 0.7) !important;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
@@ -15,9 +15,9 @@
 }
 
 .modal-content {
-  background: white !important;
+  background: #1a1a1a !important;
   padding: 2rem !important;
-  border-radius: 8px !important;
+  border-radius: 12px !important;
   width: 90% !important;
   max-width: 500px !important;
   max-height: 90vh !important;
@@ -28,8 +28,9 @@
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-  color: #000 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 .modal-header {
@@ -37,12 +38,15 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 1rem;
 }
 
 .modal-header h2 {
   margin: 0;
-  color: #333;
+  color: #fff;
   font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .close-btn {
@@ -50,7 +54,7 @@
   border: none;
   font-size: 24px !important;
   cursor: pointer;
-  color: #000 !important;
+  color: #fff !important;
   padding: 0.5rem;
   line-height: 1;
   display: flex;
@@ -59,12 +63,12 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .close-btn:hover {
-  background-color: #f0f0f0;
-  color: #000 !important;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff !important;
 }
 
 .form-group {
@@ -74,23 +78,26 @@
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #000 !important;
+  color: #fff !important;
   font-weight: 500;
 }
 
 .form-group input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   font-size: 1rem;
-  color: #000 !important;
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.2s;
 }
 
 .form-group input:focus {
   outline: none;
   border-color: #4a90e2;
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .transaction-type-buttons {
@@ -101,12 +108,17 @@
 .type-btn {
   flex: 1;
   padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
   cursor: pointer;
   font-size: 1rem;
   transition: all 0.2s;
+  color: #fff;
+}
+
+.type-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .type-btn.active {
@@ -122,20 +134,25 @@
 .category-select-button {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
   text-align: left;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #000 !important;
+  color: #fff !important;
+  transition: all 0.2s;
+}
+
+.category-select-button:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .category-arrow {
   font-size: 0.8rem;
-  color: #666;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .category-popup {
@@ -143,14 +160,14 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   margin-top: 0.5rem;
   max-height: 200px;
   overflow-y: auto;
   z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .category-option {
@@ -160,17 +177,17 @@
   background: none;
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.2s;
-  color: #000 !important;
+  transition: all 0.2s;
+  color: #fff !important;
 }
 
 .category-option:hover {
-  background-color: #f5f5f5;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .category-option.selected {
-  background-color: #e3f2fd;
-  color: #4a90e2;
+  background: rgba(74, 144, 226, 0.2);
+  color: #4a90e2 !important;
 }
 
 .button-group {
@@ -182,21 +199,20 @@
 .cancel-btn, .submit-btn {
   flex: 1;
   padding: 0.75rem;
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .cancel-btn {
-  background: white;
-  border: 1px solid #ddd;
-  color: #000 !important;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff !important;
 }
 
 .cancel-btn:hover {
-  background: #f5f5f5;
-  color: #000 !important;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .submit-btn {
