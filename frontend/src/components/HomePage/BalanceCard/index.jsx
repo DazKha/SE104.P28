@@ -5,10 +5,17 @@ import AddTransactionModal from './AddTransaction/AddTransactionModal.jsx';
 const BalanceCard = ({ balance, onAddTransaction }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const openModal = () => 
+  const openModal = () => {
+    console.log('Opening modal...');
     setIsModalOpen(true);
-  const closeModal = () => 
+    console.log('Modal state after opening:', isModalOpen);
+  };
+  
+  const closeModal = () => {
+    console.log('Closing modal...');
     setIsModalOpen(false);
+    console.log('Modal state after closing:', isModalOpen);
+  };
 
   const handleAddTransaction = (transaction) => {
     if (onAddTransaction) {
@@ -22,6 +29,8 @@ const BalanceCard = ({ balance, onAddTransaction }) => {
     style: 'currency',
     currency: 'VND'
   }).format(balance);
+
+  console.log('Current modal state:', isModalOpen);
 
   return (
     <div className="balance-card">

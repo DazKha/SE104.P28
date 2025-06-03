@@ -1,25 +1,35 @@
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 9999 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 .modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
+  background: white !important;
+  padding: 2rem !important;
+  border-radius: 8px !important;
+  width: 90% !important;
+  max-width: 500px !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  position: relative !important;
+  z-index: 10000 !important;
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  color: #000 !important;
 }
 
 .modal-header {
@@ -38,14 +48,23 @@
 .close-btn {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 24px !important;
   cursor: pointer;
-  color: #666;
+  color: #000 !important;
   padding: 0.5rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
 }
 
 .close-btn:hover {
-  color: #333;
+  background-color: #f0f0f0;
+  color: #000 !important;
 }
 
 .form-group {
@@ -55,7 +74,7 @@
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #333;
+  color: #000 !important;
   font-weight: 500;
 }
 
@@ -65,6 +84,7 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
+  color: #000 !important;
 }
 
 .form-group input:focus {
@@ -110,6 +130,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: #000 !important;
 }
 
 .category-arrow {
@@ -140,6 +161,7 @@
   text-align: left;
   cursor: pointer;
   transition: background-color 0.2s;
+  color: #000 !important;
 }
 
 .category-option:hover {
@@ -169,11 +191,12 @@
 .cancel-btn {
   background: white;
   border: 1px solid #ddd;
-  color: #666;
+  color: #000 !important;
 }
 
 .cancel-btn:hover {
   background: #f5f5f5;
+  color: #000 !important;
 }
 
 .submit-btn {

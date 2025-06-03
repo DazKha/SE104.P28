@@ -4,6 +4,8 @@ import CurrencyInput from '../../../common/CurrencyInput.jsx';
 import './AddTransactionModal.css';
 
 const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
+  console.log('Modal render - isOpen:', isOpen); // Debug log
+
   const [transactionType, setTransactionType] = useState('Expense');
   const [amount, setAmount] = useState(0);
   const [category, setCategory] = useState(expenseCategories[0]);
@@ -36,13 +38,15 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
 
   useEffect(() => {
     if (isOpen) {
-      document.body.classList.add('modal-open');
+      document.body.style.overflow = 'hidden';
+      console.log('Modal opened - body overflow hidden'); // Debug log
     } else {
-      document.body.classList.remove('modal-open');
+      document.body.style.overflow = 'unset';
+      console.log('Modal closed - body overflow reset'); // Debug log
     }
 
     return () => {
-      document.body.classList.remove('modal-open');
+      document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
 
@@ -78,7 +82,12 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
   // Get current categories based on transaction type
   const currentCategories = transactionType === 'Income' ? incomeCategories : expenseCategories;
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    console.log('Modal not rendered - isOpen is false'); // Debug log
+    return null;
+  }
+
+  console.log('Rendering modal content'); // Debug log
 
   return (
     <div className="modal-overlay" onClick={onClose}>
