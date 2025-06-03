@@ -6,7 +6,7 @@ import './AddTransactionModal.css';
 const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
   console.log('Modal render - isOpen:', isOpen); // Debug log
 
-  const [transactionType, setTransactionType] = useState('Outcome');
+  const [transactionType, setTransactionType] = useState('outcome');
   const [amount, setAmount] = useState(0);
   const [category, setCategory] = useState(outcomeCategories[0]);
   const [description, setDescription] = useState('');
@@ -18,7 +18,7 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
 
   // Update category when transaction type changes
   useEffect(() => {
-    const newCategory = transactionType === 'Income' ? incomeCategories[0] : outcomeCategories[0];
+    const newCategory = transactionType === 'income' ? incomeCategories[0] : outcomeCategories[0];
     setCategory(newCategory);
   }, [transactionType]);
 
@@ -67,7 +67,7 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
   };
 
   const resetForm = () => {
-    setTransactionType('Outcome');
+    setTransactionType('outcome');
     setAmount(0);
     setCategory(outcomeCategories[0]);
     setDescription('');
@@ -80,7 +80,7 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
   };
 
   // Get current categories based on transaction type
-  const currentCategories = transactionType === 'Income' ? incomeCategories : outcomeCategories;
+  const currentCategories = transactionType === 'income' ? incomeCategories : outcomeCategories;
 
   if (!isOpen) {
     console.log('Modal not rendered - isOpen is false'); // Debug log
@@ -103,15 +103,15 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
             <div className="transaction-type-buttons">
               <button
                 type="button"
-                className={`type-btn ${transactionType === 'Income' ? 'active' : ''}`}
-                onClick={() => setTransactionType('Income')}
+                className={`type-btn ${transactionType === 'income' ? 'active' : ''}`}
+                onClick={() => setTransactionType('income')}
               >
                 Thu nhập
               </button>
               <button
                 type="button"
-                className={`type-btn ${transactionType === 'Outcome' ? 'active' : ''}`}
-                onClick={() => setTransactionType('Outcome')}
+                className={`type-btn ${transactionType === 'outcome' ? 'active' : ''}`}
+                onClick={() => setTransactionType('outcome')}
               >
                 Chi tiêu
               </button>

@@ -53,7 +53,7 @@ const TransactionSection = () => {
     description: '',
     category: '',
     amount: '',
-    type: 'expense'
+    type: 'outcome'
   });
 
   // Lưu giao dịch vào localStorage mỗi khi danh sách thay đổi
@@ -86,11 +86,12 @@ const TransactionSection = () => {
 
   // Xử lý thay đổi loại giao dịch (thu nhập/chi tiêu)
   const handleTypeChange = (e) => {
-    setNewTransaction({
-      ...newTransaction,
-      type: e.target.value,
-      category: '' // Reset category when type changes
-    });
+    const newType = e.target.value;
+    setNewTransaction(prev => ({
+      ...prev,
+      type: newType,
+      category: newType === 'income' ? incomeCategories[0] : expenseCategories[0]
+    }));
   };
 
   // Xử lý chọn category
@@ -138,7 +139,7 @@ const TransactionSection = () => {
       description: '',
       category: '',
       amount: '',
-      type: 'expense'
+      type: 'outcome'
     });
     
     // Đóng biểu mẫu thêm
@@ -236,7 +237,7 @@ const TransactionSection = () => {
                   onChange={handleTypeChange}
                   className="search-input"
                 >
-                  <option value="expense">Chi tiêu</option>
+                  <option value="outcome">Chi tiêu</option>
                   <option value="income">Thu nhập</option>
                 </select>
               </div>
