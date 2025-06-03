@@ -44,10 +44,17 @@
 
 .modal-header h2 {
   margin: 0;
-  color: #fff;
+  color: #fff !important;
   font-size: 1.5rem;
   font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(45deg, #fff, #e0e0e0);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: glow 2s ease-in-out infinite alternate;
 }
+
 
 .close-btn {
   background: none;
@@ -78,7 +85,7 @@
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #fff !important;
+  color:#fff !important;
   font-weight: 500;
 }
 
@@ -136,7 +143,7 @@
   padding: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
+  background: #2a2a2a !important;
   text-align: left;
   cursor: pointer;
   display: flex;
@@ -144,15 +151,17 @@
   align-items: center;
   color: #fff !important;
   transition: all 0.2s;
+  font-weight: 500;
 }
 
 .category-select-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .category-arrow {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: #fff !important;
+  font-weight: bold;
 }
 
 .category-popup {
@@ -160,34 +169,53 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: #1a1a1a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #2a2a2a !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   margin-top: 0.5rem;
   max-height: 200px;
   overflow-y: auto;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .category-option {
   width: 100%;
   padding: 0.75rem;
   border: none;
-  background: none;
+  background: transparent !important;
   text-align: left;
   cursor: pointer;
   transition: all 0.2s;
   color: #fff !important;
+  font-weight: 500;
 }
 
 .category-option:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: #3a3a3a !important;
 }
 
 .category-option.selected {
-  background: rgba(74, 144, 226, 0.2);
-  color: #4a90e2 !important;
+  background: #4a90e2 !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+/* Đảm bảo không có background lạ nào khác */
+.category-popup * {
+  background: transparent !important;
+}
+
+.category-popup .category-option {
+  background: transparent !important;
+}
+
+.category-popup .category-option:hover {
+  background: #3a3a3a !important;
+}
+
+.category-popup .category-option.selected {
+  background: #4a90e2 !important;
 }
 
 .button-group {

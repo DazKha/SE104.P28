@@ -3,14 +3,45 @@ import { categoryLabels } from '../../../constants/categories';
 import './ExpenseItem.css';
 
 const ExpenseItem = ({ date, description, amount, category, type }) => {
-  // Format date from DD/MM/YYYY to MMM D format
+  // Format date - handle multiple formats
   const formatDate = (dateStr) => {
-    const [day, month, year] = dateStr.split('/');
-    const date = new Date(year, month - 1, day);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    });
+    try {
+      // Handle null, undefined, or empty string
+      if (!dateStr || dateStr === '' || dateStr === null || dateStr === undefined) {
+        return 'No Date';
+      }
+      
+      let dateObj;
+      
+      // Convert to string if it's not already
+      const dateString = String(dateStr);
+      
+      // Check if it's already a valid date string or ISO format
+      if (dateString.includes('T') || dateString.includes('-')) {
+        // ISO format (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss)
+        dateObj = new Date(dateString);
+      } else if (dateString.includes('/')) {
+        // DD/MM/YYYY format
+        const [day, month, year] = dateString.split('/');
+        dateObj = new Date(year, month - 1, day);
+      } else {
+        // Try to parse as is
+        dateObj = new Date(dateString);
+      }
+      
+      // Check if date is valid
+      if (isNaN(dateObj.getTime())) {
+        return 'Invalid Date';
+      }
+      
+      return dateObj.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Invalid Date';
+    }
   };
 
   // Format amount to currency
@@ -19,8 +50,8 @@ const ExpenseItem = ({ date, description, amount, category, type }) => {
     currency: 'VND'
   }).format(Math.abs(amount));
 
-  // Determine if it's income or expense based on amount sign
-  const isIncome = amount > 0;
+  // Determine if it's income or expense based on type
+  const isIncome = type === 'income';
 
   // Get category label
   const categoryLabel = categoryLabels[category] || category;

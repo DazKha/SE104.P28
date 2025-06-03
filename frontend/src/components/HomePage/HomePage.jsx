@@ -6,11 +6,34 @@ import IncomeExpensesChart from './IncomeExpensesChart/index.jsx';
 import transactionService from '../../services/transactionService';
 
 const HomePage = () => {
-  const [transactions, setTransactions] = useState(() => {
-    const savedTransactions = localStorage.getItem('transactions');
-    return savedTransactions ? JSON.parse(savedTransactions) : [];
-  });
+  const [transactions, setTransactions] = useState([]);
   const [balance, setBalance] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch transactions from API when component mounts
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        setIsLoading(true);
+        const data = await transactionService.getAllTransactions();
+        setTransactions(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching transactions:', err);
+        setError('Failed to load transactions');
+        // Fallback to localStorage if API fails
+        const savedTransactions = localStorage.getItem('transactions');
+        if (savedTransactions) {
+          setTransactions(JSON.parse(savedTransactions));
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
 
   // Calculate balance whenever transactions change
   useEffect(() => {
@@ -27,11 +50,6 @@ const HomePage = () => {
     setBalance(newBalance);
   }, [transactions]);
 
-  // Save transactions to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('transactions', JSON.stringify(transactions));
-  }, [transactions]);
-
   // Lấy tất cả giao dịch gần đây (cả thu nhập và chi tiêu)
   const recentTransactions = transactions
     .map(transaction => ({
@@ -46,21 +64,62 @@ const HomePage = () => {
     .slice(0, 5); // Chỉ lấy 5 giao dịch gần nhất
 
   // Xử lý thêm giao dịch mới
-  const handleAddTransaction = (newTransaction) => {
-    // Thêm id cho giao dịch mới
-    const transactionWithId = {
-      ...newTransaction,
-      id: Date.now(), // Sử dụng timestamp làm id
-      date: new Date().toISOString(), // Thêm ngày hiện tại nếu chưa có
-      amount: Math.abs(parseFloat(newTransaction.amount)) // Đảm bảo số tiền luôn là số dương
-    };
+  const handleAddTransaction = async (newTransaction) => {
+    try {
+      // Thêm id và ngày cho giao dịch mới
+      const transactionWithId = {
+        ...newTransaction,
+        id: Date.now(), // Sử dụng timestamp làm id
+        date: newTransaction.date || new Date().toISOString().split('T')[0], // Sử dụng ngày từ form hoặc ngày hiện tại
+        amount: Math.abs(parseFloat(newTransaction.amount)) // Đảm bảo số tiền luôn là số dương
+      };
 
-    setTransactions([transactionWithId, ...transactions]);
+      // Gọi API để thêm giao dịch mới
+      const addedTransaction = await transactionService.addTransaction(transactionWithId);
+      
+      // Cập nhật state với giao dịch mới
+      setTransactions([addedTransaction, ...transactions]);
+      setError(null);
+    } catch (err) {
+      console.error('Error adding transaction:', err);
+      setError('Failed to add transaction');
+      // Fallback: thêm vào state và localStorage
+      const transactionWithId = {
+        ...newTransaction,
+        id: Date.now(),
+        date: newTransaction.date || new Date().toISOString().split('T')[0],
+        amount: Math.abs(parseFloat(newTransaction.amount))
+      };
+      
+      const updatedTransactions = [transactionWithId, ...transactions];
+      setTransactions(updatedTransactions);
+      localStorage.setItem('transactions', JSON.stringify(updatedTransactions));
+    }
   };
+
+  if (isLoading) {
+    return <div className="homepage-container">
+      <div className="dashboard-content">
+        <div className="loading">Loading transactions...</div>
+      </div>
+    </div>;
+  }
 
   return (
     <div className="homepage-container">
       <div className="dashboard-content">
+        {error && (
+          <div className="error-message" style={{
+            backgroundColor: '#ff4444',
+            color: 'white',
+            padding: '10px',
+            borderRadius: '5px',
+            marginBottom: '20px'
+          }}>
+            {error}
+          </div>
+        )}
+        
         {/* Card hiển thị số dư */}
         <BalanceCard balance={balance} 
         onAddTransaction={handleAddTransaction} 

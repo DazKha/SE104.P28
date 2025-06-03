@@ -29,6 +29,62 @@ const getDefaultCategoryId = (callback) => {
   });
 };
 
+// PUBLIC METHODS (No authentication required)
+// Hàm lấy tất cả transactions (public)
+exports.getPublicTransactions = (req, res) => {
+  const { month } = req.query;
+  const userId = 1; // Default user for testing
+  
+  // Validate month format if provided
+  if (month && !/^\d{4}-\d{2}$/.test(month)) {
+    return res.status(400).json({ error: 'Invalid month format. Use YYYY-MM format' });
+  }
+
+  Transaction.getTransactionsByUser(userId, month, (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Failed to fetch transactions' });
+    res.json(rows);
+  });
+};
+
+// Hàm tạo transaction (public)
+exports.createPublicTransaction = (req, res) => {
+  const data = { ...req.body, user_id: 1 }; // Default user for testing
+  
+  // Validate input
+  const validationErrors = validateTransactionData(data);
+  if (validationErrors.length > 0) {
+    return res.status(400).json({ errors: validationErrors });
+  }
+
+  if (!data.category_id) {
+    getDefaultCategoryId((err, defaultId) => {
+      if (err) return res.status(500).json({ error: 'Failed to get default category' });
+      data.category_id = defaultId;
+      Transaction.createTransaction(data, (err, result) => {
+        if (err) return res.status(500).json({ error: 'Failed to create transaction' });
+        
+        // Return the created transaction with ID
+        res.status(201).json({ 
+          message: 'Transaction created successfully',
+          ...data,
+          id: result.lastID 
+        });
+      });
+    });
+  } else {
+    Transaction.createTransaction(data, (err, result) => {
+      if (err) return res.status(500).json({ error: 'Failed to create transaction' });
+
+      // Return the created transaction with ID
+      res.status(201).json({ 
+        message: 'Transaction created successfully',
+        ...data,
+        id: result.lastID 
+      });
+    });
+  }
+};
+
 // Hàm tạo transaction
 exports.create = (req, res) => {
     const data = { ...req.body, user_id: req.userId };
