@@ -19,21 +19,28 @@ export const AuthProvider = ({ children }) => {
   // Kiểm tra token khi app khởi động
   useEffect(() => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    if (token) {
-      setIsLoggedIn(true);
-      // Có thể decode token để lấy user info nếu cần
+    const storedUser = localStorage.getItem('user') || sessionStorage.getItem('user');
+    
+    if (token && storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        setIsLoggedIn(true);
+        setUser(userData);
+        setCurrentUserId(userData.id || userData.email);
+      } catch (error) {
+        console.error('Error parsing stored user data:', error);
+        clearUserData();
+      }
     }
   }, []);
 
   const login = (userData, token) => {
     console.log('AuthContext: User logged in', userData);
     
-    // Kiểm tra xem có phải user khác không
-    const newUserId = userData.id || userData.email; // Sử dụng ID hoặc email làm identifier
+    const newUserId = userData.id || userData.email;
     const isNewUser = currentUserId && currentUserId !== newUserId;
     
     if (isNewUser) {
-      // Chỉ clear data khi chuyển sang user khác
       console.log('Different user detected, clearing data...');
       clearUserData();
     }
@@ -41,32 +48,28 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     setCurrentUserId(newUserId);
     setIsLoggedIn(true);
-    
-    // Increment authKey để force re-render tất cả components
     setAuthKey(prev => prev + 1);
   };
 
   const logout = () => {
     console.log('AuthContext: User logged out');
     
-    // Clear tokens
+    // Chỉ xóa token và thông tin xác thực
     localStorage.removeItem('token');
     sessionStorage.removeItem('token');
     
-    // KHÔNG clear user data khi logout - chỉ clear authentication state
-    // Data sẽ được giữ lại cho lần đăng nhập tiếp theo của cùng user
-    
+    // KHÔNG xóa dữ liệu người dùng
+    // Chỉ xóa thông tin xác thực
     setUser(null);
     setIsLoggedIn(false);
-    // KHÔNG reset currentUserId để có thể detect same user login lại
     
-    // Increment authKey để force re-render tất cả components
+    // Giữ lại currentUserId để có thể phát hiện đăng nhập lại của cùng user
     setAuthKey(prev => prev + 1);
   };
 
   const clearUserData = () => {
-    // Clear any cached data in localStorage that might be user-specific
-    const keysToKeep = ['theme', 'language']; // Giữ lại các settings không liên quan đến user
+    // Chỉ xóa dữ liệu khi thực sự cần thiết (ví dụ: khi chuyển user)
+    const keysToKeep = ['theme', 'language'];
     const allKeys = Object.keys(localStorage);
     
     allKeys.forEach(key => {

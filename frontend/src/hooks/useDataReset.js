@@ -42,7 +42,7 @@ export const useClearUserData = () => {
     
     if (userChanged) {
       console.log('User changed, clearing localStorage data...');
-      // Clear any user-specific data from localStorage
+      // Chỉ xóa dữ liệu khi thực sự cần thiết (khi chuyển user)
       const userSpecificKeys = [
         'transactions',
         'budgets',

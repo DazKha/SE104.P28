@@ -28,11 +28,12 @@ instance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear storage and redirect to login
+      // Chỉ xóa token và thông tin xác thực
       localStorage.removeItem('token');
-      localStorage.removeItem('user');
       sessionStorage.removeItem('token');
-      sessionStorage.removeItem('user');
+      
+      // KHÔNG xóa dữ liệu người dùng
+      // Chỉ chuyển hướng về trang đăng nhập
       window.location.href = '/login';
     }
     return Promise.reject(error);
