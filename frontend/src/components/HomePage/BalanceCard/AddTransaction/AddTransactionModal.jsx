@@ -39,10 +39,10 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      console.log('Modal opened - body overflow hidden'); // Debug log
+      console.log('Modal opened - body overflow hidden');
     } else {
       document.body.style.overflow = 'unset';
-      console.log('Modal closed - body overflow reset'); // Debug log
+      console.log('Modal closed - body overflow reset');
     }
 
     return () => {
@@ -67,7 +67,7 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
   };
 
   const resetForm = () => {
-    setTransactionType('Expense');
+    setTransactionType('Outcome');
     setAmount(0);
     setCategory(expenseCategories[0]);
     setDescription('');
@@ -110,8 +110,8 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
               </button>
               <button
                 type="button"
-                className={`type-btn ${transactionType === 'Expense' ? 'active' : ''}`}
-                onClick={() => setTransactionType('Expense')}
+                className={`type-btn ${transactionType === 'Outcome' ? 'active' : ''}`}
+                onClick={() => setTransactionType('Outcome')}
               >
                 Chi tiêu
               </button>
