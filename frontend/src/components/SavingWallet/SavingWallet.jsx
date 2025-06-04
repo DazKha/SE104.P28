@@ -60,6 +60,14 @@ function SavingWallet() {
     }
   }, [isLoggedIn, fetchGoals]);
 
+  const formatNumberWithDot = (value) => {
+    if (!value) return '';
+    // Loại bỏ mọi ký tự không phải số
+    let number = value.replace(/\D/g, '');
+    // Format lại với dấu chấm
+    return number.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+
   const handleAddGoal = async () => {
     if (!formData.goal_name || !formData.target_amount) {
       alert('Please fill in all required fields');
@@ -69,7 +77,7 @@ function SavingWallet() {
     try {
       await savingService.create({
         goal_name: formData.goal_name,
-        target_amount: parseFloat(formData.target_amount)
+        target_amount: parseFloat(formData.target_amount.replace(/\./g, ''))
       });
       setShowAddForm(false);
       setFormData({ goal_name: '', target_amount: '', current_amount: '' });
@@ -88,7 +96,7 @@ function SavingWallet() {
     
     try {
       await savingService.update(editingGoal, {
-        current_amount: parseFloat(formData.current_amount)
+        current_amount: parseFloat(formData.current_amount.replace(/\./g, ''))
       });
       setEditingGoal(null);
       setFormData({ goal_name: '', target_amount: '', current_amount: '' });
@@ -161,20 +169,31 @@ function SavingWallet() {
                   onChange={(e) => setFormData({ ...formData, goal_name: e.target.value })}
                 />
                 <input
-                  type="number"
-                  placeholder="Target amount (e.g., 50000000 for 50 triệu VNĐ)"
+                  type="text"
+                  placeholder="Target amount (e.g., 50.000.000)"
                   value={formData.target_amount}
-                  onChange={(e) => setFormData({ ...formData, target_amount: e.target.value })}
+                  onChange={(e) => {
+                    // Không cho nhập số âm, chỉ nhận số và format
+                    const formatted = formatNumberWithDot(e.target.value);
+                    setFormData({ ...formData, target_amount: formatted });
+                  }}
+                  inputMode="numeric"
+                  pattern="[0-9.]*"
                 />
               </>
             )}
             
             {editingGoal && (
               <input
-                type="number"
+                type="text"
                 placeholder="Current amount"
                 value={formData.current_amount}
-                onChange={(e) => setFormData({ ...formData, current_amount: e.target.value })}
+                onChange={(e) => {
+                  const formatted = formatNumberWithDot(e.target.value);
+                  setFormData({ ...formData, current_amount: formatted });
+                }}
+                inputMode="numeric"
+                pattern="[0-9.]*"
               />
             )}
             
