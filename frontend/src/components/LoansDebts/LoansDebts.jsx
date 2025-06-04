@@ -181,7 +181,7 @@ function LoansDebts() {
             <h3>{editingItem ? 'Edit Loan/Debt' : 'Add New Loan/Debt'}</h3>
             
             <CurrencyInput
-              placeholder="Amount (e.g., 5.000.000 for 5 triệu VNĐ)"
+              placeholder="Amount (e.g., 5.000.000 VND)"
               value={formData.amount}
               onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
             />

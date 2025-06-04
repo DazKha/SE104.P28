@@ -82,7 +82,6 @@ const TransactionList = ({ transactions, onDelete }) => {
         </div>
         
         <div className="search-container">
-          <SearchIcon className="search-icon" size={16} />
           <input
             type="text"
             placeholder="Search transactions..."

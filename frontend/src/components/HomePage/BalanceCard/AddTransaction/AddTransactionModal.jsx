@@ -93,33 +93,33 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Thêm giao dịch mới</h2>
+          <h2>Add new transaction</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Loại giao dịch</label>
+            <label>Transaction type</label>
             <div className="transaction-type-buttons">
               <button
                 type="button"
                 className={`type-btn ${transactionType === 'income' ? 'active' : ''}`}
                 onClick={() => setTransactionType('income')}
               >
-                Thu nhập
+                Income
               </button>
               <button
                 type="button"
                 className={`type-btn ${transactionType === 'outcome' ? 'active' : ''}`}
                 onClick={() => setTransactionType('outcome')}
               >
-                Chi tiêu
+                Expense
               </button>
             </div>
           </div>
 
           <div className="form-group">
-            <label htmlFor="amount">Số tiền</label>
+            <label htmlFor="amount">Amount</label>
             <CurrencyInput
               id="amount" 
               value={amount} 
@@ -129,7 +129,7 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
           </div>
 
           <div className="form-group" ref={categoryRef}>
-            <label htmlFor="category">Danh mục</label>
+            <label htmlFor="category">Category</label>
             <div className="category-select">
               <button
                 type="button"
@@ -157,7 +157,7 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="description">Mô tả</label>
+            <label htmlFor="description">Description</label>
             <input
               type="text"
               id="description" 
@@ -168,7 +168,7 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="date">Ngày</label>
+            <label htmlFor="date">Date</label>
             <input
               type="date"
               id="date" 
@@ -179,8 +179,8 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction }) => {
           </div>
 
           <div className="button-group">
-            <button type="button" onClick={onClose} className="cancel-btn">Hủy</button>
-            <button type="submit" className="submit-btn">Thêm giao dịch</button>
+            <button type="button" onClick={onClose} className="cancel-btn">Cancel</button>
+            <button type="submit" className="submit-btn">Add transaction</button>
           </div>
         </form>
       </div>

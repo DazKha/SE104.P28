@@ -65,7 +65,7 @@ function Budget() {
 
   const handleAddBudget = async () => {
     if (!formData.month || !formData.amount) {
-      alert('Vui lòng điền đầy đủ thông tin');
+      alert('Please fill in all information');
       return;
     }
     
@@ -79,13 +79,13 @@ function Budget() {
       fetchBudgets();
     } catch (err) {
       console.error('Error adding budget:', err);
-      alert('Lỗi khi thêm ngân sách. Vui lòng thử lại.');
+      alert('Error adding budget. Please try again.');
     }
   };
 
   const handleEditBudget = async () => {
     if (!formData.amount) {
-      alert('Vui lòng nhập số tiền ngân sách');
+      alert('Please enter the budget amount');
       return;
     }
     
@@ -98,19 +98,19 @@ function Budget() {
       fetchBudgets();
     } catch (err) {
       console.error('Error updating budget:', err);
-      alert('Lỗi khi cập nhật ngân sách. Vui lòng thử lại.');
+      alert('Error updating budget. Please try again.');
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa ngân sách này?')) return;
+    if (!window.confirm('Are you sure you want to delete this budget?')) return;
     
     try {
       await budgetService.delete(id);
       fetchBudgets();
     } catch (err) {
       console.error('Error deleting budget:', err);
-      alert('Lỗi khi xóa ngân sách. Vui lòng thử lại.');
+      alert('Error deleting budget. Please try again.');
     }
   };
 
@@ -139,24 +139,24 @@ function Budget() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Ngân sách</h1>
+        <h1 className={styles.title}>Budget</h1>
         <button 
           className={styles.addBtn}
           onClick={() => setShowAddForm(true)}
         >
-          ➕ Thêm ngân sách
+          ➕ Add Budget
         </button>
       </div>
 
       {(showAddForm || editingBudget) && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
-            <h3>{editingBudget ? 'Chỉnh sửa ngân sách' : 'Thêm ngân sách mới'}</h3>
+            <h3>{editingBudget ? 'Edit Budget' : 'Add New Budget'}</h3>
             
             {!editingBudget && (
               <input
                 type="month"
-                placeholder="Chọn tháng"
+                placeholder="Choose month"
                 value={formData.month}
                 min={getCurrentMonth()}
                 onChange={(e) => setFormData({ ...formData, month: e.target.value })}
@@ -164,7 +164,7 @@ function Budget() {
             )}
             
             <CurrencyInput
-              placeholder="Số tiền ngân sách (VD: 50.000.000 cho 50 triệu VNĐ)"
+              placeholder="Budget amount (e.g. 50.000.000)"
               value={formData.amount}
               onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
             />
@@ -174,10 +174,10 @@ function Budget() {
                 onClick={editingBudget ? handleEditBudget : handleAddBudget}
                 className={styles.saveBtn}
               >
-                {editingBudget ? 'Cập nhật' : 'Lưu'}
+                {editingBudget ? 'Update' : 'Save'}
               </button>
               <button onClick={closeForm} className={styles.cancelBtn}>
-                Hủy
+                Cancel
               </button>
             </div>
           </div>
@@ -186,12 +186,12 @@ function Budget() {
 
       <div className={styles.budgetSection}>
         <div className={styles.sectionHeader}>
-          <h2>Ngân sách hàng tháng</h2>
+          <h2>Monthly Budget</h2>
         </div>
         
         <div className={styles.budgetsList}>
           {loading ? (
-            <div className={styles.loading}>Đang tải ngân sách...</div>
+            <div className={styles.loading}>Loading budget...</div>
           ) : budgets.length > 0 ? (
             budgets.map((budget) => (
               <BudgetItem
@@ -203,8 +203,8 @@ function Budget() {
             ))
           ) : (
             <div className={styles.emptyState}>
-              <p>Chưa có ngân sách nào được thiết lập.</p>
-              <p>Nhấn 'Thêm ngân sách' để bắt đầu!</p>
+              <p>No budget has been set up.</p>
+              <p>Click 'Add Budget' to start!</p>
             </div>
           )}
         </div>

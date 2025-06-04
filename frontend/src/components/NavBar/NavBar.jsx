@@ -41,7 +41,7 @@
           <div className="user-section">
             <span className="user-name">{user?.name || 'USER'}</span>
             <button className="logout-btn" onClick={handleLogout}>
-              Đăng xuất
+              LOG OUT
             </button>
           </div>
         </div>

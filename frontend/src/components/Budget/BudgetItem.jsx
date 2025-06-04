@@ -17,7 +17,7 @@ function BudgetItem({ budget, onEdit, onDelete }) {
   const formatMonth = (monthString) => {
     // Convert "2024-07" to "Tháng 7/2024"
     const [year, month] = monthString.split('-');
-    return `Tháng ${parseInt(month)}/${year}`;
+    return `Month ${parseInt(month)}/${year}`;
   };
 
   return (
@@ -37,7 +37,7 @@ function BudgetItem({ budget, onEdit, onDelete }) {
                   e.stopPropagation();
                   setShowHistory(true);
                 }}
-                title="Xem chi tiết"
+                title="View details"
               >
                 👁️
               </button>
@@ -66,7 +66,7 @@ function BudgetItem({ budget, onEdit, onDelete }) {
 
           <div className={styles.budgetInfo}>
             <div className={styles.spentRow}>
-              <span className={styles.label}>Đã chi:</span>
+              <span className={styles.label}>Spent:</span>
               <span className={isOverBudget ? styles.overBudgetText : styles.normalText}>
                 {formatCurrency(budget.used)} / {formatCurrency(budget.amount)}
               </span>
@@ -80,7 +80,7 @@ function BudgetItem({ budget, onEdit, onDelete }) {
             </div>
             
             <div className={styles.progressInfo}>
-              <span className={styles.percentage}>{spentPercentage.toFixed(0)}% Đã sử dụng</span>
+              <span className={styles.percentage}>{spentPercentage.toFixed(0)}% Used</span>
               <span className={isOverBudget ? styles.overBudgetText : styles.remainingText}>
                 {isOverBudget
                   ? `Vượt ${formatCurrency(Math.abs(remaining))}`
