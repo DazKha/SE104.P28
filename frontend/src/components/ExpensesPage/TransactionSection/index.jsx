@@ -134,10 +134,9 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
         <h2 className="section-title">Transaction</h2>
         <button 
           onClick={() => setIsAddingTransaction(!isAddingTransaction)}
-          className="filter-btn"
+          className="add-btn"
         >
-          <PlusIcon size={16} />
-          Thêm giao dịch
+          ➕ Add Transaction
         </button>
       </div>
 

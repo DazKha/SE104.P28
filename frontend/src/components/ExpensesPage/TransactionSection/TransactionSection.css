@@ -381,4 +381,24 @@
         background: #374151;
         color: #ffffff;
     }
+}
+
+/* Add button styles */
+.add-btn {
+  background: #2d7dff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-btn:hover {
+  background: #155ab6;
 } 
