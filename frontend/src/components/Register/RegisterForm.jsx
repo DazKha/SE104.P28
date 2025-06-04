@@ -9,8 +9,7 @@ const RegisterForm = ({ onSuccess }) => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    agreeTerms: false
+    confirmPassword: ''
   });
   
   // State for form validation
@@ -65,11 +64,6 @@ const RegisterForm = ({ onSuccess }) => {
       newErrors.confirmPassword = "Mật khẩu xác nhận không khớp";
     }
     
-    // Validate terms agreement
-    if (!formData.agreeTerms) {
-      newErrors.agreeTerms = "Bạn phải đồng ý với điều khoản sử dụng";
-    }
-    
     return newErrors;
   };
 
@@ -114,7 +108,7 @@ const RegisterForm = ({ onSuccess }) => {
         
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="name">Tên</label>
+            <label className="name-label">Tên</label>
             <input
               type="text"
               id="name"
@@ -129,7 +123,7 @@ const RegisterForm = ({ onSuccess }) => {
         </div>
         
         <div className="form-group">
-          <label htmlFor="email">Email</label>
+          <label className="email-label">Email</label>
           <input
             type="email"
             id="email"
@@ -143,7 +137,7 @@ const RegisterForm = ({ onSuccess }) => {
         </div>
         
         <div className="form-group">
-          <label htmlFor="password">Mật khẩu</label>
+          <label className="password-label">Mật khẩu</label>
           <input
             type="password"
             id="password"
@@ -157,7 +151,7 @@ const RegisterForm = ({ onSuccess }) => {
         </div>
         
         <div className="form-group">
-          <label htmlFor="confirmPassword">Xác nhận mật khẩu</label>
+          <label className="confirmPassword-label">Xác nhận mật khẩu</label>
           <input
             type="password"
             id="confirmPassword"
