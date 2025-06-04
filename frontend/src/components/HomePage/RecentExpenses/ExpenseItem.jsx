@@ -61,7 +61,7 @@ const ExpenseItem = ({ date, description, amount, category, type }) => {
       <div className="expense-info">
         <div className="expense-date">{formatDate(date)}</div>
         <div className="expense-category">{categoryLabel}</div>
-        <div className="expense-title">{description}</div>
+        <div className="expense-title">{description || 'Giao dịch'}</div>
       </div>
       <div className={`expense-amount ${isIncome ? 'income' : 'expense'}`}>
         {isIncome ? '+' : '-'}{formattedAmount}

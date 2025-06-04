@@ -60,26 +60,26 @@ exports.createPublicTransaction = (req, res) => {
     getDefaultCategoryId((err, defaultId) => {
       if (err) return res.status(500).json({ error: 'Failed to get default category' });
       data.category_id = defaultId;
-      Transaction.createTransaction(data, (err, result) => {
+      Transaction.createTransaction(data, function(err) {
         if (err) return res.status(500).json({ error: 'Failed to create transaction' });
         
         // Return the created transaction with ID
         res.status(201).json({ 
           message: 'Transaction created successfully',
           ...data,
-          id: result.lastID 
+          id: this.lastID 
         });
       });
     });
   } else {
-    Transaction.createTransaction(data, (err, result) => {
+    Transaction.createTransaction(data, function(err) {
       if (err) return res.status(500).json({ error: 'Failed to create transaction' });
 
       // Return the created transaction with ID
       res.status(201).json({ 
         message: 'Transaction created successfully',
         ...data,
-        id: result.lastID 
+        id: this.lastID 
       });
     });
   }
@@ -99,7 +99,7 @@ exports.create = (req, res) => {
       getDefaultCategoryId((err, defaultId) => {
         if (err) return res.status(500).json({ error: 'Failed to get default category' });
         data.category_id = defaultId;
-        Transaction.createTransaction(data, (err) => {
+        Transaction.createTransaction(data, function(err) {
           if (err) return res.status(500).json({ error: 'Failed to create transaction' });
           
           // Nếu là giao dịch chi tiêu, cập nhật cột 'used' trong budget
@@ -112,11 +112,22 @@ exports.create = (req, res) => {
               });
           }
           
-          res.status(201).json({ message: 'Transaction created successfully' });
+          // Return the created transaction with ID and other fields
+          res.status(201).json({ 
+            id: this.lastID,
+            user_id: data.user_id,
+            amount: data.amount,
+            date: data.date,
+            category_id: data.category_id,
+            note: data.note,
+            type: data.type,
+            description: data.note, // For frontend compatibility
+            category: 'Không xác định' // Default category name
+          });
         });
       });
     } else {
-      Transaction.createTransaction(data, (err) => {
+      Transaction.createTransaction(data, function(err) {
         if (err) return res.status(500).json({ error: 'Failed to create transaction' });
 
         // Nếu là giao dịch chi tiêu, cập nhật cột 'used' trong budget
@@ -129,7 +140,18 @@ exports.create = (req, res) => {
             });
         }
 
-        res.status(201).json({ message: 'Transaction created successfully' });
+        // Return the created transaction with ID and other fields
+        res.status(201).json({ 
+          id: this.lastID,
+          user_id: data.user_id,
+          amount: data.amount,
+          date: data.date,
+          category_id: data.category_id,
+          note: data.note,
+          type: data.type,
+          description: data.note, // For frontend compatibility
+          category: 'Không xác định' // Default category name
+        });
       });
     }
 };

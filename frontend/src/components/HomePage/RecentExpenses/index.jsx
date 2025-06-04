@@ -11,9 +11,9 @@ const RecentExpenses = ({ expenses }) => {
       </div>
       <div className="expense-list">
         {expenses && expenses.length > 0 ? (
-          expenses.map((expense) => (
+          expenses.map((expense, index) => (
             <ExpenseItem 
-              key={expense.id}
+              key={expense.id || `expense-${index}`}
               date={expense.date}
               description={expense.description}
               amount={expense.amount}

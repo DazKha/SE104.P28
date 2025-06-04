@@ -55,8 +55,8 @@ const HomePage = () => {
     .map(transaction => ({
       id: transaction.id,
       date: transaction.date,
-      description: transaction.description,
-      category: transaction.category,
+      description: transaction.note || transaction.description || '',
+      category: transaction.category_name || transaction.category || '',
       amount: transaction.amount,
       type: transaction.type
     }))
@@ -65,35 +65,55 @@ const HomePage = () => {
 
   // Xử lý thêm giao dịch mới
   const handleAddTransaction = async (newTransaction) => {
+    console.log('Adding new transaction:', newTransaction);
+    
     try {
-      // Thêm id và ngày cho giao dịch mới
-      const transactionWithId = {
-        ...newTransaction,
-        id: Date.now(), // Sử dụng timestamp làm id
-        date: newTransaction.date || new Date().toISOString().split('T')[0], // Sử dụng ngày từ form hoặc ngày hiện tại
-        amount: Math.abs(parseFloat(newTransaction.amount)) // Đảm bảo số tiền luôn là số dương
+      // Chuẩn bị dữ liệu giao dịch cho API
+      const transactionForAPI = {
+        amount: Math.abs(parseFloat(newTransaction.amount)),
+        date: newTransaction.date || new Date().toISOString().split('T')[0],
+        category_id: 1, // Temporary category ID
+        note: newTransaction.description || '',
+        type: newTransaction.type
       };
 
+      console.log('Sending to API:', transactionForAPI);
+
       // Gọi API để thêm giao dịch mới
-      const addedTransaction = await transactionService.addTransaction(transactionWithId);
+      const addedTransaction = await transactionService.addTransaction(transactionForAPI);
+      console.log('API response:', addedTransaction);
       
-      // Cập nhật state với giao dịch mới
-      setTransactions([addedTransaction, ...transactions]);
+      // Cập nhật state với functional update để tránh stale closure
+      setTransactions(prevTransactions => {
+        const newTransactions = [addedTransaction, ...prevTransactions];
+        console.log('Updated transactions:', newTransactions);
+        return newTransactions;
+      });
+      
       setError(null);
+      console.log('Transaction added successfully');
+      
     } catch (err) {
       console.error('Error adding transaction:', err);
-      setError('Failed to add transaction');
+      setError('Failed to add transaction: ' + err.message);
+      
       // Fallback: thêm vào state và localStorage
-      const transactionWithId = {
-        ...newTransaction,
+      const fallbackTransaction = {
         id: Date.now(),
+        amount: Math.abs(parseFloat(newTransaction.amount)),
         date: newTransaction.date || new Date().toISOString().split('T')[0],
-        amount: Math.abs(parseFloat(newTransaction.amount))
+        description: newTransaction.description || '',
+        category: newTransaction.category || 'Không xác định',
+        type: newTransaction.type
       };
       
-      const updatedTransactions = [transactionWithId, ...transactions];
-      setTransactions(updatedTransactions);
-      localStorage.setItem('transactions', JSON.stringify(updatedTransactions));
+      console.log('Using fallback transaction:', fallbackTransaction);
+      
+      setTransactions(prevTransactions => {
+        const newTransactions = [fallbackTransaction, ...prevTransactions];
+        localStorage.setItem('transactions', JSON.stringify(newTransactions));
+        return newTransactions;
+      });
     }
   };
 
