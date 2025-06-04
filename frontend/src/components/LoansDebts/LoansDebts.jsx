@@ -168,7 +168,7 @@ function LoansDebts() {
       <div className={styles.header}>
         <h1 className={styles.title}>Loans & Debts</h1>
         <button 
-          className={styles.addBtn}
+          className="add-btn"
           onClick={() => setShowAddForm(true)}
         >
           ➕ Add Loan/Debt

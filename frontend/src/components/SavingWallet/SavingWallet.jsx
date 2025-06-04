@@ -148,7 +148,7 @@ function SavingWallet() {
       <div className="header">
         <h1 className="title">Savings Goals</h1>
         <button 
-          className="addBtn"
+          className="add-btn"
           onClick={() => setShowAddForm(true)}
         >
           ➕ Add Saving Goal

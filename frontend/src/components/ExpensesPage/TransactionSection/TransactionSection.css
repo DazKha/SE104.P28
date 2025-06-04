@@ -384,7 +384,7 @@
 }
 
 /* Add button styles */
-.add-btn {
+.add-btn::before {
   background: #2d7dff;
   color: #fff;
   border: none;
@@ -396,8 +396,12 @@
   transition: background 0.2s;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  justify-content: center;
+  position: relative;
 }
+
+
 
 .add-btn:hover {
   background: #155ab6;

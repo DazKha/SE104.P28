@@ -141,7 +141,7 @@ function Budget() {
       <div className={styles.header}>
         <h1 className={styles.title}>Budget</h1>
         <button 
-          className={styles.addBtn}
+          className="add-btn"
           onClick={() => setShowAddForm(true)}
         >
           ➕ Add Budget
