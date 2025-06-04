@@ -15,7 +15,11 @@ const TransactionItem = ({ transaction, onDelete }) => {
   };
 
   // Kiểm tra xem giao dịch là thu nhập hay chi tiêu
-  const isIncome = transaction.amount > 0;
+  const isIncome = transaction.type === 'income';
+  
+  // Get description and category with fallbacks for API data
+  const description = transaction.note || transaction.description || 'Giao dịch';
+  const category = transaction.category_name || transaction.category || 'Không xác định';
 
   return (
     <div className={`transaction-item ${isIncome ? 'income' : 'expense'}`}>
@@ -26,13 +30,13 @@ const TransactionItem = ({ transaction, onDelete }) => {
           </div>
           <div className="transaction-details">
             <div className="transaction-date">{transaction.date}</div>
-            <div className="transaction-description">{transaction.description}</div>
+            <div className="transaction-description">{description}</div>
           </div>
         </div>
 
         <div className="transaction-actions">
           <div className="transaction-category">
-            <span className="category-tag">{transaction.category}</span>
+            <span className="category-tag">{category}</span>
             <button 
               onClick={handleDelete} 
               className="delete-button"

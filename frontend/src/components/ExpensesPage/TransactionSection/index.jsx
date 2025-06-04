@@ -4,16 +4,7 @@ import CurrencyInput from '../../common/CurrencyInput.jsx';
 import { PlusIcon } from 'lucide-react';
 import './TransactionSection.css';
 
-const TransactionSection = () => {
-  // Trạng thái cho danh sách các giao dịch
-  const [transactions, setTransactions] = useState(() => {
-    // Kiểm tra xem có dữ liệu trong localStorage không
-    const savedTransactions = localStorage.getItem('transactions');
-    if (savedTransactions) {
-      return JSON.parse(savedTransactions);
-    }
-  });
-
+const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTransaction, onDeleteTransaction }) => {
   const expenseCategories = [
     'Ăn uống',
     'Di chuyển',
@@ -51,15 +42,10 @@ const TransactionSection = () => {
       year: 'numeric'
     }).replace(/\//g, '/'),
     description: '',
-    category: '',
+    category: expenseCategories[0], // Set default category
     amount: '',
     type: 'outcome'
   });
-
-  // Lưu giao dịch vào localStorage mỗi khi danh sách thay đổi
-  useEffect(() => {
-    localStorage.setItem('transactions', JSON.stringify(transactions));
-  }, [transactions]);
 
   // Close category popup when clicking outside
   useEffect(() => {
@@ -113,21 +99,10 @@ const TransactionSection = () => {
       return;
     }
 
-    // Tạo giao dịch mới với ID duy nhất
-    const amount = Number(newTransaction.amount);
-    const finalAmount = newTransaction.type === 'income' ? Math.abs(amount) : -Math.abs(amount);
-    
-    const transaction = {
-      id: Date.now(),
-      date: newTransaction.date,
-      description: newTransaction.description,
-      category: newTransaction.category,
-      amount: finalAmount,
-      type: newTransaction.type
-    };
-
-    // Thêm giao dịch mới vào đầu danh sách
-    setTransactions([transaction, ...transactions]);
+    // Gọi hàm onAddTransaction từ parent component
+    if (onAddTransaction) {
+      onAddTransaction(newTransaction);
+    }
     
     // Đặt lại biểu mẫu
     setNewTransaction({
@@ -137,7 +112,7 @@ const TransactionSection = () => {
         year: 'numeric'
       }).replace(/\//g, '/'),
       description: '',
-      category: '',
+      category: newTransaction.type === 'income' ? incomeCategories[0] : expenseCategories[0],
       amount: '',
       type: 'outcome'
     });
@@ -148,8 +123,9 @@ const TransactionSection = () => {
 
   // Xử lý xóa giao dịch
   const handleDeleteTransaction = (id) => {
-    const updatedTransactions = transactions.filter(transaction => transaction.id !== id);
-    setTransactions(updatedTransactions);
+    if (onDeleteTransaction) {
+      onDeleteTransaction(id);
+    }
   };
 
   return (

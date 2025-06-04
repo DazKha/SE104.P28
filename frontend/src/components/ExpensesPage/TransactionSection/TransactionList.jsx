@@ -14,24 +14,40 @@ const TransactionList = ({ transactions, onDelete }) => {
     
     // Lọc theo loại (thu nhập/chi tiêu/tất cả)
     if (filter === 'income') {
-      result = result.filter(transaction => transaction.amount > 0);
+      result = result.filter(transaction => transaction.type === 'income');
     } else if (filter === 'expense') {
-      result = result.filter(transaction => transaction.amount < 0);
+      result = result.filter(transaction => transaction.type === 'outcome');
     }
     
     // Lọc theo từ khóa tìm kiếm
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(transaction => 
-        transaction.description.toLowerCase().includes(query) || 
-        transaction.category.toLowerCase().includes(query)
-      );
+      result = result.filter(transaction => {
+        const description = transaction.note || transaction.description || '';
+        const category = transaction.category_name || transaction.category || '';
+        return description.toLowerCase().includes(query) || 
+               category.toLowerCase().includes(query);
+      });
     }
     
     // Sắp xếp theo ngày tháng giảm dần (mới nhất lên đầu)
     result = result.sort((a, b) => {
-      const dateA = a.date.split('/').reverse().join('');
-      const dateB = b.date.split('/').reverse().join('');
+      // Handle both date formats from API and local data
+      const getDateForSort = (dateStr) => {
+        if (!dateStr) return '';
+        
+        // If date is in DD/MM/YYYY format, convert to YYYY-MM-DD for sorting
+        if (dateStr.includes('/')) {
+          const [day, month, year] = dateStr.split('/');
+          return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        }
+        
+        // If date is already in YYYY-MM-DD format, use as is
+        return dateStr;
+      };
+      
+      const dateA = getDateForSort(a.date);
+      const dateB = getDateForSort(b.date);
       return dateB.localeCompare(dateA);
     });
     

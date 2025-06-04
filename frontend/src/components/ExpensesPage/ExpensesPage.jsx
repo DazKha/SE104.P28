@@ -4,7 +4,7 @@ import { useDataReset } from '../../hooks/useDataReset.js';
 import TransactionSection from './TransactionSection/index.jsx';
 import ReportSection from './ReportSection/ReportSection';
 import CurrentBalance from './CurrentBalance/CurrentBalance';
-import expenseService from '../../services/expenseService';
+import transactionService from '../../services/transactionService';
 
 const ExpensesPage = () => {
   const { isLoggedIn } = useAuth();
@@ -14,12 +14,10 @@ const ExpensesPage = () => {
   const [error, setError] = useState(null);
 
   const fetchTransactions = useCallback(async () => {
-    if (!isLoggedIn) return;
-    
     setLoading(true);
     setError(null);
     try {
-      const data = await expenseService.getAll();
+      const data = await transactionService.getAllTransactions();
       setTransactions(data);
       
       // Calculate balance from API data
@@ -31,10 +29,15 @@ const ExpensesPage = () => {
     } catch (err) {
       setError('Failed to fetch transactions');
       console.error('Error fetching transactions:', err);
+      // Fallback to localStorage if API fails
+      const savedTransactions = localStorage.getItem('transactions');
+      if (savedTransactions) {
+        setTransactions(JSON.parse(savedTransactions));
+      }
     } finally {
       setLoading(false);
     }
-  }, [isLoggedIn]);
+  }, []);
 
   // Reset data chỉ khi user thay đổi hoặc lần đầu đăng nhập
   const resetData = useCallback(() => {
@@ -46,38 +49,67 @@ const ExpensesPage = () => {
 
   useDataReset(resetData);
 
-  // Fetch data khi component mount hoặc login status thay đổi
+  // Fetch data khi component mount
   useEffect(() => {
-    if (isLoggedIn) {
-      fetchTransactions();
-    }
-  }, [isLoggedIn, fetchTransactions]);
+    fetchTransactions();
+  }, [fetchTransactions]);
 
   // Handle adding new transaction
   const handleAddTransaction = async (newTransaction) => {
     try {
-      // Save to API
-      const savedTransaction = await expenseService.create(newTransaction);
+      console.log('Adding transaction in ExpensesPage:', newTransaction);
       
-      // Update local state
-      setTransactions(prev => [...prev, savedTransaction]);
+      // Chuẩn bị dữ liệu cho API
+      const transactionForAPI = {
+        amount: Math.abs(parseFloat(newTransaction.amount)),
+        date: newTransaction.date || new Date().toISOString().split('T')[0],
+        category_id: 1, // Temporary category ID
+        note: newTransaction.description || '',
+        type: newTransaction.type
+      };
+
+      // Save to API
+      const savedTransaction = await transactionService.addTransaction(transactionForAPI);
+      console.log('API response:', savedTransaction);
+      
+      // Update local state với functional update
+      setTransactions(prevTransactions => {
+        const newTransactions = [savedTransaction, ...prevTransactions];
+        return newTransactions;
+      });
       
       // Update balance
       setBalance(prev => prev + (savedTransaction.type === 'income' ? savedTransaction.amount : -savedTransaction.amount));
+      
+      setError(null);
     } catch (err) {
-      setError('Failed to add transaction');
+      setError('Failed to add transaction: ' + err.message);
       console.error('Error adding transaction:', err);
+      
+      // Fallback: add to local state
+      const fallbackTransaction = {
+        id: Date.now(),
+        amount: newTransaction.type === 'income' ? Math.abs(parseFloat(newTransaction.amount)) : -Math.abs(parseFloat(newTransaction.amount)),
+        date: newTransaction.date || new Date().toISOString().split('T')[0],
+        note: newTransaction.description || '',
+        description: newTransaction.description || '',
+        category: newTransaction.category || 'Không xác định',
+        type: newTransaction.type
+      };
+      
+      setTransactions(prev => [fallbackTransaction, ...prev]);
+      setBalance(prev => prev + (fallbackTransaction.type === 'income' ? fallbackTransaction.amount : -fallbackTransaction.amount));
     }
   };
 
   // Handle updating transaction
   const handleUpdateTransaction = async (id, updatedData) => {
     try {
-      const updatedTransaction = await expenseService.update(id, updatedData);
+      const updatedTransaction = await transactionService.updateTransaction(id, updatedData);
       
       // Update local state
       setTransactions(prev => prev.map(transaction => 
-        transaction._id === id ? updatedTransaction : transaction
+        transaction.id === id ? updatedTransaction : transaction
       ));
       
       // Recalculate balance
@@ -95,13 +127,14 @@ const ExpensesPage = () => {
   // Handle deleting transaction
   const handleDeleteTransaction = async (id) => {
     try {
-      await expenseService.delete(id);
+      await transactionService.deleteTransaction(id);
       
       // Update local state
-      setTransactions(prev => prev.filter(transaction => transaction._id !== id));
+      setTransactions(prev => prev.filter(transaction => transaction.id !== id));
       
-      // Recalculate balance
-      const newBalance = transactions.reduce((sum, transaction) => {
+      // Recalculate balance từ remaining transactions
+      const remainingTransactions = transactions.filter(transaction => transaction.id !== id);
+      const newBalance = remainingTransactions.reduce((sum, transaction) => {
         return sum + (transaction.type === 'income' ? transaction.amount : -transaction.amount);
       }, 0);
       
@@ -112,8 +145,18 @@ const ExpensesPage = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div className="loading">Loading transactions...</div>;
+  if (error) return (
+    <div className="error-message" style={{
+      backgroundColor: '#ff4444',
+      color: 'white', 
+      padding: '10px',
+      borderRadius: '5px',
+      margin: '20px'
+    }}>
+      {error}
+    </div>
+  );
 
   return (
     <div>
@@ -127,6 +170,7 @@ const ExpensesPage = () => {
         <div>
           <TransactionSection 
             transactions={transactions}
+            onAddTransaction={handleAddTransaction}
             onUpdateTransaction={handleUpdateTransaction}
             onDeleteTransaction={handleDeleteTransaction}
           />
