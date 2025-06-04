@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { useDataReset } from '../../hooks/useDataReset.js';
-import CurrencyInput from '../common/CurrencyInput.jsx';
 import savingService from '../../services/savingService';
-import SavingWalletModal from './SavingWalletModal';
 import './SavingWallet.css';
 
 function SavingWallet() {
@@ -12,7 +10,7 @@ function SavingWallet() {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
-  const [editingGoalData, setEditingGoalData] = useState(null);
+  const [formData, setFormData] = useState({ goal_name: '', target_amount: '', current_amount: '' });
 
   const fetchGoals = useCallback(async () => {
     if (!isLoggedIn) return;
@@ -23,7 +21,7 @@ function SavingWallet() {
       setGoals(data);
     } catch (err) {
       console.error('Error fetching savings:', err);
-      // Mock data for demo
+      // Nếu lỗi, hiển thị mock data để demo
       setGoals([
         {
           id: 1,
@@ -44,33 +42,37 @@ function SavingWallet() {
     setLoading(false);
   }, [isLoggedIn]);
 
+  // Reset data chỉ khi user thay đổi hoặc lần đầu đăng nhập
   const resetData = useCallback(() => {
     setGoals([]);
     setShowAddForm(false);
     setEditingGoal(null);
-    setEditingGoalData(null);
+    setFormData({ goal_name: '', target_amount: '', current_amount: '' });
     fetchGoals();
   }, [fetchGoals]);
 
   useDataReset(resetData);
 
+  // Fetch data khi component mount hoặc login status thay đổi
   useEffect(() => {
     if (isLoggedIn) {
       fetchGoals();
     }
   }, [isLoggedIn, fetchGoals]);
 
-  const handleAddGoal = async (formData) => {
-    // Convert currency fields to numbers
-    const dataToSend = {
-      ...formData,
-      target_amount: parseFloat(formData.target_amount) || 0,
-      current_amount: parseFloat(formData.current_amount) || 0,
-      monthly_goal: parseFloat(formData.monthly_goal) || 0,
-    };
+  const handleAddGoal = async () => {
+    if (!formData.goal_name || !formData.target_amount) {
+      alert('Please fill in all required fields');
+      return;
+    }
+    
     try {
-      await savingService.create(dataToSend);
+      await savingService.create({
+        goal_name: formData.goal_name,
+        target_amount: parseFloat(formData.target_amount)
+      });
       setShowAddForm(false);
+      setFormData({ goal_name: '', target_amount: '', current_amount: '' });
       fetchGoals();
     } catch (err) {
       console.error('Error adding goal:', err);
@@ -78,18 +80,18 @@ function SavingWallet() {
     }
   };
 
-  const handleEditGoal = async (formData) => {
-    // Convert currency fields to numbers
-    const dataToSend = {
-      ...formData,
-      target_amount: parseFloat(formData.target_amount) || 0,
-      current_amount: parseFloat(formData.current_amount) || 0,
-      monthly_goal: parseFloat(formData.monthly_goal) || 0,
-    };
+  const handleEditGoal = async () => {
+    if (!formData.current_amount) {
+      alert('Please enter current amount');
+      return;
+    }
+    
     try {
-      await savingService.update(editingGoal, dataToSend);
+      await savingService.update(editingGoal, {
+        current_amount: parseFloat(formData.current_amount)
+      });
       setEditingGoal(null);
-      setEditingGoalData(null);
+      setFormData({ goal_name: '', target_amount: '', current_amount: '' });
       fetchGoals();
     } catch (err) {
       console.error('Error updating goal:', err);
@@ -113,14 +115,18 @@ function SavingWallet() {
     const goal = goals.find(g => g.id === goalId);
     if (goal) {
       setEditingGoal(goalId);
-      setEditingGoalData(goal);
+      setFormData({
+        goal_name: goal.goal_name,
+        target_amount: goal.target_amount.toString(),
+        current_amount: goal.current_amount.toString()
+      });
     }
   };
 
   const closeForm = () => {
     setShowAddForm(false);
     setEditingGoal(null);
-    setEditingGoalData(null);
+    setFormData({ goal_name: '', target_amount: '', current_amount: '' });
   };
 
   const formatCurrency = (value) =>
@@ -141,13 +147,51 @@ function SavingWallet() {
         </button>
       </div>
 
-      <SavingWalletModal
-        isOpen={showAddForm || editingGoal}
-        onClose={closeForm}
-        onSave={editingGoal ? handleEditGoal : handleAddGoal}
-        editingGoal={editingGoal}
-        initialData={editingGoalData}
-      />
+      {(showAddForm || editingGoal) && (
+        <div className="modal">
+          <div className="modalContent">
+            <h3>{editingGoal ? 'Update Saving Goal' : 'Add New Saving Goal'}</h3>
+            
+            {!editingGoal && (
+              <>
+                <input
+                  type="text"
+                  placeholder="Goal name (e.g., New Laptop)"
+                  value={formData.goal_name}
+                  onChange={(e) => setFormData({ ...formData, goal_name: e.target.value })}
+                />
+                <input
+                  type="number"
+                  placeholder="Target amount (e.g., 50000000 for 50 triệu VNĐ)"
+                  value={formData.target_amount}
+                  onChange={(e) => setFormData({ ...formData, target_amount: e.target.value })}
+                />
+              </>
+            )}
+            
+            {editingGoal && (
+              <input
+                type="number"
+                placeholder="Current amount"
+                value={formData.current_amount}
+                onChange={(e) => setFormData({ ...formData, current_amount: e.target.value })}
+              />
+            )}
+            
+            <div className="modalActions">
+              <button 
+                onClick={editingGoal ? handleEditGoal : handleAddGoal}
+                className="saveBtn"
+              >
+                {editingGoal ? 'Update' : 'Save'}
+              </button>
+              <button onClick={closeForm} className="cancelBtn">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="goalsSection">
         <div className="sectionHeader">
@@ -163,6 +207,52 @@ function SavingWallet() {
                 (goal.target_amount > 0 ? (goal.current_amount / goal.target_amount) * 100 : 0);
               const remaining = Math.max(0, goal.target_amount - goal.current_amount);
               const isComplete = progressPercentage >= 100;
+
+              return (
+                <div key={goal.id} className="card">
+                  <div className="cardHeader">
+                    <div>
+                      <h3>{goal.goal_name}</h3>
+                      <div className="target">
+                        🎯 Target: {formatCurrency(goal.target_amount)}
+                      </div>
+                    </div>
+                    <div className="actions">
+                      <button onClick={() => openEditForm(goal.id)} title="Edit">
+                        ✏️
+                      </button>
+                      <button onClick={() => handleDelete(goal.id)} title="Delete">
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="cardContent">
+                    <div className="amountSection">
+                      <div className="amount">
+                        🐷 {formatCurrency(goal.current_amount)}
+                      </div>
+                      
+                      <div className="progressBar">
+                        <div
+                          className={isComplete ? "progress complete" : "progress"}
+                          style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                        />
+                      </div>
+                      
+                      <div className="progressInfo">
+                        <span className="percent">{progressPercentage.toFixed(0)}% Complete</span>
+                        {!isComplete && (
+                          <span className="left">{formatCurrency(remaining)} Left</span>
+                        )}
+                        {isComplete && (
+                          <span className="achieved">Goal Achieved! 🎉</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
             })
           ) : (
             <div className="emptyState">
