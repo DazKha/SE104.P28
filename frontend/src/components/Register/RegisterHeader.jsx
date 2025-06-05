@@ -3,8 +3,8 @@ import React from 'react';
 const RegisterHeader = () => {
   return (
     <div className="register-header">
-      <h1>Tạo tài khoản mới</h1>
-      <p>Vui lòng điền thông tin dưới đây để đăng ký</p>
+      <h1>Create new account</h1>
+      <p>Please fill in the information below to register</p>
     </div>
   );
 };

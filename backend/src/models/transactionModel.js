@@ -1,7 +1,7 @@
 const db = require('../database/db');
 
 // tạo transaction
-exports.createTransaction = (transactionData, callback) => {
+exports.createTransaction = (transactionData) => {
   const { user_id, amount, date, category_id, note, type } = transactionData;
 
   const query = `
@@ -9,11 +9,12 @@ exports.createTransaction = (transactionData, callback) => {
     VALUES (?, ?, ?, ?, ?, ?)
   `;
 
-  db.run(query, [user_id, amount, date, category_id, note, type], callback);
+  const stmt = db.prepare(query);
+  return stmt.run(user_id, amount, date, category_id, note, type);
 };
 
 // READ ALL for user with optional month filter
-exports.getTransactionsByUser = (userId, month, callback) => {
+exports.getTransactionsByUser = (userId, month) => {
   let query = `
     SELECT t.*, c.name as category_name
     FROM transactions t
@@ -30,17 +31,19 @@ exports.getTransactionsByUser = (userId, month, callback) => {
 
   query += ` ORDER BY t.date DESC`;
   
-  db.all(query, params, callback);
+  const stmt = db.prepare(query);
+  return stmt.all(...params);
 };
 
 // READ ONE
-exports.getTransactionById = (id, callback) => {
+exports.getTransactionById = (id) => {
   const query = `SELECT * FROM transactions WHERE id = ?`;
-  db.get(query, [id], callback);
+  const stmt = db.prepare(query);
+  return stmt.get(id);
 };
 
 // UPDATE
-exports.updateTransaction = (id, transactionData, callback) => {
+exports.updateTransaction = (id, transactionData) => {
   const {
     amount, date, category_id, note, type
   } = transactionData;
@@ -50,17 +53,19 @@ exports.updateTransaction = (id, transactionData, callback) => {
     SET amount = ?, date = ?, category_id = ?, note = ?, type = ?
     WHERE id = ?
   `;
-  db.run(query, [amount, date, category_id, note, type, id], callback);
+  const stmt = db.prepare(query);
+  return stmt.run(amount, date, category_id, note, type, id);
 };
 
 // DELETE
-exports.deleteTransaction = (id, callback) => {
+exports.deleteTransaction = (id) => {
   const query = `DELETE FROM transactions WHERE id = ?`;
-  db.run(query, [id], callback);
+  const stmt = db.prepare(query);
+  return stmt.run(id);
 };
 
 // Search transactions by note content
-exports.searchTransactionsByNote = (userId, searchTerm, callback) => {
+exports.searchTransactionsByNote = (userId, searchTerm) => {
   const query = `
     SELECT t.*, c.name as category_name
     FROM transactions t
@@ -69,5 +74,6 @@ exports.searchTransactionsByNote = (userId, searchTerm, callback) => {
     ORDER BY t.date DESC
   `;
   const searchPattern = `%${searchTerm}%`;
-  db.all(query, [userId, searchPattern], callback);
+  const stmt = db.prepare(query);
+  return stmt.all(userId, searchPattern);
 };

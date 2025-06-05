@@ -41,27 +41,27 @@ const RegisterForm = ({ onSuccess }) => {
     
     // Validate name
     if (!formData.name.trim()) {
-      newErrors.name = "Tên không được để trống";
+      newErrors.name = "Do not leave this field blank";
     }
     
     // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim()) {
-      newErrors.email = "Email không được để trống";
+      newErrors.email = "Do not leave this field blank";
     } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Email không hợp lệ";
+      newErrors.email = "Invalid email";
     }
     
     // Validate password
     if (!formData.password) {
-      newErrors.password = "Mật khẩu không được để trống";
+      newErrors.password = "Do not leave this field blank";
     } else if (formData.password.length < 8) {
-      newErrors.password = "Mật khẩu phải có ít nhất 8 ký tự";
+      newErrors.password = "Password must be at least 8 characters";
     }
     
     // Validate confirm password
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Mật khẩu xác nhận không khớp";
+      newErrors.confirmPassword = "Password confirmation does not match";
     }
     
     return newErrors;
@@ -95,7 +95,7 @@ const RegisterForm = ({ onSuccess }) => {
       navigate('/login');
     } catch (error) {
       console.error('Registration error:', error);
-      setApiError(error.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+      setApiError(error.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -108,7 +108,7 @@ const RegisterForm = ({ onSuccess }) => {
         
         <div className="form-row">
           <div className="form-group">
-            <label className="name-label">Tên</label>
+            <label className="name-label">Name</label>
             <input
               type="text"
               id="name"
@@ -116,7 +116,7 @@ const RegisterForm = ({ onSuccess }) => {
               value={formData.name}
               onChange={handleChange}
               className={errors.name ? 'error' : ''}
-              placeholder="Nhập tên của bạn"
+              placeholder="Enter your name"
             />
             {errors.name && <span className="error-message">{errors.name}</span>}
           </div>
@@ -131,13 +131,13 @@ const RegisterForm = ({ onSuccess }) => {
             value={formData.email}
             onChange={handleChange}
             className={errors.email ? 'error' : ''}
-            placeholder="Nhập email của bạn"
+            placeholder="Enter your email"
           />
           {errors.email && <span className="error-message">{errors.email}</span>}
         </div>
         
         <div className="form-group">
-          <label className="password-label">Mật khẩu</label>
+          <label className="password-label">Password</label>
           <input
             type="password"
             id="password"
@@ -145,13 +145,13 @@ const RegisterForm = ({ onSuccess }) => {
             value={formData.password}
             onChange={handleChange}
             className={errors.password ? 'error' : ''}
-            placeholder="Nhập mật khẩu của bạn"
+            placeholder="Enter your password"
           />
           {errors.password && <span className="error-message">{errors.password}</span>}
         </div>
         
         <div className="form-group">
-          <label className="confirmPassword-label">Xác nhận mật khẩu</label>
+          <label className="confirmPassword-label">Confirm password</label>
           <input
             type="password"
             id="confirmPassword"
@@ -159,18 +159,18 @@ const RegisterForm = ({ onSuccess }) => {
             value={formData.confirmPassword}
             onChange={handleChange}
             className={errors.confirmPassword ? 'error' : ''}
-            placeholder="Nhập lại mật khẩu của bạn"
+            placeholder="Re-enter your password"
           />
           {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
         </div>
         
         <button type="submit" className="submit-button" disabled={isSubmitting}>
-          {isSubmitting ? 'Đang xử lý...' : 'Đăng ký'}
+          {isSubmitting ? 'Processing...' : 'Register'}
         </button>
       </form>
       
       <div className="register-footer">
-        <p>Đã có tài khoản? <Link to="/login" className="login-link">Đăng nhập</Link></p>
+        <p>Already have an account? <Link to="/login" className="login-link">Login</Link></p>
       </div>
     </>
   );

@@ -15,20 +15,16 @@ const createSaving = async (req, res) => {
       VALUES (?, ?, ?, 0)
     `;
 
-    db.run(sql, [user_id, goal_name, target_amount], function(err) {
-      if (err) {
-        console.error('Error creating saving goal:', err);
-        return res.status(500).json({ message: 'Error creating saving goal' });
-      }
+    const stmt = db.prepare(sql);
+    const result = stmt.run(user_id, goal_name, target_amount);
 
-      res.status(201).json({
-        id: this.lastID,
-        user_id,
-        goal_name,
-        target_amount,
-        current_amount: 0,
-        completion_percentage: 0
-      });
+    res.status(201).json({
+      id: result.lastInsertRowid,
+      user_id,
+      goal_name,
+      target_amount,
+      current_amount: 0,
+      completion_percentage: 0
     });
   } catch (error) {
     console.error('Error in createSaving:', error);
@@ -52,14 +48,9 @@ const getSavings = async (req, res) => {
       WHERE user_id = ?
     `;
 
-    db.all(sql, [user_id], (err, rows) => {
-      if (err) {
-        console.error('Error getting saving goals:', err);
-        return res.status(500).json({ message: 'Error getting saving goals' });
-      }
-
-      res.json(rows);
-    });
+    const stmt = db.prepare(sql);
+    const rows = stmt.all(user_id);
+    res.json(rows);
   } catch (error) {
     console.error('Error in getSavings:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -78,46 +69,35 @@ const updateSaving = async (req, res) => {
     }
 
     // First get the target amount to calculate completion percentage
-    db.get('SELECT target_amount FROM savings WHERE id = ? AND user_id = ?', 
-      [id, user_id], 
-      (err, row) => {
-        if (err) {
-          console.error('Error getting saving goal:', err);
-          return res.status(500).json({ message: 'Error getting saving goal' });
-        }
+    const stmt = db.prepare('SELECT target_amount FROM savings WHERE id = ? AND user_id = ?');
+    const row = stmt.get(id, user_id);
 
-        if (!row) {
-          return res.status(404).json({ message: 'Saving goal not found' });
-        }
+    if (!row) {
+      return res.status(404).json({ message: 'Saving goal not found' });
+    }
 
-        const completion_percentage = Math.min(
-          Math.round((current_amount / row.target_amount) * 100 * 100) / 100,
-          100
-        );
+    const completion_percentage = Math.min(
+      Math.round((current_amount / row.target_amount) * 100 * 100) / 100,
+      100
+    );
 
-        const sql = `
-          UPDATE savings 
-          SET current_amount = ?
-          WHERE id = ? AND user_id = ?
-        `;
+    const updateStmt = db.prepare(`
+      UPDATE savings 
+      SET current_amount = ?
+      WHERE id = ? AND user_id = ?
+    `);
 
-        db.run(sql, [current_amount, id, user_id], function(err) {
-          if (err) {
-            console.error('Error updating saving goal:', err);
-            return res.status(500).json({ message: 'Error updating saving goal' });
-          }
+    const result = updateStmt.run(current_amount, id, user_id);
 
-          if (this.changes === 0) {
-            return res.status(404).json({ message: 'Saving goal not found' });
-          }
+    if (result.changes === 0) {
+      return res.status(404).json({ message: 'Saving goal not found' });
+    }
 
-          res.json({
-            id,
-            current_amount,
-            completion_percentage,
-            is_completed: completion_percentage >= 100
-          });
-        });
+    res.json({
+      id,
+      current_amount,
+      completion_percentage,
+      is_completed: completion_percentage >= 100
     });
   } catch (error) {
     console.error('Error in updateSaving:', error);
@@ -131,20 +111,14 @@ const deleteSaving = async (req, res) => {
     const { id } = req.params;
     const user_id = req.userId;
 
-    const sql = 'DELETE FROM savings WHERE id = ? AND user_id = ?';
+    const stmt = db.prepare('DELETE FROM savings WHERE id = ? AND user_id = ?');
+    const result = stmt.run(id, user_id);
 
-    db.run(sql, [id, user_id], function(err) {
-      if (err) {
-        console.error('Error deleting saving goal:', err);
-        return res.status(500).json({ message: 'Error deleting saving goal' });
-      }
+    if (result.changes === 0) {
+      return res.status(404).json({ message: 'Saving goal not found' });
+    }
 
-      if (this.changes === 0) {
-        return res.status(404).json({ message: 'Saving goal not found' });
-      }
-
-      res.json({ message: 'Saving goal deleted successfully' });
-    });
+    res.json({ message: 'Saving goal deleted successfully' });
   } catch (error) {
     console.error('Error in deleteSaving:', error);
     res.status(500).json({ message: 'Internal server error' });

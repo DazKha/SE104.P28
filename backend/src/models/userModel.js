@@ -1,17 +1,15 @@
 const db = require('../database/db');
 
 const User = {
-  create: (user, callback) => {
+  create: (user) => {
     const { name, email, password } = user;
-    db.run(
-      `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`,
-      [name, email, password],
-      callback
-    );
+    const stmt = db.prepare('INSERT INTO users (name, email, password) VALUES (?, ?, ?)');
+    return stmt.run(name, email, password);
   },
 
-  findByEmail: (email, callback) => {
-    db.get(`SELECT * FROM users WHERE email = ?`, [email], callback);
+  findByEmail: (email) => {
+    const stmt = db.prepare('SELECT * FROM users WHERE email = ?');
+    return stmt.get(email);
   }
 };
 
