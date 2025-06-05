@@ -93,7 +93,7 @@ const ExpensesPage = () => {
         date: newTransaction.date || new Date().toISOString().split('T')[0],
         note: newTransaction.description || '',
         description: newTransaction.description || '',
-        category: newTransaction.category || 'Không xác định',
+        category: newTransaction.category || 'Others',
         type: newTransaction.type
       };
       

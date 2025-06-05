@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import ExpenseItem from './ExpenseItem';
 import './RecentExpenses.css';
 
@@ -27,9 +26,6 @@ const RecentExpenses = ({ expenses }) => {
             <p>No recent transactions</p>
           </div>
         )}
-      </div>
-      <div className="view-all">
-        <Link to="/all-transactions" className="view-all-button">View All</Link>
       </div>
     </div>
   );

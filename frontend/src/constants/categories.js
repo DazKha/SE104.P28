@@ -26,27 +26,27 @@ export const incomeCategories = [
 
 // Map categories to their Vietnamese names
 export const categoryLabels = {
-  // Outcome categories
-  'Ăn uống': 'Ăn uống',
-  'Di chuyển': 'Di chuyển',
-  'Thuê nhà': 'Thuê nhà',
-  'Hoá đơn': 'Hoá đơn',
-  'Du lịch': 'Du lịch',
-  'Sức khoẻ': 'Sức khoẻ',
-  'Giáo dục': 'Giáo dục',
-  'Mua sắm': 'Mua sắm',
-  'Vật nuôi': 'Vật nuôi',
-  'Thể dục thể thao': 'Thể dục thể thao',
-  'Giải trí': 'Giải trí',
-  'Đầu tư': 'Đầu tư',
-  'Người thân': 'Người thân',
-  'Khác': 'Khác',
+   // Outcome categories - map từ tiếng Anh sang tiếng Việt
+  'Food & Drinks': 'Ăn uống',
+  'Transportation': 'Di chuyển', 
+  'Housing': 'Thuê nhà',
+  'Bills': 'Hoá đơn',
+  'Travel': 'Du lịch',
+  'Health': 'Sức khoẻ',
+  'Education': 'Giáo dục',
+  'Shopping': 'Mua sắm',
+  'Pets': 'Vật nuôi',
+  'Sports': 'Thể dục thể thao',
+  'Entertainment': 'Giải trí',
+  'Investment': 'Đầu tư',
+  'Family': 'Người thân',
+  'Others': 'Khác',
   
   // Income categories
-  'Lương': 'Lương',
-  'Thưởng': 'Thưởng',
-  'Đầu tư': 'Đầu tư',
-  'Kinh doanh': 'Kinh doanh',
-  'Quà tặng': 'Quà tặng',
-  'Khác': 'Khác'
+  'Salary': 'Lương',
+  'Bonus': 'Thưởng',
+  'Investment': 'Đầu tư',
+  'Business': 'Kinh doanh',
+  'Gifts': 'Quà tặng',
+  'Others': 'Khác' 
 }; 

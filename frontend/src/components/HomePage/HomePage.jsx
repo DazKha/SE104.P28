@@ -56,7 +56,7 @@ const HomePage = () => {
       id: transaction.id,
       date: transaction.date,
       description: transaction.note || transaction.description || '',
-      category: transaction.category_name || transaction.category || 'Không xác định',
+      category: transaction.category_name || transaction.category || 'Others',
       amount: transaction.amount,
       type: transaction.type
     }))
@@ -103,7 +103,7 @@ const HomePage = () => {
         amount: Math.abs(parseFloat(newTransaction.amount)),
         date: newTransaction.date || new Date().toISOString().split('T')[0],
         description: newTransaction.description || '',
-        category: newTransaction.category || 'Không xác định',
+        category: newTransaction.category || 'Others',
         type: newTransaction.type
       };
       
