@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ExpenseItem from './ExpenseItem';
 import './RecentExpenses.css';
 
+
 const RecentExpenses = ({ expenses }) => {
   return (
     <div className="card expenses-card">

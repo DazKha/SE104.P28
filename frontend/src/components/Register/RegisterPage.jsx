@@ -11,7 +11,6 @@ const RegisterPage = () => {
 
   const handleRegistrationSuccess = (formData) => {
     setRegistrationSuccess(true);
-    // Ở đây bạn có thể xử lý dữ liệu form nếu cần
     console.log("Registration completed with data:", formData);
   };
 
