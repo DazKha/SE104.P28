@@ -18,8 +18,8 @@ const TransactionItem = ({ transaction, onDelete }) => {
   const isIncome = transaction.type === 'income';
   
   // Get description and category with fallbacks for API data
-  const description = transaction.note || transaction.description || 'Giao dịch';
-  const category = transaction.category_name || transaction.category || 'Không xác định';
+  const description = transaction.note || transaction.description || 'Transaction';
+  const category = transaction.category_name || transaction.category || 'Undefined';
 
   return (
     <div className={`transaction-item ${isIncome ? 'income' : 'expense'}`}>
@@ -40,7 +40,7 @@ const TransactionItem = ({ transaction, onDelete }) => {
             <button 
               onClick={handleDelete} 
               className="delete-button"
-              title="Xóa giao dịch"
+              title="Delete transaction"
             >
               <XIcon size={16} />
             </button>

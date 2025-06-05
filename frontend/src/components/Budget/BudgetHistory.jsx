@@ -21,7 +21,7 @@ function BudgetHistory({ budget, onClose }) {
         setError(null);
       } catch (err) {
         console.error('Error fetching transactions:', err);
-        setError('Không thể tải lịch sử giao dịch. Vui lòng thử lại sau.');
+        setError('Cannot load transaction history. Please try again later.');
       }
       setLoading(false);
     };
@@ -46,23 +46,23 @@ function BudgetHistory({ budget, onClose }) {
 
   const getCategoryIcon = (category) => {
     const icons = {
-      'Ăn uống': '🍽️',
-      'Di chuyển': '🚗',
-      'Thuê nhà': '🏠',
-      'Hoá đơn': '📝',
-      'Du lịch': '✈️',
-      'Sức khoẻ': '💊',
-      'Giáo dục': '📚',
-      'Mua sắm': '🛍️',
-      'Vật nuôi': '🐾',
-      'Thể dục thể thao': '🏃',
-      'Giải trí': '🎮',
-      'Đầu tư': '📈',
-      'Người thân': '👨‍👩‍👧‍👦',
-      'Không xác định': '❓',
-      'Lương': '💰',
-      'Thưởng': '🎁',
-      'Kinh doanh': '💼'
+      'Food & Drinks': '🍽️',
+      'Transportation': '🚗',
+      'Housing': '🏠',
+      'Bills': '📝',
+      'Travel': '✈️',
+      'Health': '💊',
+      'Education': '📚',
+      'Shopping': '🛍️',
+      'Pets': '🐾',
+      'Sports': '🏃',
+      'Entertainment': '🎮',
+      'Investment': '📈',
+      'Family': '👨‍👩‍👧‍👦',
+      'Undefined': '❓',
+      'Salary': '💰',
+      'Bonus': '🎁',
+      'Business': '💼'
     };
     return icons[category] || '📌';
   };
@@ -71,12 +71,12 @@ function BudgetHistory({ budget, onClose }) {
     <div className={styles.modal}>
       <div className={styles.modalContent}>
         <div className={styles.modalHeader}>
-          <h2>Lịch sử chi tiêu - {budget.month}</h2>
+          <h2>Transaction History - {budget.month}</h2>
           <button onClick={onClose} className={styles.closeBtn}>✕</button>
         </div>
 
         {loading ? (
-          <div className={styles.loading}>Đang tải lịch sử...</div>
+          <div className={styles.loading}>Loading transaction history...</div>
         ) : error ? (
           <div className={styles.error}>{error}</div>
         ) : transactions.length > 0 ? (
@@ -104,21 +104,21 @@ function BudgetHistory({ budget, onClose }) {
           </div>
         ) : (
           <div className={styles.emptyState}>
-            <p>Chưa có giao dịch nào trong tháng này.</p>
+            <p>No transaction in this month.</p>
           </div>
         )}
 
         <div className={styles.summary}>
           <div className={styles.summaryItem}>
-            <span className={styles.label}>Tổng chi:</span>
+            <span className={styles.label}>Total expense:</span>
             <span className={styles.expense}>{formatCurrency(budget.used)}</span>
           </div>
           <div className={styles.summaryItem}>
-            <span className={styles.label}>Ngân sách:</span>
+            <span className={styles.label}>Budget:</span>
             <span className={styles.budget}>{formatCurrency(budget.amount)}</span>
           </div>
           <div className={styles.summaryItem}>
-            <span className={styles.label}>Còn lại:</span>
+            <span className={styles.label}>Remaining:</span>
             <span className={budget.amount - budget.used < 0 ? styles.overBudget : styles.remaining}>
               {formatCurrency(budget.amount - budget.used)}
             </span>

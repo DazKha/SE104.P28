@@ -101,8 +101,8 @@ const CurrentBalance = ({ onAddTransaction }) => {
     <div className="current-balance__card">
       <div className="current-balance__header">
         <div>
-          <h2> Số dư hiện tại </h2>
-          <p> Cập nhật theo thời gian thực</p>
+          <h2> Current Balance </h2>
+          <p> Update in real time</p>
         </div>
       </div>
 
@@ -116,11 +116,11 @@ const CurrentBalance = ({ onAddTransaction }) => {
       {/* Thêm thông tin chi tiết */}
       <div className="current-balance__detail">
         <div className="current-balance__stat-card">
-          <p>Thu nhập</p>
+          <p>Income</p>
           <p>{formatBalance(totalIncome)}</p>
         </div>
         <div className="current-balance__stat-card">
-          <p>Chi tiêu</p>
+          <p>Expense</p>
           <p>{formatBalance(totalOutcome)}</p>
         </div>
       </div>

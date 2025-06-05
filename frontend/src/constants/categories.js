@@ -1,27 +1,27 @@
 export const outcomeCategories = [
-  'Ăn uống',
-  'Di chuyển',
-  'Thuê nhà',
-  'Hoá đơn',
-  'Du lịch',
-  'Sức khoẻ',
-  'Giáo dục',
-  'Mua sắm',
-  'Vật nuôi',
-  'Thể dục thể thao',
-  'Giải trí',
-  'Đầu tư',
-  'Người thân',
-  'Khác'
+  'Food & Drinks',
+  'Transportation',
+  'Housing',
+  'Bills',
+  'Travel',
+  'Health',
+  'Education',
+  'Shopping',
+  'Pets',
+  'Sports',
+  'Entertainment',
+  'Investment',
+  'Family',
+  'Others'
 ];
 
 export const incomeCategories = [
-  'Lương',
-  'Thưởng',
-  'Đầu tư',
-  'Kinh doanh',
-  'Quà tặng',
-  'Khác'
+  'Salary',
+  'Bonus',
+  'Investment',
+  'Business',
+  'Gifts',
+  'Others'
 ];
 
 // Map categories to their Vietnamese names

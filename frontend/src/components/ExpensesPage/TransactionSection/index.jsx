@@ -7,32 +7,32 @@ import './TransactionSection.css';
 
 const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTransaction, onDeleteTransaction }) => {
   const expenseCategories = [
-    'Ăn uống',
-    'Di chuyển',
-    'Thuê nhà',
-    'Hoá đơn',
-    'Du lịch',
-    'Sức khoẻ',
-    'Giáo dục',
-    'Mua sắm',
-    'Vật nuôi',
-    'Thể dục thể thao',
-    'Giải trí',
-    'Đầu tư',
-    'Người thân',
-    'Khác'
+    'Food & Drinks',
+    'Transportation',
+    'Housing',
+    'Bills',
+    'Travel',
+    'Health',
+    'Education',
+    'Shopping',
+    'Pets',
+    'Sports',
+    'Entertainment',
+    'Investment',
+    'Family',
+    'Others'
   ];
 
   const incomeCategories = [
-    'Lương',
-    'Thưởng',
-    'Đầu tư',
-    'Kinh doanh',
-    'Quà tặng',
-    'Khác'
+    'Salary',
+    'Bonus',
+    'Investment',
+    'Business',
+    'Gifts',
+    'Others'
   ];
 
-  // Trạng thái cho biểu mẫu thêm giao dịch
+  // State for transaction form
   const [isAddingTransaction, setIsAddingTransaction] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const categoryRef = useRef(null);
@@ -62,7 +62,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     };
   }, []);
 
-  // Xử lý thay đổi input cho giao dịch mới
+  // Handle input changes for new transaction
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewTransaction({
@@ -71,7 +71,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     });
   };
 
-  // Xử lý thay đổi loại giao dịch (thu nhập/chi tiêu)
+  // Handle transaction type change (income/expense)
   const handleTypeChange = (e) => {
     const newType = e.target.value;
     setNewTransaction(prev => ({
@@ -81,7 +81,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     }));
   };
 
-  // Xử lý chọn category
+  // Handle category selection
   const handleCategorySelect = (selectedCategory) => {
     setNewTransaction({
       ...newTransaction,
@@ -90,22 +90,22 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     setIsCategoryOpen(false);
   };
 
-  // Xử lý thêm giao dịch mới
+  // Handle adding new transaction
   const handleAddTransaction = (e) => {
     e.preventDefault();
     
-    // Kiểm tra dữ liệu đầu vào
+    // Validate input data
     if (!newTransaction.description || !newTransaction.category || !newTransaction.amount) {
-      alert('Vui lòng điền đầy đủ thông tin giao dịch');
+      alert('Please fill in all transaction details');
       return;
     }
 
-    // Gọi hàm onAddTransaction từ parent component
+    // Call onAddTransaction from parent component
     if (onAddTransaction) {
       onAddTransaction(newTransaction);
     }
     
-    // Đặt lại biểu mẫu
+    // Reset form
     setNewTransaction({
       date: new Date().toLocaleDateString('en-GB', {
         day: '2-digit',
@@ -118,11 +118,11 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       type: 'outcome'
     });
     
-    // Đóng biểu mẫu thêm
+    // Close add form
     setIsAddingTransaction(false);
   };
 
-  // Xử lý xóa giao dịch
+  // Handle delete transaction
   const handleDeleteTransaction = (id) => {
     if (onDeleteTransaction) {
       onDeleteTransaction(id);
@@ -135,10 +135,9 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
         <h2 className="section-title">Transaction</h2>
         <button 
           onClick={() => setIsAddingTransaction(!isAddingTransaction)}
-          className="filter-btn"
+          className="add-btn"
         >
-          <PlusIcon size={16} />
-          Thêm giao dịch
+          ➕ Add Transaction
         </button>
       </div>
 
@@ -147,7 +146,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
           <form onSubmit={handleAddTransaction}>
             <div className="form-grid">
               <div className="form-group">
-                <label>Ngày</label>
+                <label>Date</label>
                 <input
                   type="text"
                   name="date"
@@ -158,25 +157,25 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
                 />
               </div>
               <div className="form-group">
-                <label>Mô tả</label>
+                <label>Description</label>
                 <input
                   type="text"
                   name="description"
                   value={newTransaction.description}
                   onChange={handleInputChange}
                   className="search-input"
-                  placeholder="Mô tả giao dịch"
+                  placeholder="Transaction description"
                 />
               </div>
               <div className="form-group" ref={categoryRef}>
-                <label>Danh mục</label>
+                <label>Category</label>
                 <div className="category-select">
                   <button
                     type="button"
                     className="category-select-button"
                     onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                   >
-                    {newTransaction.category || 'Chọn danh mục'}
+                    {newTransaction.category || 'Select category'}
                   </button>
                   {isCategoryOpen && (
                     <div className="category-popup">
@@ -198,24 +197,24 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
 
             <div className="form-grid">
               <div className="form-group">
-                <label>Số tiền (đ)</label>
+                <label>Amount (VND)</label>
                 <CurrencyInput
-                  placeholder="Số tiền"
+                  placeholder="Amount"
                   value={newTransaction.amount}
                   onChange={(e) => setNewTransaction({ ...newTransaction, amount: e.target.value })}
                   className="search-input"
                 />
               </div>
               <div className="form-group">
-                <label>Loại</label>
+                <label>Type</label>
                 <select
                   name="type"
                   value={newTransaction.type}
                   onChange={handleTypeChange}
                   className="search-input"
                 >
-                  <option value="outcome">Chi tiêu</option>
-                  <option value="income">Thu nhập</option>
+                  <option value="outcome">Expense</option>
+                  <option value="income">Income</option>
                 </select>
               </div>
             </div>
@@ -226,13 +225,13 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
                 onClick={() => setIsAddingTransaction(false)}
                 className="filter-btn"
               >
-                Hủy
+                Cancel
               </button>
               <button
                 type="submit"
                 className="filter-btn active"
               >
-                Lưu giao dịch
+                Save Transaction
               </button>
             </div>
           </form>
