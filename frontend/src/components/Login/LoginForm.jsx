@@ -40,14 +40,14 @@ const LoginForm = ({ onSuccess }) => {
     // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim()) {
-      newErrors.email = "Email không được để trống";
+      newErrors.email = "Do not leave this field blank";
     } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Email không hợp lệ";
+      newErrors.email = "Invalid email";
     }
     
     // Validate password
     if (!formData.password) {
-      newErrors.password = "Mật khẩu không được để trống";
+      newErrors.password = "Do not leave this field blank";
     }
     
     return newErrors;
@@ -84,7 +84,7 @@ const LoginForm = ({ onSuccess }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Đăng nhập thất bại');
+        throw new Error(data.message || 'Login failed');
       }
 
       // Store token and user data
@@ -110,7 +110,7 @@ const LoginForm = ({ onSuccess }) => {
       navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
-      setApiError(error.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
+      setApiError(error.message || 'Login failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -129,13 +129,13 @@ const LoginForm = ({ onSuccess }) => {
           value={formData.email}
           onChange={handleChange}
           className={errors.email ? 'error' : ''}
-          placeholder="Nhập email của bạn"
+          placeholder="Enter your email"
         />
         {errors.email && <span className="error-message">{errors.email}</span>}
       </div>
       
       <div className="form-group">
-        <label htmlFor="password">Mật khẩu</label>
+        <label htmlFor="password">Password</label>
         <input
           type="password"
           id="password"
@@ -143,7 +143,7 @@ const LoginForm = ({ onSuccess }) => {
           value={formData.password}
           onChange={handleChange}
           className={errors.password ? 'error' : ''}
-          placeholder="Nhập mật khẩu của bạn"
+          placeholder="Enter your password"
         />
         {errors.password && <span className="error-message">{errors.password}</span>}
       </div>
@@ -157,20 +157,20 @@ const LoginForm = ({ onSuccess }) => {
             checked={formData.rememberMe}
             onChange={handleChange}
           />
-          <label htmlFor="rememberMe">Ghi nhớ đăng nhập</label>
+          <label htmlFor="rememberMe">Remember me</label>
         </div>
         
         <Link to="/forgot-password" className="forgot-password">
-          Quên mật khẩu?
+          Forgot password?
         </Link>
       </div>
       
       <button type="submit" className="submit-button" disabled={isSubmitting}>
-        {isSubmitting ? 'Đang xử lý...' : 'Đăng nhập'}
+        {isSubmitting ? 'Processing...' : 'Login'}
       </button>
       
       <div className="login-footer">
-        <p>Chưa có tài khoản? <Link to="/register" className="register-link">Đăng ký</Link></p>
+        <p>Don't have an account? <Link to="/register" className="register-link">Register</Link></p>
       </div>
     </form>
   );

@@ -13,10 +13,10 @@ const LoginSuccessMessage = ({ user }) => {
   return (
     <div className="login-container success-container">
       <div className="success-message">
-        <h2>Đăng nhập thành công!</h2>
-        <p>Chào mừng quay trở lại, {user?.email || 'bạn'}!</p>
-        <p>Bạn sẽ được chuyển đến trang chủ trong vài giây...</p>
-        <Link to="/" className="btn btn-primary">Đến trang chủ ngay</Link>
+        <h2>Login successful!</h2>
+        <p>Welcome back, {user?.email || 'you'}!</p>
+        <p>You will be redirected to the home page in a few seconds...</p>
+        <Link to="/" className="btn btn-primary">Go to home page now</Link>
       </div>
     </div>
   );

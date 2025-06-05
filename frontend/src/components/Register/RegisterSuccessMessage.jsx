@@ -5,10 +5,10 @@ const RegisterSuccessMessage = () => {
     return (
         <div className="register-container success-container">
             <div className="success-message">
-                <h2>Đăng ký thành công</h2>
-                <p>Cảm ơn bạn đã đăng ký tài khoản.</p>
+                <h2>Registration successful</h2>
+                <p>Thank you for registering.</p>
                 <Link to="/login" className="btn btn-primary">
-                    Quay trở lại trang đăng nhập
+                    Go back to login page
                 </Link>
             </div>
         </div>
