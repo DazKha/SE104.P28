@@ -93,10 +93,14 @@ exports.create = (req, res) => {
     
     // Nếu là giao dịch chi tiêu, cập nhật cột 'used' trong budget
     if (data.type === 'outcome') {
+      // Lấy month từ date dạng 'DD/MM/YYYY'
+      const [day, monthStr, year] = data.date.split('/');
+      const monthBudget = `${year}-${monthStr}`;
       budgetController.updateBudgetUsed({
         user: data.user_id,
         amount: data.amount,
-        month: new Date(data.date).toISOString().slice(0, 7) // Extract YYYY-MM from date
+        month: monthBudget,
+        type: 'outcome'
       });
     }
     
@@ -138,8 +142,14 @@ exports.getByUser = (req, res) => {
     const params = [userId];
 
     if (month) {
-      query += ` AND strftime('%Y-%m', t.date) = ?`;
-      params.push(month);
+      // Lọc theo tháng với định dạng DD/MM/YYYY
+      // month dạng 'YYYY-MM', ví dụ '2025-06'
+      // So sánh phần MM/YYYY của date với MM/YYYY của month
+      query += ` AND substr(t.date, 4, 7) = ?`;
+      // month: '2025-06' => '06/2025'
+      const [y, m] = month.split('-');
+      const monthYear = `${m}/${y}`;
+      params.push(monthYear);
     }
 
     query += ` ORDER BY t.date DESC`;
@@ -207,6 +217,29 @@ exports.update = (req, res) => {
       return res.status(404).json({ error: 'Transaction not found or unauthorized' });
     }
 
+    // Nếu là giao dịch outcome, revert used cũ trước khi update
+    if (existingTransaction.type === 'outcome') {
+      const [day, monthStr, year] = existingTransaction.date.split('/');
+      const monthBudget = `${year}-${monthStr}`;
+      budgetController.updateBudgetUsed({
+        user: existingTransaction.user_id,
+        amount: -existingTransaction.amount,
+        month: monthBudget,
+        type: 'outcome'
+      });
+    }
+    // Nếu giao dịch mới là outcome, cộng used mới
+    if (updateData.type === 'outcome') {
+      const [day, monthStr, year] = updateData.date.split('/');
+      const monthBudget = `${year}-${monthStr}`;
+      budgetController.updateBudgetUsed({
+        user: userId,
+        amount: updateData.amount,
+        month: monthBudget,
+        type: 'outcome'
+      });
+    }
+
     // Update the transaction
     const updateQuery = `
       UPDATE transactions
@@ -263,6 +296,18 @@ exports.delete = (req, res) => {
     }
     if (transaction.user_id !== req.userId) {
       return res.status(403).json({ error: 'Unauthorized access to transaction' });
+    }
+
+    // Nếu là giao dịch outcome, revert used
+    if (transaction.type === 'outcome') {
+      const [day, monthStr, year] = transaction.date.split('/');
+      const monthBudget = `${year}-${monthStr}`;
+      budgetController.updateBudgetUsed({
+        user: transaction.user_id,
+        amount: -transaction.amount,
+        month: monthBudget,
+        type: 'outcome'
+      });
     }
 
     Transaction.deleteTransaction(req.params.id);
