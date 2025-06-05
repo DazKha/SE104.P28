@@ -275,7 +275,6 @@
 .card:hover {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   border-color: #444;
-  border-left-color: #2d7dff;
 }
 
 .cardOverBudget {
