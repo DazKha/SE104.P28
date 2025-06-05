@@ -4,6 +4,7 @@ import CurrencyInput from '../../common/CurrencyInput.jsx';
 import { PlusIcon } from 'lucide-react';
 import './TransactionSection.css';
 
+
 const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTransaction, onDeleteTransaction }) => {
   const expenseCategories = [
     'Ăn uống',

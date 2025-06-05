@@ -231,8 +231,8 @@ function LoansDebts() {
         <div className={styles.itemsList}>
           {loading ? (
             <div className={styles.loading}>Loading your loans & debts...</div>
-          ) : items.length > 0 ? (
-            items.map((item) => (
+          ) : items.filter(item => item.status === 'pending').length > 0 ? (
+            items.filter(item => item.status === 'pending').map((item) => (
               <LoanDebtItem
                 key={item.id}
                 item={item}
@@ -243,7 +243,7 @@ function LoansDebts() {
             ))
           ) : (
             <div className={styles.emptyState}>
-              <p>No loans or debts recorded yet.</p>
+              <p>No pending loans or debts.</p>
               <p>Click 'Add Loan/Debt' to start tracking!</p>
             </div>
           )}

@@ -3,7 +3,7 @@
   padding: 32px;
   min-height: 100vh;
   background: transparent;
-  background-color: #1a1a1a;
+  background-color: #23272f;
 }
 
 .header {
@@ -11,6 +11,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
+  color: #fff
 }
 
 .title {
@@ -220,6 +221,27 @@
   padding: 40px;
 }
 
+.budgetSection {
+  background: #181c24;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid #333;
+}
+
+.sectionHeader h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.budgetsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -247,15 +269,20 @@
   padding: 20px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
-  border-left: 4px solid #2d7dff;
+  border: 1px solid #333;
 }
 
 .card:hover {
-  transform: translateY(-2px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-color: #444;
+  border-left-color: #2d7dff;
 }
 
 .cardOverBudget {
+  border-left-color: #ff6b6b;
+}
+
+.cardOverBudget:hover {
   border-left-color: #ff6b6b;
 }
 
@@ -407,20 +434,26 @@
 
 .saveBtn,
 .cancelBtn {
-  background: #2a2f3a; /* Darker background */
+  background: #2d7dff;
   color: #fff;
-  border: 1px solid #444; /* Add border */
+  border: none;
   border-radius: 8px;
   padding: 10px 20px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
+  transition: background 0.2s;
   flex: 1;
 }
 
-.saveBtn:hover,
+.saveBtn:hover {
+  background: #155ab6;
+}
+
+.cancelBtn {
+  background: #444;
+}
+
 .cancelBtn:hover {
-  background: #3a404b; /* Slightly lighter on hover */
-  border-color: #555; /* Darker border on hover */
+  background: #555;
 } 

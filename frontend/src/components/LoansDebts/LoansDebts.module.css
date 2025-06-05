@@ -3,7 +3,7 @@
   padding: 32px;
   min-height: 100vh;
   background: transparent;
-  background-color: #1a1a1a;
+  background-color: #23272f;
 }
 
 .header {
@@ -11,6 +11,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
+  color: #fff
 }
 
 .title {
@@ -59,6 +60,7 @@
 }
 
 .modalContent h3 {
+  background-color: #23272f;
   margin-bottom: 24px;
   font-size: 1.5rem;
   font-weight: 600;

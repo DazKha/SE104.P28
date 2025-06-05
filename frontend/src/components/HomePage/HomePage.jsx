@@ -56,7 +56,7 @@ const HomePage = () => {
       id: transaction.id,
       date: transaction.date,
       description: transaction.note || transaction.description || '',
-      category: transaction.category_name || transaction.category || '',
+      category: transaction.category_name || transaction.category || 'Không xác định',
       amount: transaction.amount,
       type: transaction.type
     }))
