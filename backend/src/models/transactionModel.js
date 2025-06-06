@@ -77,3 +77,22 @@ exports.searchTransactionsByNote = (userId, searchTerm) => {
   const stmt = db.prepare(query);
   return stmt.all(userId, searchPattern);
 };
+
+// Get category ID by name
+exports.getCategoryIdByName = (categoryName) => {
+  try {
+    console.log('Getting category ID for:', categoryName);
+    const query = `
+      SELECT id FROM categories 
+      WHERE name = ? 
+      LIMIT 1
+    `;
+    const stmt = db.prepare(query);
+    const result = stmt.get(categoryName);
+    console.log('Category lookup result:', result);
+    return result ? result.id : null;
+  } catch (err) {
+    console.error('Error getting category ID:', err);
+    return null;
+  }
+};

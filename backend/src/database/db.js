@@ -67,9 +67,9 @@ db.exec(`
 
 // Chèn dữ liệu mẫu cho bảng categories
 const categories = [
-  'Ăn uống', 'Di chuyển', 'Thuê nhà', 'Hoá đơn', 'Du lịch', 'Sức khoẻ',
-  'Giáo dục', 'Mua sắm', 'Vật nuôi', 'Thể dục thể thao', 'Giải trí',
-  'Đầu tư', 'Người thân', 'Không xác định', 'Lương', 'Thưởng', 'Kinh doanh'
+  'Uncategorized', 'Food & Drinks', 'Transportation', 'Housing', 'Bills', 'Travel', 'Health',
+  'Education', 'Shopping', 'Pets', 'Sports', 'Entertainment',
+  'Investment', 'Family', 'Salary', 'Bonus', 'Business', 'Gifts'
 ];
 
 // Kiểm tra xem bảng categories đã có dữ liệu chưa
@@ -82,7 +82,17 @@ if (count.count === 0) {
   }
   console.log('Categories seeded successfully');
 } else {
-  console.log('Categories already seeded');
+  // Nếu bảng đã có dữ liệu, cập nhật lại
+  // First, delete all transactions that reference categories
+  db.prepare('DELETE FROM transactions').run();
+  // Then delete all categories
+  db.prepare('DELETE FROM categories').run();
+  // Finally, insert new categories
+  const insertCategory = db.prepare('INSERT INTO categories (name) VALUES (?)');
+  for (const category of categories) {
+    insertCategory.run(category);
+  }
+  console.log('Categories updated successfully');
 }
 
 // Đóng kết nối khi server dừng

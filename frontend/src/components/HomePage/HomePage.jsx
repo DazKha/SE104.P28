@@ -51,17 +51,14 @@ const HomePage = () => {
   }, [transactions]);
 
   // Lấy tất cả giao dịch gần đây (cả thu nhập và chi tiêu)
-  const recentTransactions = transactions
-    .map(transaction => ({
-      id: transaction.id,
-      date: transaction.date,
-      description: transaction.note || transaction.description || '',
-      category: transaction.category_name || transaction.category || 'Others',
-      amount: transaction.amount,
-      type: transaction.type
-    }))
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 5); // Chỉ lấy 5 giao dịch gần nhất
+  const recentTransactions = transactions.slice(0, 5).map(transaction => ({
+    id: transaction.id,
+    date: transaction.date,
+    description: transaction.note || transaction.description,
+    amount: Math.abs(parseFloat(transaction.amount)),
+    category: transaction.category_name || transaction.category || 'Uncategorized',
+    type: transaction.type
+  }));
 
   // Xử lý thêm giao dịch mới
   const handleAddTransaction = async (newTransaction) => {
@@ -72,7 +69,7 @@ const HomePage = () => {
       const transactionForAPI = {
         amount: Math.abs(parseFloat(newTransaction.amount)),
         date: newTransaction.date || new Date().toISOString().split('T')[0],
-        category_id: 1, // Temporary category ID
+        category: newTransaction.category, // Pass the selected category name
         note: newTransaction.description || '',
         type: newTransaction.type
       };
@@ -103,7 +100,7 @@ const HomePage = () => {
         amount: Math.abs(parseFloat(newTransaction.amount)),
         date: newTransaction.date || new Date().toISOString().split('T')[0],
         description: newTransaction.description || '',
-        category: newTransaction.category || 'Others',
+        category: newTransaction.category || 'Uncategorized',
         type: newTransaction.type
       };
       

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_URL = 'http://localhost:3000/api'; // Backend server
+const PUBLIC_API_URL = 'http://localhost:3000/api/public'; // Public API
 
 const getToken = () => {
   return localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -11,8 +12,11 @@ const transactionService = {
   getAllTransactions: async () => {
     try {
       const token = getToken();
+      
       if (!token) {
-        throw new Error('No authentication token found');
+        // Use public API if no token
+        const response = await axios.get(`${PUBLIC_API_URL}/transactions`);
+        return response.data;
       }
 
       const response = await axios.get(`${API_URL}/transactions`, {
@@ -30,8 +34,11 @@ const transactionService = {
   getByMonth: async (month) => {
     try {
       const token = getToken();
+      
       if (!token) {
-        throw new Error('No authentication token found');
+        // Use public API if no token
+        const response = await axios.get(`${PUBLIC_API_URL}/transactions?month=${month}`);
+        return response.data;
       }
 
       const response = await axios.get(`${API_URL}/transactions?month=${month}`, {
@@ -50,8 +57,11 @@ const transactionService = {
   addTransaction: async (transaction) => {
     try {
       const token = getToken();
+      
       if (!token) {
-        throw new Error('No authentication token found');
+        // Use public API if no token
+        const response = await axios.post(`${PUBLIC_API_URL}/transactions`, transaction);
+        return response.data;
       }
 
       const response = await axios.post(`${API_URL}/transactions`, transaction, {

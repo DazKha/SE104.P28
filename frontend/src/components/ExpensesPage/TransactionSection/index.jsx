@@ -20,7 +20,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     'Entertainment',
     'Investment',
     'Family',
-    'Others'
+    'Uncategorized'
   ];
 
   const incomeCategories = [
@@ -29,7 +29,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     'Investment',
     'Business',
     'Gifts',
-    'Others'
+    'Uncategorized'
   ];
 
   // State for transaction form

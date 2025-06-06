@@ -63,7 +63,7 @@ const ExpensesPage = () => {
       const transactionForAPI = {
         amount: Math.abs(parseFloat(newTransaction.amount)),
         date: newTransaction.date || new Date().toISOString().split('T')[0],
-        category_id: 1, // Temporary category ID
+        category: newTransaction.category, // Pass the selected category name
         note: newTransaction.description || '',
         type: newTransaction.type
       };
@@ -89,11 +89,10 @@ const ExpensesPage = () => {
       // Fallback: add to local state
       const fallbackTransaction = {
         id: Date.now(),
-        amount: newTransaction.type === 'income' ? Math.abs(parseFloat(newTransaction.amount)) : -Math.abs(parseFloat(newTransaction.amount)),
+        amount: Math.abs(parseFloat(newTransaction.amount)),
         date: newTransaction.date || new Date().toISOString().split('T')[0],
-        note: newTransaction.description || '',
         description: newTransaction.description || '',
-        category: newTransaction.category || 'Others',
+        category: newTransaction.category || 'Uncategorized',
         type: newTransaction.type
       };
       

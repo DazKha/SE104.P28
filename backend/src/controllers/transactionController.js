@@ -2,28 +2,49 @@ const Transaction = require('../models/transactionModel');
 const db = require('../database/db');
 const budgetController = require('./budgetController');
 
+// Map English categories to English (no translation needed now)
+const categoryMapping = {
+  'Food & Drinks': 'Food & Drinks',
+  'Transportation': 'Transportation',
+  'Housing': 'Housing',
+  'Bills': 'Bills',
+  'Travel': 'Travel',
+  'Health': 'Health',
+  'Education': 'Education',
+  'Shopping': 'Shopping',
+  'Pets': 'Pets',
+  'Sports': 'Sports',
+  'Entertainment': 'Entertainment',
+  'Investment': 'Investment',
+  'Family': 'Family',
+  'Salary': 'Salary',
+  'Bonus': 'Bonus',
+  'Business': 'Business',
+  'Gifts': 'Gifts'
+};
+
 // Helper function to validate transaction data
 const validateTransactionData = (data) => {
   const errors = [];
   
   if (!data.amount || isNaN(data.amount) || data.amount <= 0) {
-    errors.push('Số tiền phải là số dương');
+    errors.push('Amount must be a positive number');
   }
   
   if (!data.date || isNaN(Date.parse(data.date))) {
-    errors.push('Ngày không hợp lệ');
+    errors.push('Date is invalid');
   }
   
   if (!data.type || !['income', 'outcome'].includes(data.type)) {
-    errors.push("Loại giao dịch phải là 'thu' hoặc 'chi'");
+    errors.push("Transaction type must be 'income' or 'outcome'");
   }
   
   return errors;
 };
 
-// Hàm lấy ID của category "Không xác định"
+// Hàm lấy ID của category "Uncategorized"
 const getDefaultCategoryId = () => {
-  const stmt = db.prepare(`SELECT id FROM categories WHERE name = 'Không xác định'`);
+  const stmt = db.prepare(`SELECT id FROM categories WHERE name = 'Uncategorized'`);
   const row = stmt.get();
   return row?.id || null;
 };
@@ -58,19 +79,51 @@ exports.createPublicTransaction = (req, res) => {
   }
 
   try {
-    if (!data.category_id) {
-      data.category_id = getDefaultCategoryId();
+    // Get category_id from category name if provided
+    let category_id = data.category_id;
+    if (data.category && !category_id) {
+      // Map category to database name if needed
+      const mappedCategory = categoryMapping[data.category] || data.category;
+      console.log('Looking up category:', mappedCategory);
+      category_id = Transaction.getCategoryIdByName(mappedCategory);
+      console.log('Found category_id:', category_id);
     }
     
-    const result = Transaction.createTransaction(data);
+    if (!category_id) {
+      console.log('No category_id found, using default category');
+      category_id = getDefaultCategoryId();
+    }
+    
+    if (!category_id) {
+      console.error('Failed to get category_id for transaction');
+      return res.status(400).json({ error: 'Invalid category' });
+    }
+
+    const result = Transaction.createTransaction({
+      ...data,
+      category_id
+    });
+    
+    // Get category name from database
+    const categoryQuery = `SELECT name FROM categories WHERE id = ?`;
+    const categoryStmt = db.prepare(categoryQuery);
+    const categoryRow = categoryStmt.get(category_id);
+    const categoryName = categoryRow ? categoryRow.name : 'Uncategorized';
     
     res.status(201).json({ 
-      message: 'Transaction created successfully',
-      ...data,
-      id: result.lastInsertRowid 
+      id: result.lastInsertRowid,
+      user_id: data.user_id,
+      amount: data.amount,
+      date: data.date,
+      category_id: category_id,
+      note: data.note,
+      type: data.type,
+      description: data.note,
+      category: categoryName
     });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to create transaction' });
+    console.error('Error creating transaction:', err);
+    res.status(500).json({ error: 'Failed to create transaction', details: err.message });
   }
 };
 
@@ -85,11 +138,30 @@ exports.create = (req, res) => {
   }
 
   try {
-    if (!data.category_id) {
-      data.category_id = getDefaultCategoryId();
+    // Get category_id from category name if provided
+    let category_id = data.category_id;
+    if (data.category && !category_id) {
+      // Map category to database name if needed
+      const mappedCategory = categoryMapping[data.category] || data.category;
+      console.log('Looking up category:', mappedCategory);
+      category_id = Transaction.getCategoryIdByName(mappedCategory);
+      console.log('Found category_id:', category_id);
     }
     
-    const result = Transaction.createTransaction(data);
+    if (!category_id) {
+      console.log('No category_id found, using default category');
+      category_id = getDefaultCategoryId();
+    }
+    
+    if (!category_id) {
+      console.error('Failed to get category_id for transaction');
+      return res.status(400).json({ error: 'Invalid category' });
+    }
+
+    const result = Transaction.createTransaction({
+      ...data,
+      category_id
+    });
     
     // Nếu là giao dịch chi tiêu, cập nhật cột 'used' trong budget
     if (data.type === 'outcome') {
@@ -104,19 +176,26 @@ exports.create = (req, res) => {
       });
     }
     
+    // Get category name from database
+    const categoryQuery = `SELECT name FROM categories WHERE id = ?`;
+    const categoryStmt = db.prepare(categoryQuery);
+    const categoryRow = categoryStmt.get(category_id);
+    const categoryName = categoryRow ? categoryRow.name : 'Uncategorized';
+    
     res.status(201).json({ 
       id: result.lastInsertRowid,
       user_id: data.user_id,
       amount: data.amount,
       date: data.date,
-      category_id: data.category_id,
+      category_id: category_id,
       note: data.note,
       type: data.type,
-      description: data.note, // For frontend compatibility
-      category: 'Không xác định' // Default category name
+      description: data.note,
+      category: categoryName
     });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to create transaction' });
+    console.error('Error creating transaction:', err);
+    res.status(500).json({ error: 'Failed to create transaction', details: err.message });
   }
 };
 
@@ -126,41 +205,23 @@ exports.getByUser = (req, res) => {
     const { month } = req.query;
     const userId = req.userId; // Lấy userId từ token đã verify
     
+    console.log('Getting transactions for user:', userId, 'month:', month);
+    
     // Validate month format if provided
     if (month && !/^\d{4}-\d{2}$/.test(month)) {
-      return res.status(400).json({ error: 'Invalid month format. Use YYYY-MM format' });
+      return res.status(400).json({ error: 'Invalid month format. Use YYYY-MM format.' });
     }
 
-    // Build query with proper month filtering
-    let query = `
-      SELECT t.*, c.name as category_name
-      FROM transactions t
-      LEFT JOIN categories c ON t.category_id = c.id
-      WHERE t.user_id = ?
-    `;
+    const transactions = Transaction.getTransactionsByUser(userId, month);
+    console.log('Found transactions:', transactions);
     
-    const params = [userId];
-
-    if (month) {
-      // Lọc theo tháng với định dạng DD/MM/YYYY
-      // month dạng 'YYYY-MM', ví dụ '2025-06'
-      // So sánh phần MM/YYYY của date với MM/YYYY của month
-      query += ` AND substr(t.date, 4, 7) = ?`;
-      // month: '2025-06' => '06/2025'
-      const [y, m] = month.split('-');
-      const monthYear = `${m}/${y}`;
-      params.push(monthYear);
-    }
-
-    query += ` ORDER BY t.date DESC`;
-    
-    const stmt = db.prepare(query);
-    const rows = stmt.all(...params);
-    
-    res.json(rows);
+    res.json(transactions);
   } catch (err) {
     console.error('Error fetching transactions:', err);
-    res.status(500).json({ error: 'Failed to fetch transactions' });
+    res.status(500).json({ 
+      error: 'Failed to fetch transactions',
+      details: err.message 
+    });
   }
 };
 

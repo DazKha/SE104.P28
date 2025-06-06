@@ -28,8 +28,14 @@ const budgetRoutes = require('./routes/budgetRoutes');
 const savingRoutes = require('./routes/savingRoutes');
 const loanRoutes = require('./routes/loanRoutes');
 
+// Import controllers for public routes
+const transactionController = require('./controllers/transactionController');
 
-// Mount routes
+// Public routes (no authentication required)
+app.get('/api/public/transactions', transactionController.getPublicTransactions);
+app.post('/api/public/transactions', transactionController.createPublicTransaction);
+
+// Protected routes (require authentication)
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/budgets', budgetRoutes);

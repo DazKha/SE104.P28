@@ -11,8 +11,7 @@ export const outcomeCategories = [
   'Sports',
   'Entertainment',
   'Investment',
-  'Family',
-  'Others'
+  'Family'
 ];
 
 export const incomeCategories = [
@@ -20,33 +19,30 @@ export const incomeCategories = [
   'Bonus',
   'Investment',
   'Business',
-  'Gifts',
-  'Others'
+  'Gifts'
 ];
 
-// Map categories to their Vietnamese names
+// Map categories to English names for display
 export const categoryLabels = {
-   // Outcome categories - map từ tiếng Anh sang tiếng Việt
-  'Food & Drinks': 'Ăn uống',
-  'Transportation': 'Di chuyển', 
-  'Housing': 'Thuê nhà',
-  'Bills': 'Hoá đơn',
-  'Travel': 'Du lịch',
-  'Health': 'Sức khoẻ',
-  'Education': 'Giáo dục',
-  'Shopping': 'Mua sắm',
-  'Pets': 'Vật nuôi',
-  'Sports': 'Thể dục thể thao',
-  'Entertainment': 'Giải trí',
-  'Investment': 'Đầu tư',
-  'Family': 'Người thân',
-  'Others': 'Khác',
+  // Outcome categories - display in English
+  'Food & Drinks': 'Food & Drinks',
+  'Transportation': 'Transportation', 
+  'Housing': 'Housing',
+  'Bills': 'Bills',
+  'Travel': 'Travel',
+  'Health': 'Health',
+  'Education': 'Education',
+  'Shopping': 'Shopping',
+  'Pets': 'Pets',
+  'Sports': 'Sports',
+  'Entertainment': 'Entertainment',
+  'Investment': 'Investment',
+  'Family': 'Family',
+  'Uncategorized': 'Uncategorized',
   
   // Income categories
-  'Salary': 'Lương',
-  'Bonus': 'Thưởng',
-  'Investment': 'Đầu tư',
-  'Business': 'Kinh doanh',
-  'Gifts': 'Quà tặng',
-  'Others': 'Khác' 
+  'Salary': 'Salary',
+  'Bonus': 'Bonus',
+  'Business': 'Business',
+  'Gifts': 'Gifts'
 }; 
