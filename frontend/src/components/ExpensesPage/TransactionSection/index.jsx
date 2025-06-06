@@ -1,40 +1,34 @@
 import React, { useState, useEffect, useRef } from 'react';
-import TransactionList from './TransactionList.jsx';
+import TransactionItem from './TransactionItem.jsx';
 import CurrencyInput from '../../common/CurrencyInput.jsx';
-import { PlusIcon } from 'lucide-react';
+import { outcomeCategories, incomeCategories } from '../../../constants/categories.js';
+import { 
+  PlusIcon, 
+  SearchIcon, 
+  ChevronLeftIcon, 
+  ChevronRightIcon, 
+  CalendarIcon, 
+  TrendingUpIcon, 
+  TrendingDownIcon,
+  InboxIcon
+} from 'lucide-react';
 import './TransactionSection.css';
 
-
 const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTransaction, onDeleteTransaction }) => {
-  const expenseCategories = [
-    'Food & Drinks',
-    'Transportation',
-    'Housing',
-    'Bills',
-    'Travel',
-    'Health',
-    'Education',
-    'Shopping',
-    'Pets',
-    'Sports',
-    'Entertainment',
-    'Investment',
-    'Family',
-    'Uncategorized'
-  ];
+  // Categories
+  const expenseCategories = [...outcomeCategories, 'Uncategorized'];
+  const incomeCategories_extended = [...incomeCategories, 'Uncategorized'];
 
-  const incomeCategories = [
-    'Salary',
-    'Bonus',
-    'Investment',
-    'Business',
-    'Gifts',
-    'Uncategorized'
-  ];
-
-  // State for transaction form
+  // Main state
   const [isAddingTransaction, setIsAddingTransaction] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Month/Year navigation state
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  
   const categoryRef = useRef(null);
   const [newTransaction, setNewTransaction] = useState({
     date: new Date().toLocaleDateString('en-GB', {
@@ -43,10 +37,16 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       year: 'numeric'
     }).replace(/\//g, '/'),
     description: '',
-    category: expenseCategories[0], // Set default category
+    category: expenseCategories[0],
     amount: '',
     type: 'outcome'
   });
+
+  // Months array
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
 
   // Close category popup when clicking outside
   useEffect(() => {
@@ -77,7 +77,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     setNewTransaction(prev => ({
       ...prev,
       type: newType,
-      category: newType === 'income' ? incomeCategories[0] : expenseCategories[0]
+      category: newType === 'income' ? incomeCategories_extended[0] : expenseCategories[0]
     }));
   };
 
@@ -94,13 +94,11 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
   const handleAddTransaction = (e) => {
     e.preventDefault();
     
-    // Validate input data
     if (!newTransaction.description || !newTransaction.category || !newTransaction.amount) {
       alert('Please fill in all transaction details');
       return;
     }
 
-    // Call onAddTransaction from parent component
     if (onAddTransaction) {
       onAddTransaction(newTransaction);
     }
@@ -113,12 +111,11 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
         year: 'numeric'
       }).replace(/\//g, '/'),
       description: '',
-      category: newTransaction.type === 'income' ? incomeCategories[0] : expenseCategories[0],
+      category: newTransaction.type === 'income' ? incomeCategories_extended[0] : expenseCategories[0],
       amount: '',
       type: 'outcome'
     });
     
-    // Close add form
     setIsAddingTransaction(false);
   };
 
@@ -129,18 +126,162 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     }
   };
 
+  // Navigate month
+  const navigateMonth = (direction) => {
+    if (direction === 'prev') {
+      if (selectedMonth === 0) {
+        setSelectedMonth(11);
+        setSelectedYear(selectedYear - 1);
+      } else {
+        setSelectedMonth(selectedMonth - 1);
+      }
+    } else {
+      if (selectedMonth === 11) {
+        setSelectedMonth(0);
+        setSelectedYear(selectedYear + 1);
+      } else {
+        setSelectedMonth(selectedMonth + 1);
+      }
+    }
+  };
+
+  // Generate year options (from 2020 to current year + 2)
+  const getYearOptions = () => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let year = 2020; year <= currentYear + 2; year++) {
+      years.push(year);
+    }
+    return years;
+  };
+
+  // Handle month/year selection
+  const handleMonthChange = (e) => {
+    setSelectedMonth(parseInt(e.target.value));
+  };
+
+  const handleYearChange = (e) => {
+    setSelectedYear(parseInt(e.target.value));
+  };
+
+  // Filter and process transactions
+  const getProcessedTransactions = () => {
+    // First filter by month/year
+    let filtered = transactions.filter(transaction => {
+      if (!transaction.date) return false;
+      
+      let transactionMonth, transactionYear;
+      
+      if (transaction.date.includes('/')) {
+        const parts = transaction.date.split('/');
+        transactionMonth = parseInt(parts[1]) - 1;
+        transactionYear = parseInt(parts[2]);
+      } else if (transaction.date.includes('-')) {
+        const parts = transaction.date.split('-');
+        transactionYear = parseInt(parts[0]);
+        transactionMonth = parseInt(parts[1]) - 1;
+      }
+      
+      return transactionMonth === selectedMonth && transactionYear === selectedYear;
+    });
+    
+    // Then apply type filter
+    if (activeFilter === 'Income') {
+      filtered = filtered.filter(t => t.type === 'income');
+    } else if (activeFilter === 'Expense') {
+      filtered = filtered.filter(t => t.type === 'outcome');
+    }
+    
+    // Then apply search filter
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(transaction => 
+        transaction.description?.toLowerCase().includes(searchLower) ||
+        transaction.category?.toLowerCase().includes(searchLower) ||
+        transaction.note?.toLowerCase().includes(searchLower) ||
+        transaction.amount?.toString().includes(searchTerm)
+      );
+    }
+    
+    // Sort by date
+    const sorted = filtered.sort((a, b) => {
+      const getDateForSort = (dateStr) => {
+        if (!dateStr) return '';
+        
+        if (dateStr.includes('/')) {
+          const [day, month, year] = dateStr.split('/');
+          return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        }
+        return dateStr;
+      };
+      
+      const dateA = getDateForSort(a.date);
+      const dateB = getDateForSort(b.date);
+      return dateB.localeCompare(dateA);
+    });
+
+    return sorted;
+  };
+
+  // Calculate monthly stats (for all transactions in the month, ignoring filters)
+  const getMonthlyStats = () => {
+    const monthTransactions = transactions.filter(transaction => {
+      if (!transaction.date) return false;
+      
+      let transactionMonth, transactionYear;
+      
+      if (transaction.date.includes('/')) {
+        const parts = transaction.date.split('/');
+        transactionMonth = parseInt(parts[1]) - 1;
+        transactionYear = parseInt(parts[2]);
+      } else if (transaction.date.includes('-')) {
+        const parts = transaction.date.split('-');
+        transactionYear = parseInt(parts[0]);
+        transactionMonth = parseInt(parts[1]) - 1;
+      }
+      
+      return transactionMonth === selectedMonth && transactionYear === selectedYear;
+    });
+
+    const stats = monthTransactions.reduce((acc, transaction) => {
+      const amount = Math.abs(transaction.amount);
+      if (transaction.type === 'income') {
+        acc.totalIncome += amount;
+      } else {
+        acc.totalExpense += amount;
+      }
+      acc.transactionCount++;
+      return acc;
+    }, { totalIncome: 0, totalExpense: 0, transactionCount: 0 });
+
+    stats.netAmount = stats.totalIncome - stats.totalExpense;
+    return stats;
+  };
+
+  // Format amount
+  const formatAmount = (amount) => {
+    if (amount === 0) return '0';
+    return Math.abs(amount).toLocaleString('vi-VN');
+  };
+
+  const displayedTransactions = getProcessedTransactions();
+  const monthlyStats = getMonthlyStats();
+
   return (
     <div className="transaction-section">
+      {/* Main Header */}
       <div className="section-header">
         <h2 className="section-title">Transaction</h2>
         <button 
           onClick={() => setIsAddingTransaction(!isAddingTransaction)}
           className="add-btn"
         >
-          ➕ Add Transaction
+          <PlusIcon size={20} />
+          Add Transaction
         </button>
       </div>
 
+      {/* Add Transaction Form */}
       {isAddingTransaction && (
         <div className="transaction-form">
           <form onSubmit={handleAddTransaction}>
@@ -179,7 +320,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
                   </button>
                   {isCategoryOpen && (
                     <div className="category-popup">
-                      {(newTransaction.type === 'income' ? incomeCategories : expenseCategories).map((cat) => (
+                      {(newTransaction.type === 'income' ? incomeCategories_extended : expenseCategories).map((cat) => (
                         <button
                           key={cat}
                           type="button"
@@ -220,17 +361,10 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
             </div>
 
             <div className="form-actions">
-              <button
-                type="button"
-                onClick={() => setIsAddingTransaction(false)}
-                className="filter-btn"
-              >
+              <button type="button" onClick={() => setIsAddingTransaction(false)} className="cancel-btn">
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="filter-btn active"
-              >
+              <button type="submit" className="save-btn">
                 Save Transaction
               </button>
             </div>
@@ -238,10 +372,180 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
         </div>
       )}
 
-      <TransactionList 
-        transactions={transactions} 
-        onDelete={handleDeleteTransaction} 
-      />
+      {/* Unified Filter and Navigation Section */}
+      <div className="unified-controls">
+        {/* Filter Tabs */}
+        <div className="main-filter-tabs">
+          <button 
+            className={`filter-tab ${activeFilter === 'All' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('All')}
+          >
+            All
+          </button>
+          <button 
+            className={`filter-tab ${activeFilter === 'Income' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('Income')}
+          >
+            Income
+          </button>
+          <button 
+            className={`filter-tab ${activeFilter === 'Expense' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('Expense')}
+          >
+            Expense
+          </button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="main-search-container">
+          <div className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search transactions..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="main-search-input"
+          />
+        </div>
+
+        {/* Month Navigation */}
+        <div className="month-navigation">
+          <button onClick={() => navigateMonth('prev')} className="nav-button">
+            <ChevronLeftIcon size={20} />
+          </button>
+          
+          <div className="month-year-display">
+            <CalendarIcon size={20} />
+            <select 
+              value={selectedMonth} 
+              onChange={handleMonthChange}
+              className="month-year-selector"
+            >
+              {months.map((month, index) => (
+                <option key={index} value={index}>
+                  {month}
+                </option>
+              ))}
+            </select>
+            
+            <select 
+              value={selectedYear} 
+              onChange={handleYearChange}
+              className="month-year-selector"
+            >
+              {getYearOptions().map(year => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <button onClick={() => navigateMonth('next')} className="nav-button">
+            <ChevronRightIcon size={20} />
+          </button>
+        </div>
+      </div>
+
+      {/* Monthly Stats */}
+      <div className="monthly-stats">
+        <div className="stat-card income">
+          <div className="stat-icon">
+            <TrendingUpIcon size={24} />
+          </div>
+          <div className="stat-info">
+            <div className="stat-label">Total Income</div>
+            <div className="stat-value">
+              {formatAmount(monthlyStats.totalIncome)} VND
+            </div>
+          </div>
+        </div>
+
+        <div className="stat-card expense">
+          <div className="stat-icon">
+            <TrendingDownIcon size={24} />
+          </div>
+          <div className="stat-info">
+            <div className="stat-label">Total Expense</div>
+            <div className="stat-value">
+              {formatAmount(monthlyStats.totalExpense)} VND
+            </div>
+          </div>
+        </div>
+
+        <div className={`stat-card net ${monthlyStats.netAmount >= 0 ? 'positive' : 'negative'}`}>
+          <div className="stat-icon">
+            {monthlyStats.netAmount >= 0 ? (
+              <TrendingUpIcon size={24} />
+            ) : (
+              <TrendingDownIcon size={24} />
+            )}
+          </div>
+          <div className="stat-info">
+            <div className="stat-label">Net Amount</div>
+            <div className="stat-value">
+              {monthlyStats.netAmount >= 0 ? '+' : '-'}
+              {formatAmount(monthlyStats.netAmount)} VND
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Transactions Section */}
+      <div className="transactions-section">
+        <div className="section-header">
+          <h3>
+            {activeFilter === 'All' 
+              ? 'All Transactions' 
+              : activeFilter === 'Income' 
+                ? 'Income Transactions' 
+                : 'Expense Transactions'
+            }
+            {displayedTransactions.length > 0 && (
+              <span style={{ 
+                color: '#6b7280', 
+                fontWeight: 'normal', 
+                fontSize: '1rem',
+                marginLeft: '0.5rem'
+              }}>
+                ({displayedTransactions.length})
+              </span>
+            )}
+          </h3>
+        </div>
+
+        {displayedTransactions.length > 0 ? (
+          <div className="transactions-list">
+            {displayedTransactions.map((transaction, index) => (
+              <TransactionItem 
+                key={transaction.id || index} 
+                transaction={transaction} 
+                onDelete={handleDeleteTransaction}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <div className="empty-icon">
+              <InboxIcon size={64} />
+            </div>
+            <div className="empty-title">
+              {activeFilter === 'All' 
+                ? searchTerm 
+                  ? 'No transactions found'
+                  : 'No transactions this month'
+                : `No ${activeFilter.toLowerCase()} transactions this month`
+              }
+            </div>
+            <div className="empty-subtitle">
+              {searchTerm 
+                ? 'Try adjusting your search terms'
+                : `Add some ${activeFilter === 'All' ? '' : activeFilter.toLowerCase() + ' '}transactions to get started`
+              }
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

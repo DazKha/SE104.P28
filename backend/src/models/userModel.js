@@ -10,6 +10,18 @@ const User = {
   findByEmail: (email) => {
     const stmt = db.prepare('SELECT * FROM users WHERE email = ?');
     return stmt.get(email);
+  },
+
+  getAllUsers: async () => {
+    return new Promise((resolve, reject) => {
+      db.all('SELECT id, name, email FROM users', [], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
   }
 };
 

@@ -31,3 +31,25 @@ exports.confirmReceipt = async (req, res) => {
     res.status(500).json({ message: 'Save failed', error: err.message });
   }
 };
+
+exports.scanReceipt = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file uploaded' });
+    }
+
+    // TODO: Implement actual receipt scanning logic here
+    // For now, return a mock response
+    res.json({
+      message: 'Receipt scanned successfully',
+      data: {
+        amount: 0,
+        date: new Date().toISOString(),
+        category: 'Uncategorized',
+        items: []
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Scan failed', error: err.message });
+  }
+};

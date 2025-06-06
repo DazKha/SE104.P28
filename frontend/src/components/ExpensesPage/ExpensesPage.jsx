@@ -162,7 +162,7 @@ const ExpensesPage = () => {
       <div>
         <div>
           <CurrentBalance 
-            balance={balance}
+            transactions={transactions}
             onAddTransaction={handleAddTransaction}
           />
         </div>
