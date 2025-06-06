@@ -27,6 +27,7 @@ const transactionRoutes = require('./routes/transactionRoutes');
 const budgetRoutes = require('./routes/budgetRoutes');
 const savingRoutes = require('./routes/savingRoutes');
 const loanRoutes = require('./routes/loanRoutes');
+const receiptRoutes = require('./routes/receiptRoutes');
 
 // Import controllers for public routes
 const transactionController = require('./controllers/transactionController');
@@ -41,6 +42,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/budgets', budgetRoutes);
 app.use('/api/savings', savingRoutes);
 app.use('/api/loans_debts', loanRoutes);
+app.use('/api/receipts', receiptRoutes);
 
 // Start server
 const PORT = process.env.PORT || 3000;

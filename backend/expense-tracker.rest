@@ -25,7 +25,7 @@ Content-Type: application/json
 Authorization: Bearer {{login.response.body.token}}
 
 {
-    "amount": 150000,
+    "amount": 160000,
     "date": "2025-06-02T12:00:00Z",
     "category_id": 5,
     "note": "Ăn trưa", 
@@ -86,7 +86,7 @@ Authorization: Bearer {{login.response.body.token}}
 
 {
     "amount": 100000,
-    "month": "2024-06"
+    "month": "2025-06"
 }
 
 ### Get all budgets
