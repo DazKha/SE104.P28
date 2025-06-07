@@ -10,7 +10,9 @@ import {
   CalendarIcon, 
   TrendingUpIcon, 
   TrendingDownIcon,
-  InboxIcon
+  InboxIcon,
+  CameraIcon,
+  ImageIcon
 } from 'lucide-react';
 import './TransactionSection.css';
 
@@ -24,12 +26,16 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   
   // Month/Year navigation state
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   
   const categoryRef = useRef(null);
+  const fileInputRef = useRef(null);
+  
   const [newTransaction, setNewTransaction] = useState({
     date: new Date().toLocaleDateString('en-GB', {
       day: '2-digit',
@@ -90,6 +96,35 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     setIsCategoryOpen(false);
   };
 
+  // Handle image selection
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedImage(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Handle add picture button click
+  const handleAddPictureClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  // Remove selected image
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   // Handle adding new transaction
   const handleAddTransaction = (e) => {
     e.preventDefault();
@@ -99,8 +134,14 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       return;
     }
 
+    // Create transaction data with image if selected
+    const transactionData = {
+      ...newTransaction,
+      image: selectedImage // Include the selected image
+    };
+
     if (onAddTransaction) {
-      onAddTransaction(newTransaction);
+      onAddTransaction(transactionData);
     }
     
     // Reset form
@@ -115,6 +156,13 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       amount: '',
       type: 'outcome'
     });
+    
+    // Reset image states
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     
     setIsAddingTransaction(false);
   };
@@ -360,7 +408,42 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
               </div>
             </div>
 
+            {/* Image Upload Section */}
+            {imagePreview && (
+              <div className="image-preview-section">
+                <label>Receipt Image</label>
+                <div className="image-preview-container">
+                  <img src={imagePreview} alt="Receipt preview" className="image-preview" />
+                  <button 
+                    type="button" 
+                    onClick={handleRemoveImage}
+                    className="remove-image-btn"
+                    title="Remove image"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Hidden file input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageSelect}
+              accept="image/*"
+              style={{ display: 'none' }}
+            />
+
             <div className="form-actions">
+              <button 
+                type="button" 
+                onClick={handleAddPictureClick} 
+                className="picture-btn"
+              >
+                <CameraIcon size={16} />
+                Receipt
+              </button>
               <button type="button" onClick={() => setIsAddingTransaction(false)} className="cancel-btn">
                 Cancel
               </button>
