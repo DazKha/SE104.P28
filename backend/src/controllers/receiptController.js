@@ -38,18 +38,35 @@ exports.scanReceipt = async (req, res) => {
       return res.status(400).json({ error: 'No image file uploaded' });
     }
 
+    // Xử lý memory buffer trực tiếp (không cần file system)
+    const imageBuffer = req.file.buffer;
+    const originalName = req.file.originalname;
+    const fileSize = req.file.size;
+    const mimeType = req.file.mimetype;
+
+    console.log('Receipt uploaded:', { originalName, fileSize, mimeType });
+
+    // Convert buffer thành base64
+    const base64Image = imageBuffer.toString('base64');
+    const dataUrl = `data:${mimeType};base64,${base64Image}`;
+
     // TODO: Implement actual receipt scanning logic here
-    // For now, return a mock response
+    // For now, return base64 data + mock OCR data
     res.json({
-      message: 'Receipt scanned successfully',
+      message: 'Receipt processed successfully',
       data: {
+        receiptImage: dataUrl,        // ← Base64 data URL
+        originalName: originalName,
+        fileSize: fileSize,
+        // Mock OCR data
         amount: 0,
-        date: new Date().toISOString(),
-        category: 'Uncategorized',
-        items: []
+        date: new Date().toISOString().split('T')[0],
+        category: 'Food & Drinks',
+        items: [],
+        confidence: 0.8
       }
     });
   } catch (err) {
-    res.status(500).json({ message: 'Scan failed', error: err.message });
+    res.status(500).json({ message: 'Processing failed', error: err.message });
   }
 };

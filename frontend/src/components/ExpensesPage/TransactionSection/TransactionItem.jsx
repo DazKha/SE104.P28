@@ -1,8 +1,10 @@
-import React from 'react';
-import { ArrowDownIcon, ArrowUpIcon, XIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowDownIcon, ArrowUpIcon, XIcon, ImageIcon } from 'lucide-react';
 import './TransactionItem.css';
 
 const TransactionItem = ({ transaction, onDelete }) => {
+  const [showImageModal, setShowImageModal] = useState(false);
+
   // Định dạng số tiền
   const formatAmount = (amount) => {
     const absAmount = Math.abs(amount);
@@ -10,8 +12,16 @@ const TransactionItem = ({ transaction, onDelete }) => {
   };
 
   // Xử lý xóa giao dịch
-  const handleDelete = () => {
+  const handleDelete = (e) => {
+    e.stopPropagation(); // Prevent triggering transaction click
     onDelete(transaction.id);
+  };
+
+  // Xử lý click vào transaction
+  const handleTransactionClick = () => {
+    if (hasImage) {
+      setShowImageModal(true);
+    }
   };
 
   // Kiểm tra xem giao dịch là thu nhập hay chi tiêu
@@ -20,10 +30,18 @@ const TransactionItem = ({ transaction, onDelete }) => {
   // Get description and category with fallbacks for API data
   const description = transaction.note || transaction.description || 'Transaction';
   const category = transaction.category_name || transaction.category || 'Undefined';
+  
+  // Check if transaction has image (support multiple formats)
+  const hasImage = transaction.imagePath || transaction.receipt_path || transaction.receipt_image;
 
   return (
-    <div className={`transaction-item ${isIncome ? 'income' : 'expense'}`}>
-      <div className="transaction-content">
+    <>
+      <div 
+        className={`transaction-item ${isIncome ? 'income' : 'expense'} ${hasImage ? 'has-receipt' : ''}`}
+        onClick={handleTransactionClick}
+        style={{ cursor: hasImage ? 'pointer' : 'default' }}
+      >
+        <div className="transaction-content">
         <div className="transaction-info">
           <div className={`transaction-icon ${isIncome ? 'income' : 'expense'}`}>
             {isIncome ? <ArrowUpIcon size={20} /> : <ArrowDownIcon size={20} />}
@@ -31,6 +49,12 @@ const TransactionItem = ({ transaction, onDelete }) => {
           <div className="transaction-details">
             <div className="transaction-date">{transaction.date}</div>
             <div className="transaction-description">{description}</div>
+            {hasImage && (
+              <div className="transaction-image-indicator">
+                <ImageIcon size={14} />
+                <span>Receipt attached - Click to view</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -49,8 +73,44 @@ const TransactionItem = ({ transaction, onDelete }) => {
             {isIncome ? '+' : '-'}{formatAmount(transaction.amount)} đ
           </div>
         </div>
+        </div>
       </div>
-    </div>
+
+      {/* Receipt Modal */}
+      {hasImage && showImageModal && (
+        <div className="receipt-modal-overlay" onClick={() => setShowImageModal(false)}>
+          <div className="receipt-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="receipt-modal-header">
+              <h4>Receipt - {description}</h4>
+              <button 
+                onClick={() => setShowImageModal(false)}
+                className="close-modal-btn"
+              >
+                ×
+              </button>
+            </div>
+            <div className="receipt-modal-content">
+              <img 
+                src={
+                  transaction.receipt_image || // Base64 data URL
+                  transaction.imagePath || // Legacy format
+                  `http://localhost:3000/${transaction.receipt_path}` // File path format
+                } 
+                alt="Receipt" 
+                className="modal-receipt-image"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              <div className="image-error" style={{ display: 'none' }}>
+                Receipt image not available
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

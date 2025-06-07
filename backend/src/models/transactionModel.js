@@ -2,15 +2,15 @@ const db = require('../database/db');
 
 // tạo transaction
 exports.createTransaction = (transactionData) => {
-  const { user_id, amount, date, category_id, note, type } = transactionData;
+  const { user_id, amount, date, category_id, note, type, receipt_image, receipt_data } = transactionData;
 
   const query = `
-    INSERT INTO transactions (user_id, amount, date, category_id, note, type)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO transactions (user_id, amount, date, category_id, note, type, receipt_image, receipt_data)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const stmt = db.prepare(query);
-  return stmt.run(user_id, amount, date, category_id, note, type);
+  return stmt.run(user_id, amount, date, category_id, note, type, receipt_image, receipt_data);
 };
 
 // READ ALL for user with optional month filter

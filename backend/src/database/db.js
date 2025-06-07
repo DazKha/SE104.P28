@@ -31,6 +31,8 @@ db.exec(`
     category_id INTEGER NOT NULL,
     note TEXT,
     type TEXT CHECK (type IN ('income', 'outcome')) NOT NULL,
+    receipt_image TEXT,
+    receipt_data TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (category_id) REFERENCES categories(id)
   );

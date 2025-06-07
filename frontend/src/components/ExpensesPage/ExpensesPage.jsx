@@ -65,7 +65,9 @@ const ExpensesPage = () => {
         date: newTransaction.date || new Date().toISOString().split('T')[0],
         category: newTransaction.category, // Pass the selected category name
         note: newTransaction.description || '',
-        type: newTransaction.type
+        type: newTransaction.type,
+        receipt_image: newTransaction.imagePath || null, // Base64 image data
+        receipt_data: newTransaction.ocrData ? JSON.stringify(newTransaction.ocrData) : null // OCR data as JSON string
       };
 
       // Save to API
@@ -93,7 +95,9 @@ const ExpensesPage = () => {
         date: newTransaction.date || new Date().toISOString().split('T')[0],
         description: newTransaction.description || '',
         category: newTransaction.category || 'Uncategorized',
-        type: newTransaction.type
+        type: newTransaction.type,
+        receipt_image: newTransaction.imagePath || null,
+        receipt_data: newTransaction.ocrData ? JSON.stringify(newTransaction.ocrData) : null
       };
       
       setTransactions(prev => [fallbackTransaction, ...prev]);

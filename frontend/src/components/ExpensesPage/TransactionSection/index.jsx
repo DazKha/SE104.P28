@@ -4,7 +4,6 @@ import CurrencyInput from '../../common/CurrencyInput.jsx';
 import { outcomeCategories, incomeCategories } from '../../../constants/categories.js';
 import { 
   PlusIcon, 
-  SearchIcon, 
   ChevronLeftIcon, 
   ChevronRightIcon, 
   CalendarIcon, 
@@ -28,6 +27,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   
   // Month/Year navigation state
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
@@ -96,18 +96,55 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     setIsCategoryOpen(false);
   };
 
+  // Compress image before setting
+  const compressImage = (file, quality = 0.6, maxWidth = 800) => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions while maintaining aspect ratio
+        let { width, height } = img;
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(resolve, 'image/jpeg', quality);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   // Handle image selection
-  const handleImageSelect = (e) => {
+  const handleImageSelect = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedImage(file);
+      console.log('Original file size:', file.size / 1024 / 1024, 'MB');
+      
+      // Compress image if it's larger than 1MB
+      let processedFile = file;
+      if (file.size > 1024 * 1024) {
+        console.log('Compressing image...');
+        processedFile = await compressImage(file);
+        console.log('Compressed file size:', processedFile.size / 1024 / 1024, 'MB');
+      }
+      
+      setSelectedImage(processedFile);
       
       // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target.result);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(processedFile);
     }
   };
 
@@ -125,8 +162,32 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     }
   };
 
+  // Upload image to backend
+  const uploadImage = async (imageFile) => {
+    try {
+      const formData = new FormData();
+      formData.append('image', imageFile);
+
+      const response = await fetch('http://localhost:3000/api/receipts/scan', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const result = await response.json();
+      console.log('Upload result:', result);
+      return result.data || {}; // Return file path + OCR data if available
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
+
   // Handle adding new transaction
-  const handleAddTransaction = (e) => {
+  const handleAddTransaction = async (e) => {
     e.preventDefault();
     
     if (!newTransaction.description || !newTransaction.category || !newTransaction.amount) {
@@ -134,14 +195,34 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       return;
     }
 
-    // Create transaction data with image if selected
+    let imagePath = null;
+    let ocrData = null;
+
+    // Upload image if selected
+    if (selectedImage) {
+      try {
+        setUploadingImage(true);
+        console.log('Uploading receipt...');
+        ocrData = await uploadImage(selectedImage);
+        imagePath = ocrData.receiptImage; // Use base64 data URL from backend
+        console.log('Receipt processed successfully:', ocrData);
+      } catch (error) {
+        alert('Failed to upload image. Transaction will be saved without image.');
+        console.error('Image upload error:', error);
+      } finally {
+        setUploadingImage(false);
+      }
+    }
+
+    // Create transaction data with image path
     const transactionData = {
       ...newTransaction,
-      image: selectedImage // Include the selected image
+      imagePath: imagePath, // Store image path instead of file object
+      ocrData: ocrData // Store OCR extracted data if available
     };
 
     if (onAddTransaction) {
-      onAddTransaction(transactionData);
+      await onAddTransaction(transactionData);
     }
     
     // Reset form
@@ -447,8 +528,8 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
               <button type="button" onClick={() => setIsAddingTransaction(false)} className="cancel-btn">
                 Cancel
               </button>
-              <button type="submit" className="save-btn">
-                Save Transaction
+              <button type="submit" className="save-btn" disabled={uploadingImage}>
+                {uploadingImage ? 'Uploading...' : 'Save Transaction'}
               </button>
             </div>
           </form>

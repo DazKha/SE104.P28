@@ -13,7 +13,9 @@ app.use(cors({
   exposedHeaders: ['Authorization']
 }));
 
-app.use(express.json());
+// Increase payload size limits for image uploads (base64 storage)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 console.log('hello world')
 // Define the root route
