@@ -83,8 +83,8 @@ function BudgetItem({ budget, onEdit, onDelete }) {
               <span className={styles.percentage}>{spentPercentage.toFixed(0)}% Used</span>
               <span className={isOverBudget ? styles.overBudgetText : styles.remainingText}>
                 {isOverBudget
-                  ? `Vượt ${formatCurrency(Math.abs(remaining))}`
-                  : `Còn lại ${formatCurrency(remaining)}`}
+                  ? `Over ${formatCurrency(Math.abs(remaining))}`
+                  : `Remaining ${formatCurrency(remaining)}`}
               </span>
             </div>
           </div>
