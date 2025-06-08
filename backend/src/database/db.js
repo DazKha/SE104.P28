@@ -109,7 +109,7 @@ if (count.count === 0) {
   for (const category of categories) {
     insertCategory.run(category);
   }
-  console.log('✅ Categories seeded successfully');
+  console.log('Categories seeded successfully');
 } else if (maxId > 50) {
   // If category IDs are too high (indicating previous deletion/recreation cycles), reset them
   console.log('🔧 Category IDs are too high (max: ' + maxId + '), resetting...');
@@ -125,7 +125,7 @@ if (count.count === 0) {
     }
   }
   if (newCategoriesCount > 0) {
-    console.log(`✅ Added ${newCategoriesCount} new categories`);
+    console.log(`Added ${newCategoriesCount} new categories`);
   } else {
     console.log('✅ All categories already exist');
   }
