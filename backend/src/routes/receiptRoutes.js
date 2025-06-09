@@ -8,5 +8,6 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 router.post('/scan', upload.single('image'), receiptController.scanReceipt);
 router.post('/confirm', receiptController.confirmReceipt);
+router.get('/ocr-health', receiptController.checkOcrHealth);
 
 module.exports = router;
