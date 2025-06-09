@@ -26,21 +26,21 @@ function Budget() {
       setBudgets(data);
     } catch (err) {
       console.error('Error fetching budgets:', err);
-      // Fallback với mock data nếu lỗi
-      setBudgets([
-        {
-          id: 1,
-          month: '2024-07',
-          amount: 62500000, // 2500 USD = 62.5 triệu VNĐ
-          used: 46250000,   // 1850 USD = 46.25 triệu VNĐ
-        },
-        {
-          id: 2,
-          month: '2024-06',
-          amount: 60000000, // 2400 USD = 60 triệu VNĐ
-          used: 61250000,   // 2450 USD = 61.25 triệu VNĐ (over budget)
-        }
-      ]);
+      // // Fallback với mock data nếu lỗi
+      // setBudgets([
+      //   {
+      //     id: 1,
+      //     month: '2024-07',
+      //     amount: 62500000, // 2500 USD = 62.5 triệu VNĐ
+      //     used: 46250000,   // 1850 USD = 46.25 triệu VNĐ
+      //   },
+      //   {
+      //     id: 2,
+      //     month: '2024-06',
+      //     amount: 60000000, // 2400 USD = 60 triệu VNĐ
+      //     used: 61250000,   // 2450 USD = 61.25 triệu VNĐ (over budget)
+      //   }
+      // ]);
     }
     setLoading(false);
   }, [isLoggedIn]);
