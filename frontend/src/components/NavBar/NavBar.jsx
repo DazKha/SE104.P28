@@ -36,6 +36,10 @@
             <NavLink to="/your-debt" className={({ isActive }) => isActive ? "active-link" : ""}>
               Your debt
             </NavLink>
+            
+            <NavLink to="/ocr" className={({ isActive }) => isActive ? "active-link" : ""}>
+              <i className="fas fa-camera"></i> OCR
+            </NavLink>
           </div>
           
           <div className="user-section">
