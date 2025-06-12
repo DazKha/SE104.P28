@@ -27,7 +27,7 @@ OCR_SERVICE_URL=http://localhost:8000/ocr
 # Timeout cho OCR request (mặc định: 30000 = 30 giây)
 OCR_TIMEOUT=30000
 ```
-
+ 
 ### 2. OCR Service Requirements
 
 OCR service cần hỗ trợ:

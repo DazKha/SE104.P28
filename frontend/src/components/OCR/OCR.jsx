@@ -25,7 +25,7 @@ const OCR = () => {
         }
     };
 
-    const handleSubmit = async (event) => {
+    const handleProcessImage = async (event) => {
         event.preventDefault();
         if (!selectedFile) {
             setError('Please select an image first');
@@ -37,30 +37,33 @@ const OCR = () => {
         setResult(null);
 
         try {
-            // Create FormData and append the file
             const formData = new FormData();
-            formData.append('image', selectedFile);
-            
-            console.log('Sending request to backend...');
-            // Call backend OCR endpoint
-            const response = await axios.post('http://localhost:3000/api/receipts/ocr', formData, {
+            formData.append('file', selectedFile);
+
+            const response = await fetch('https://8fd6-34-169-178-189.ngrok-free.app/ocr', {
+                method: 'POST',
+                body: formData,
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Accept': 'application/json',
                 }
             });
 
-            console.log('OCR Response:', response.data);
-            if (response.data.error) {
-                throw new Error(response.data.error);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.error || `HTTP error! status: ${response.status}`);
             }
-            setResult(response.data);
+
+            const data = await response.json();
+            console.log('OCR Response:', data); // Debug log
+
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            setResult(data);
         } catch (error) {
-            console.error('OCR Error:', error);
-            const errorMessage = error.response?.data?.error || 
-                                error.response?.data?.details || 
-                                error.message || 
-                                'Failed to process image. Please try again.';
-            setError(errorMessage);
+            console.error('Error processing image:', error);
+            setError(error.message || 'Failed to process image');
         } finally {
             setLoading(false);
         }
@@ -81,8 +84,15 @@ const OCR = () => {
         if (!result || !result.response_message) return null;
 
         try {
-            const receiptData = JSON.parse(result.response_message);
-            const { "Danh sách món": items, "Tổng tiền thanh toán": total } = receiptData;
+            // Remove markdown code block if present
+            let jsonStr = result.response_message;
+            if (jsonStr.includes('```json')) {
+                jsonStr = jsonStr.replace(/```json\n|\n```/g, '');
+            }
+            
+            // Parse the JSON string
+            const items = JSON.parse(jsonStr);
+            const total = items.reduce((sum, item) => sum + item["Thành tiền"], 0);
 
             return (
                 <div className="receipt-details">
@@ -92,7 +102,7 @@ const OCR = () => {
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Tên món</th>
+                                    <th>Tên mặt hàng</th>
                                     <th>Số lượng</th>
                                     <th>Thành tiền</th>
                                 </tr>
@@ -100,20 +110,19 @@ const OCR = () => {
                             <tbody>
                                 {items.map((item, index) => (
                                     <tr key={index}>
-                                        <td>{item["Tên món"]}</td>
+                                        <td>{item["Tên mặt hàng"]}</td>
                                         <td>{item["Số lượng"]}</td>
                                         <td>{formatCurrency(item["Thành tiền"])}</td>
                                     </tr>
                                 ))}
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colSpan="2"><strong>Tổng tiền thanh toán:</strong></td>
+                                    <td><strong>{formatCurrency(total)}</strong></td>
+                                </tr>
+                            </tfoot>
                         </table>
-                    </div>
-
-                    <div className="receipt-summary">
-                        <div className="summary-item">
-                            <span>Tổng tiền thanh toán:</span>
-                            <span>{formatCurrency(total)}</span>
-                        </div>
                     </div>
                 </div>
             );
@@ -122,7 +131,9 @@ const OCR = () => {
             return (
                 <div className="error-message">
                     <p>Error parsing receipt data. Raw data:</p>
-                    <pre>{result.response_message}</pre>
+                    <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                        {result.response_message}
+                    </pre>
                 </div>
             );
         }
@@ -133,7 +144,7 @@ const OCR = () => {
             <h1>Receipt OCR</h1>
             <p>Upload a receipt image to extract information</p>
 
-            <form onSubmit={handleSubmit} className="ocr-form">
+            <form onSubmit={handleProcessImage} className="ocr-form">
                 <div className="file-input-container">
                     <input
                         type="file"

@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 
 // OCR server URL - Update this when the ngrok URL changes
-const OCR_SERVER_URL = 'https://1f4d-35-247-134-54.ngrok-free.app/ocr';
+const OCR_SERVER_URL = 'https://8fd6-34-169-178-189.ngrok-free.app/ocr';
 
 router.post('/scan', receiptController.scanReceipt);
 router.post('/confirm', receiptController.confirmReceipt);
