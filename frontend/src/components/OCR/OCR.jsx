@@ -40,7 +40,7 @@ const OCR = () => {
             const formData = new FormData();
             formData.append('file', selectedFile);
 
-            const response = await fetch('https://8fd6-34-169-178-189.ngrok-free.app/ocr', {
+            const response = await fetch('https://b063-34-169-178-189.ngrok-free.app/ocr', {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -70,14 +70,47 @@ const OCR = () => {
     };
 
     const formatCurrency = (amount) => {
-        // Convert string to number and multiply by 1000 to get the correct amount
-        const numericAmount = parseFloat(amount) * 1000;
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(numericAmount);
+        // Return the amount as is with VND suffix
+        return `${amount} VND`;
+    };
+
+    const preserveDecimalFormat = (jsonStr, data) => {
+        // Helper function to format number
+        const formatNumber = (numberStr) => {
+            // If the number doesn't have a decimal point, add .000
+            if (!numberStr.includes('.')) {
+                // Convert to number, divide by 1000, and format to 3 decimal places
+                const num = parseFloat(numberStr) / 1000;
+                return num.toFixed(3);
+            }
+            // If it already has a decimal point, keep it as is
+            return numberStr;
+        };
+
+        // Extract numbers with their original format from JSON string
+        const items = data["Mặt hàng"] || data;
+        const itemsWithFormat = items.map((item, index) => {
+            // Find the original number format in JSON string for this item
+            const itemName = item["Tên mặt hàng"];
+            const escapedName = itemName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`"Tên mặt hàng":\\s*"${escapedName}"[^}]*"Thành tiền":\\s*([0-9]+\\.?[0-9]*)`);
+            const match = jsonStr.match(regex);
+            const originalAmount = match ? match[1] : item["Thành tiền"].toString();
+            const formattedAmount = formatNumber(originalAmount);
+            
+            return {
+                ...item,
+                formattedAmount: formattedAmount
+            };
+        });
+        
+        // Extract total format
+        const totalRegex = /"Tổng số":\s*([0-9]+\.?[0-9]*)/;
+        const totalMatch = jsonStr.match(totalRegex);
+        const originalTotal = totalMatch ? totalMatch[1] : (data["Tổng số"] || 0).toString();
+        const formattedTotal = formatNumber(originalTotal);
+        
+        return { items: itemsWithFormat, total: formattedTotal };
     };
 
     const renderReceiptDetails = () => {
@@ -90,9 +123,45 @@ const OCR = () => {
                 jsonStr = jsonStr.replace(/```json\n|\n```/g, '');
             }
             
-            // Parse the JSON string
-            const items = JSON.parse(jsonStr);
-            const total = items.reduce((sum, item) => sum + item["Thành tiền"], 0);
+            let items = [];
+            let total = 0;
+            
+            // Parse the JSON response
+            const data = JSON.parse(jsonStr);
+            
+            // Check if data has "Mặt hàng" key (new format)
+            if (data["Mặt hàng"]) {
+                const formatted = preserveDecimalFormat(jsonStr, data);
+                items = formatted.items;
+                total = formatted.total;
+            }
+            // Check if response contains both array and total object (old format)
+            else if (jsonStr.includes('\n]\n{')) {
+                // Split the response into items array and total object
+                const parts = jsonStr.split('\n]\n');
+                const itemsStr = parts[0] + ']';
+                const totalStr = parts[1] ? parts[1].trim() : null;
+                
+                // Parse items array
+                items = JSON.parse(itemsStr);
+                
+                // Parse total amount if available
+                if (totalStr) {
+                    try {
+                        const totalObj = JSON.parse(totalStr);
+                        total = totalObj["Tổng số"] || 0;
+                    } catch (e) {
+                        console.warn('Could not parse total amount:', e);
+                        total = 0; // Set to 0 if parsing fails
+                    }
+                } else {
+                    total = 0; // Set to 0 if no total object
+                }
+            } else if (Array.isArray(data)) {
+                // Response only contains items array (old format)
+                items = data;
+                total = 0; // Set to 0 if no total amount provided
+            }
 
             return (
                 <div className="receipt-details">
@@ -112,7 +181,7 @@ const OCR = () => {
                                     <tr key={index}>
                                         <td>{item["Tên mặt hàng"]}</td>
                                         <td>{item["Số lượng"]}</td>
-                                        <td>{formatCurrency(item["Thành tiền"])}</td>
+                                        <td>{formatCurrency(item.formattedAmount || item["Thành tiền"])}</td>
                                     </tr>
                                 ))}
                             </tbody>
