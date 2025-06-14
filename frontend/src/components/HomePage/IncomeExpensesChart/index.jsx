@@ -8,9 +8,22 @@ const IncomeExpensesChart = ({ transactions }) => {
 
   // Memoize the processed data to avoid unnecessary recalculations
   const chartData = useMemo(() => {
+    console.log('=== CHART DEBUG ===');
+    console.log('Raw transactions received:', transactions?.length || 0);
+    console.log('Sample transaction:', transactions?.[0]);
+    
     if (!transactions) {
+      console.log('No transactions provided');
       return [];
     }
+
+    // Debug: Check transaction types
+    const outcomeTransactions = transactions.filter(t => t.type === 'outcome');
+    const incomeTransactions = transactions.filter(t => t.type === 'income');
+    
+    console.log('Income transactions:', incomeTransactions.length);
+    console.log('Outcome transactions:', outcomeTransactions.length);
+    console.log('Sample outcome:', outcomeTransactions[0]);
 
     const now = new Date();
     const data = [];
@@ -35,6 +48,8 @@ const IncomeExpensesChart = ({ transactions }) => {
           .filter(t => t.type === 'outcome')
           .reduce((sum, t) => sum + Math.abs(parseFloat(t.amount)), 0);
 
+        console.log(`${dayName} - Income: ${income}, Outcome: ${outcome}`);
+        
         data.push({
           name: dayName,
           income,
@@ -70,6 +85,8 @@ const IncomeExpensesChart = ({ transactions }) => {
       }
     }
     
+    console.log('Final chart data:', data);
+    console.log('=== END CHART DEBUG ===');
     return data;
   }, [transactions, viewType]);
 

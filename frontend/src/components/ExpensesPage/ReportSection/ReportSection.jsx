@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import ReportChart from './ReportChart/ReportChart.jsx';
-import { PieChart, BarChart, TrendingUp, TrendingDown, Calendar, Download } from 'lucide-react';
+import { PieChart, BarChart, TrendingUp, TrendingDown, Calendar, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import './ReportSection.css';
 
-const ReportSection = () => {
-  // Trạng thái cho các giao dịch
-  const [transactions, setTransactions] = useState([]);
+const ReportSection = ({ transactions = [] }) => {
+  // State cho month/year selector
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   
   // Trạng thái cho báo cáo tổng quan
   const [summary, setSummary] = useState({
@@ -22,80 +23,124 @@ const ReportSection = () => {
     }
   });
 
-  // Tải dữ liệu từ localStorage
-  useEffect(() => {
-    const savedTransactions = localStorage.getItem('transactions');
-    if (savedTransactions) {
-      setTransactions(JSON.parse(savedTransactions));
-    }
-  }, []);
-
-  // Tính toán các báo cáo tổng quan
-  useEffect(() => {
-    if (transactions.length === 0) return;
-
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
+  // Helper function để parse date
+  const parseTransactionDate = (dateString) => {
+    if (!dateString) return null;
     
-    // Lọc giao dịch theo tháng hiện tại và tháng trước
-    const currentMonthTransactions = transactions.filter(transaction => {
-      const [day, month, year] = transaction.date.split('/').map(Number);
-      return month - 1 === currentMonth && year === currentYear;
+    // Xử lý format DD/MM/YYYY
+    if (dateString.includes('/')) {
+      const [day, month, year] = dateString.split('/').map(Number);
+      return { day, month: month - 1, year }; // month - 1 vì JavaScript Date sử dụng 0-based month
+    }
+    
+    // Xử lý format YYYY-MM-DD
+    if (dateString.includes('-')) {
+      const [year, month, day] = dateString.split('-').map(Number);
+      return { day, month: month - 1, year };
+    }
+    
+    return null;
+  };
+
+  // Filter transactions theo tháng được chọn
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter(transaction => {
+      const parsedDate = parseTransactionDate(transaction.date);
+      if (!parsedDate) return false;
+      return parsedDate.month === selectedMonth && parsedDate.year === selectedYear;
     });
+  }, [transactions, selectedMonth, selectedYear]);
+
+  // Tính toán các báo cáo tổng quan dựa trên transactions đã filter
+  useEffect(() => {
+    console.log('=== REPORT SECTION DEBUG ===');
+    console.log('All transactions received:', transactions?.length || 0);
+    console.log('Filtered transactions for month:', filteredTransactions?.length || 0);
+    console.log('Selected month/year:', selectedMonth + 1, selectedYear);
+    if (filteredTransactions?.length > 0) {
+      console.log('Sample filtered transaction:', {
+        date: filteredTransactions[0].date,
+        category_name: filteredTransactions[0].category_name,
+        type: filteredTransactions[0].type,
+        amount: filteredTransactions[0].amount
+      });
+    }
+    console.log('=== END REPORT SECTION DEBUG ===');
+    
+    if (filteredTransactions.length === 0) {
+      // Reset summary if no transactions
+      setSummary({
+        balance: 0,
+        income: 0,
+        expense: 0,
+        thisMonth: { income: 0, expense: 0 },
+        lastMonth: { income: 0, expense: 0 }
+      });
+      return;
+    }
+
+    // Tính toán tổng thu nhập và chi tiêu cho tháng được chọn
+    const totalIncome = filteredTransactions
+      .filter(transaction => transaction.type === 'income')
+      .reduce((sum, transaction) => sum + Math.abs(parseFloat(transaction.amount)), 0);
+    
+    const totalExpense = filteredTransactions
+      .filter(transaction => transaction.type === 'outcome')
+      .reduce((sum, transaction) => sum + Math.abs(parseFloat(transaction.amount)), 0);
+
+    // Tính toán cho tháng trước để so sánh
+    const lastMonth = selectedMonth === 0 ? 11 : selectedMonth - 1;
+    const lastYear = selectedMonth === 0 ? selectedYear - 1 : selectedYear;
     
     const lastMonthTransactions = transactions.filter(transaction => {
-      const [day, month, year] = transaction.date.split('/').map(Number);
-      // Xử lý tháng 1 (so với tháng 12 năm trước)
-      if (currentMonth === 0) {
-        return month === 12 && year === currentYear - 1;
-      }
-      return month - 1 === currentMonth - 1 && year === currentYear;
+      const parsedDate = parseTransactionDate(transaction.date);
+      if (!parsedDate) return false;
+      return parsedDate.month === lastMonth && parsedDate.year === lastYear;
     });
 
-    // Tính toán tổng thu nhập và chi tiêu
-    const totalIncome = transactions
-      .filter(transaction => transaction.amount > 0)
-      .reduce((sum, transaction) => sum + transaction.amount, 0);
-    
-    const totalExpense = transactions
-      .filter(transaction => transaction.amount < 0)
-      .reduce((sum, transaction) => sum + transaction.amount, 0);
-    
-    // Tính toán cho tháng hiện tại
-    const thisMonthIncome = currentMonthTransactions
-      .filter(transaction => transaction.amount > 0)
-      .reduce((sum, transaction) => sum + transaction.amount, 0);
-    
-    const thisMonthExpense = currentMonthTransactions
-      .filter(transaction => transaction.amount < 0)
-      .reduce((sum, transaction) => sum + transaction.amount, 0);
-    
-    // Tính toán cho tháng trước
     const lastMonthIncome = lastMonthTransactions
-      .filter(transaction => transaction.amount > 0)
-      .reduce((sum, transaction) => sum + transaction.amount, 0);
+      .filter(transaction => transaction.type === 'income')
+      .reduce((sum, transaction) => sum + Math.abs(parseFloat(transaction.amount)), 0);
     
     const lastMonthExpense = lastMonthTransactions
-      .filter(transaction => transaction.amount < 0)
-      .reduce((sum, transaction) => sum + transaction.amount, 0);
+      .filter(transaction => transaction.type === 'outcome')
+      .reduce((sum, transaction) => sum + Math.abs(parseFloat(transaction.amount)), 0);
 
     // Cập nhật báo cáo tổng quan
     setSummary({
-      balance: totalIncome + totalExpense,
+      balance: totalIncome - totalExpense,
       income: totalIncome,
       expense: totalExpense,
       thisMonth: {
-        income: thisMonthIncome,
-        expense: thisMonthExpense
+        income: totalIncome,
+        expense: totalExpense
       },
       lastMonth: {
         income: lastMonthIncome,
         expense: lastMonthExpense
       }
     });
-  }, [transactions]);
-  
+  }, [filteredTransactions, transactions, selectedMonth, selectedYear]);
+
+  // Navigation handlers
+  const goToPreviousMonth = () => {
+    if (selectedMonth === 0) {
+      setSelectedMonth(11);
+      setSelectedYear(selectedYear - 1);
+    } else {
+      setSelectedMonth(selectedMonth - 1);
+    }
+  };
+
+  const goToNextMonth = () => {
+    if (selectedMonth === 11) {
+      setSelectedMonth(0);
+      setSelectedYear(selectedYear + 1);
+    } else {
+      setSelectedMonth(selectedMonth + 1);
+    }
+  };
+
   // Định dạng số tiền
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN').format(Math.abs(amount));
@@ -125,28 +170,29 @@ const ReportSection = () => {
   };
 
   // Lấy tên tháng hiện tại
-  const getCurrentMonth = () => {
+  const getMonthName = (month, year) => {
     const months = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 
                   'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
-    return months[new Date().getMonth()];
+    return `${months[month]} ${year}`;
   };
 
   // Xử lý xuất báo cáo dưới dạng CSV
   const exportToCSV = () => {
-    // Tạo dữ liệu CSV
-    let csvContent = "Date,Description,Category,Amount\n";
+    let csvContent = "Date,Description,Category,Amount,Type\n";
     
-    transactions.forEach(transaction => {
-      csvContent += `${transaction.date},"${transaction.description}","${transaction.category}",${transaction.amount}\n`;
+    filteredTransactions.forEach(transaction => {
+      const category = transaction.category_name || transaction.category || 'Uncategorized';
+      const description = transaction.note || transaction.description || '';
+      csvContent += `${transaction.date},"${description}","${category}",${transaction.amount},"${transaction.type}"\n`;
     });
     
-    // Tạo đối tượng Blob và liên kết tải xuống
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     
+    const monthYear = `${selectedYear}-${(selectedMonth + 1).toString().padStart(2, '0')}`;
     link.setAttribute('href', url);
-    link.setAttribute('download', `finance_report_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `finance_report_${monthYear}.csv`);
     link.style.visibility = 'hidden';
     
     document.body.appendChild(link);
@@ -158,80 +204,34 @@ const ReportSection = () => {
     <div className="report-section">
       <div className="report-header">
         <h2>Report</h2>
-        <button className="export-btn" onClick={exportToCSV}>
-          <Download size={14} />
-          Export CSV
+      </div>
+
+      {/* Month Navigator */}
+      <div className="month-navigator">
+        <button className="nav-button" onClick={goToPreviousMonth}>
+          <ChevronLeft size={20} />
+        </button>
+        <div className="month-display">
+          <Calendar size={20} />
+          <h3>{getMonthName(selectedMonth, selectedYear)}</h3>
+        </div>
+        <button className="nav-button" onClick={goToNextMonth}>
+          <ChevronRight size={20} />
         </button>
       </div>
 
-      {/* Thẻ tổng quan */}
-      <div className="overview-grid">
-        <div className="overview-card">
-          <div className="overview-card-title">Số dư hiện tại</div>
-          <div className="overview-card-amount">
-            {formatCurrency(summary.balance)} đ
-          </div>
-          <div className="overview-card-subtitle">
-            Tổng: {transactions.length} giao dịch
-          </div>
-        </div>
-        
-        <div className="overview-card">
-          <div className="overview-card-title">Thu nhập</div>
-          <div className="overview-card-amount">
-            {formatCurrency(summary.income)} đ
-          </div>
-          <div className="overview-card-subtitle">
-            {transactions.filter(t => t.amount > 0).length} giao dịch thu nhập
-          </div>
-        </div>
-        
-        <div className="overview-card">
-          <div className="overview-card-title">Chi tiêu</div>
-          <div className="overview-card-amount">
-            {formatCurrency(summary.expense)} đ
-          </div>
-          <div className="overview-card-subtitle">
-            {transactions.filter(t => t.amount < 0).length} giao dịch chi tiêu
-          </div>
-        </div>
-        
-        <div className="current-month-card">
-          <div className="month-header">
-            <Calendar size={14}/>
-            {getCurrentMonth()}
-          </div>
-          <div className="month-stats">
-            <div className="month-stat-item">
-              <div className="month-stat-amount income">
-                +{formatCurrency(summary.thisMonth.income)}đ
-              </div>
-              <div className="percentage-change">
-                {renderPercentageChange(summary.thisMonth.income, summary.lastMonth.income)}
-              </div>
-            </div>
-            <div className="month-stat-item">
-              <div className="month-stat-amount expense">
-                -{formatCurrency(summary.thisMonth.expense)}đ
-              </div>
-              <div className="percentage-change">
-                {renderPercentageChange(Math.abs(summary.thisMonth.expense), Math.abs(summary.lastMonth.expense))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       {/* Phần biểu đồ */}
-      {transactions.length === 0 ? (
+      {filteredTransactions.length === 0 ? (
         <div className="no-data">
           <PieChart size={48}/>
           <h3>Không có dữ liệu để hiển thị</h3>
-          <p>Thêm giao dịch để xem báo cáo chi tiết và biểu đồ phân tích.</p>
+          <p>Không có giao dịch nào trong {getMonthName(selectedMonth, selectedYear).toLowerCase()}.</p>
         </div>
       ) : (
         <div className="chart-section">
-          <ReportChart transactions={transactions} />
+          <ReportChart transactions={filteredTransactions} />
         </div>
       )}
     </div>

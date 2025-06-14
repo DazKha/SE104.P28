@@ -58,11 +58,55 @@ const ExpensesPage = () => {
   const handleAddTransaction = async (newTransaction) => {
     try {
       console.log('Adding transaction in ExpensesPage:', newTransaction);
+      console.log('Date received:', newTransaction.date, 'Type:', typeof newTransaction.date);
+      
+      // Validate amount
+      const amount = parseFloat(newTransaction.amount);
+      if (isNaN(amount) || amount <= 0) {
+        throw new Error('Amount must be a positive number');
+      }
+      
+      // Validate date with better format handling
+      if (!newTransaction.date) {
+        throw new Error('Date is required');
+      }
+      
+      let dateToValidate = newTransaction.date;
+      
+      // Convert DD/MM/YYYY to YYYY-MM-DD for Date.parse
+      if (dateToValidate.includes('/')) {
+        const parts = dateToValidate.split('/');
+        if (parts.length === 3) {
+          // Assuming DD/MM/YYYY format
+          const [day, month, year] = parts;
+          dateToValidate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        }
+      }
+      
+      if (isNaN(Date.parse(dateToValidate))) {
+        throw new Error('Invalid date format');
+      }
+      
+      // Validate type
+      if (!newTransaction.type || !['income', 'outcome'].includes(newTransaction.type)) {
+        throw new Error('Invalid transaction type');
+      }
+      
+      // Convert to YYYY-MM-DD format (ISO) for reliable parsing
+      let formattedDate = newTransaction.date;
+      if (newTransaction.date.includes('/')) {
+        // Convert DD/MM/YYYY to YYYY-MM-DD
+        const [day, month, year] = newTransaction.date.split('/');
+        formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      }
+      // If already in YYYY-MM-DD format, keep as is
+      
+      console.log('After conversion:', formattedDate);
       
       // Chuẩn bị dữ liệu cho API
       const transactionForAPI = {
-        amount: Math.abs(parseFloat(newTransaction.amount)),
-        date: newTransaction.date || new Date().toISOString().split('T')[0],
+        amount: Math.abs(amount),
+        date: formattedDate,
         category: newTransaction.category, // Pass the selected category name
         note: newTransaction.description || '',
         type: newTransaction.type,
@@ -70,6 +114,20 @@ const ExpensesPage = () => {
         receipt_data: newTransaction.ocrData ? JSON.stringify(newTransaction.ocrData) : null // OCR data as JSON string
       };
 
+      // Log data being sent to API
+      console.log('Data being sent to API:', transactionForAPI);
+      console.log('Stringified data:', JSON.stringify(transactionForAPI, null, 2));
+      
+      // Test with minimal data to debug the issue
+      const testData = {
+        amount: 100,
+        date: '2024-01-01',
+        category: 'Salary',
+        note: 'Test transaction',
+        type: 'income'
+      };
+      console.log('Test data that should work (income - no budget update):', testData);
+      
       // Save to API
       const savedTransaction = await transactionService.addTransaction(transactionForAPI);
       console.log('API response:', savedTransaction);

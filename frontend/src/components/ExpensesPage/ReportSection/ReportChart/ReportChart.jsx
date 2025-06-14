@@ -17,27 +17,49 @@ const ReportChart = ({ transactions }) => {
 
   // Phân loại và tổng hợp dữ liệu cho biểu đồ
   useEffect(() => {
+    console.log('=== REPORT CHART DEBUG ===');
+    console.log('Raw transactions received:', transactions?.length || 0);
+    console.log('Sample transaction:', transactions?.[0]);
+    console.log('Income transactions:', transactions?.filter(t => t.type === 'income').length || 0);
+    console.log('Outcome transactions:', transactions?.filter(t => t.type === 'outcome').length || 0);
+    
+    // Debug chi tiết về categories
+    if (transactions?.length > 0) {
+      console.log('--- CATEGORY DEBUG ---');
+      transactions.slice(0, 5).forEach((t, idx) => {
+        console.log(`Transaction ${idx}:`, {
+          type: t.type,
+          category: t.category,
+          category_name: t.category_name,
+          amount: t.amount,
+          allKeys: Object.keys(t)
+        });
+      });
+      console.log('--- END CATEGORY DEBUG ---');
+    }
     // Xử lý dữ liệu thu nhập (theo danh mục)
     const incomeByCategory = transactions
-      .filter(transaction => transaction.amount > 0)
+      .filter(transaction => transaction.type === 'income')
       .reduce((acc, transaction) => {
-        const category = transaction.category;
+        // Sử dụng category_name từ API hoặc category từ localStorage
+        const category = transaction.category_name || transaction.category || 'Uncategorized';
         if (!acc[category]) {
           acc[category] = 0;
         }
-        acc[category] += transaction.amount;
+        acc[category] += Math.abs(parseFloat(transaction.amount));
         return acc;
       }, {});
     
     // Xử lý dữ liệu chi tiêu (theo danh mục)
     const expenseByCategory = transactions
-      .filter(transaction => transaction.amount < 0)
+      .filter(transaction => transaction.type === 'outcome')
       .reduce((acc, transaction) => {
-        const category = transaction.category;
+        // Sử dụng category_name từ API hoặc category từ localStorage
+        const category = transaction.category_name || transaction.category || 'Uncategorized';
         if (!acc[category]) {
           acc[category] = 0;
         }
-        acc[category] += Math.abs(transaction.amount);
+        acc[category] += Math.abs(parseFloat(transaction.amount));
         return acc;
       }, {});
     
@@ -56,16 +78,22 @@ const ReportChart = ({ transactions }) => {
       income: incomeData,
       expense: expenseData
     });
+    
+    console.log('Processed chart data:', { 
+      incomeData: incomeData.length, 
+      expenseData: expenseData.length 
+    });
+    console.log('=== END REPORT CHART DEBUG ===');
   }, [transactions]);
 
   // Tính tổng thu nhập và chi tiêu
   const totalIncome = transactions
-    .filter(transaction => transaction.amount > 0)
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
+    .filter(transaction => transaction.type === 'income')
+    .reduce((sum, transaction) => sum + Math.abs(parseFloat(transaction.amount)), 0);
   
   const totalExpense = transactions
-    .filter(transaction => transaction.amount < 0)
-    .reduce((sum, transaction) => sum + Math.abs(transaction.amount), 0);
+    .filter(transaction => transaction.type === 'outcome')
+    .reduce((sum, transaction) => sum + Math.abs(parseFloat(transaction.amount)), 0);
 
   // Định dạng số tiền
   const formatCurrency = (amount) => {
