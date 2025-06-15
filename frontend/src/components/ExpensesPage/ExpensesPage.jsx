@@ -113,6 +113,12 @@ const ExpensesPage = () => {
         receipt_image: newTransaction.imagePath || null, // Base64 image data
         receipt_data: newTransaction.ocrData ? JSON.stringify(newTransaction.ocrData) : null // OCR data as JSON string
       };
+      
+      console.log('Transaction data with image:', {
+        hasImagePath: !!newTransaction.imagePath,
+        imagePathPreview: newTransaction.imagePath ? newTransaction.imagePath.substring(0, 50) + '...' : 'No image',
+        ocrData: newTransaction.ocrData
+      });
 
       // Log data being sent to API
       console.log('Data being sent to API:', transactionForAPI);
@@ -132,9 +138,20 @@ const ExpensesPage = () => {
       const savedTransaction = await transactionService.addTransaction(transactionForAPI);
       console.log('API response:', savedTransaction);
       
-      // Update local state với functional update
+      // Update local state với functional update, ensure image data is preserved
       setTransactions(prevTransactions => {
-        const newTransactions = [savedTransaction, ...prevTransactions];
+        const transactionWithImage = {
+          ...savedTransaction,
+          // Preserve image data from original transaction if not returned by API
+          imagePath: savedTransaction.receipt_image || savedTransaction.imagePath || newTransaction.imagePath,
+          receipt_image: savedTransaction.receipt_image || newTransaction.imagePath
+        };
+        console.log('Adding transaction to state:', {
+          id: transactionWithImage.id,
+          hasImagePath: !!transactionWithImage.imagePath,
+          hasReceiptImage: !!transactionWithImage.receipt_image
+        });
+        const newTransactions = [transactionWithImage, ...prevTransactions];
         return newTransactions;
       });
       
@@ -154,7 +171,8 @@ const ExpensesPage = () => {
         description: newTransaction.description || '',
         category: newTransaction.category || 'Uncategorized',
         type: newTransaction.type,
-        receipt_image: newTransaction.imagePath || null,
+        imagePath: newTransaction.imagePath || null, // For TransactionItem compatibility
+        receipt_image: newTransaction.imagePath || null, // For API compatibility
         receipt_data: newTransaction.ocrData ? JSON.stringify(newTransaction.ocrData) : null
       };
       

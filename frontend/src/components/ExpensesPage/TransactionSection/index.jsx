@@ -168,7 +168,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       const formData = new FormData();
       formData.append('image', imageFile);
 
-      const response = await fetch('http://localhost:3000/api/receipts/scan', {
+      const response = await fetch('http://localhost:3000/api/receipts/ocr', {
         method: 'POST',
         body: formData,
       });
@@ -203,9 +203,19 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       try {
         setUploadingImage(true);
         console.log('Uploading receipt...');
-        ocrData = await uploadImage(selectedImage);
-        imagePath = ocrData.receiptImage; // Use base64 data URL from backend
-        console.log('Receipt processed successfully:', ocrData);
+        const uploadResponse = await uploadImage(selectedImage);
+        console.log('Upload Response:', uploadResponse);
+        
+        // Handle response format correctly
+        if (uploadResponse.data && uploadResponse.data.receiptImage) {
+          imagePath = uploadResponse.data.receiptImage; // Base64 data URL
+          ocrData = uploadResponse.data; // Full OCR data
+        } else if (uploadResponse.receiptImage) {
+          imagePath = uploadResponse.receiptImage; // Fallback
+          ocrData = uploadResponse;
+        }
+        
+        console.log('Receipt processed successfully, imagePath:', imagePath);
       } catch (error) {
         alert('Failed to upload image. Transaction will be saved without image.');
         console.error('Image upload error:', error);
@@ -523,7 +533,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
                 className="picture-btn"
               >
                 <CameraIcon size={16} />
-                Receipt
+                Add Image
               </button>
               <button type="button" onClick={() => setIsAddingTransaction(false)} className="cancel-btn">
                 Cancel

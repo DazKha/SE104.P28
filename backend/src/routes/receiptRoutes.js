@@ -75,21 +75,44 @@ router.post('/ocr', async (req, res) => {
         console.log('7. Sending request to OCR server...');
         console.log('8. OCR server URL:', OCR_SERVER_URL);
         
-        // Call OCR API
-        const response = await axios.post(OCR_SERVER_URL, formData, {
-            headers: {
-                ...formData.getHeaders(),
-                'Accept': 'application/json'
-            },
-            maxContentLength: Infinity,
-            maxBodyLength: Infinity,
-            timeout: 30000 // 30 seconds timeout
-        });
-
-        console.log('9. OCR server responded successfully');
-        console.log('10. OCR Response:', response.data);
+        // Try to call OCR API with fallback
+        let ocrResponse;
+        try {
+            const response = await axios.post(OCR_SERVER_URL, formData, {
+                headers: {
+                    ...formData.getHeaders(),
+                    'Accept': 'application/json'
+                },
+                maxContentLength: Infinity,
+                maxBodyLength: Infinity,
+                timeout: 10000 // 10 seconds timeout
+            });
+            
+            console.log('9. OCR server responded successfully');
+            console.log('10. OCR Response:', response.data);
+            ocrResponse = response.data;
+        } catch (ocrError) {
+            console.log('9. OCR server failed, using fallback');
+            console.log('10. OCR Error:', ocrError.message);
+            
+            // Fallback response when OCR fails
+            ocrResponse = {
+                success: false,
+                message: 'Image uploaded successfully (OCR unavailable)',
+                data: {
+                    receiptImage: `data:${imageFile.mimetype};base64,${imageFile.data.toString('base64')}`,
+                    originalName: imageFile.name,
+                    fileSize: imageFile.size,
+                    amount: 0,
+                    date: new Date().toISOString().split('T')[0],
+                    category: 'Uncategorized',
+                    ocrError: 'OCR service unavailable'
+                }
+            };
+        }
+        
         console.log('=== OCR REQUEST SUCCESS ===');
-        res.json(response.data);
+        res.json(ocrResponse);
         
     } catch (error) {
         console.error('=== OCR REQUEST ERROR ===');

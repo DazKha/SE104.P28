@@ -38,7 +38,7 @@
             </NavLink>
             
             <NavLink to="/ocr" className={({ isActive }) => isActive ? "active-link" : ""}>
-              <i className="fas fa-camera"></i> OCR
+              <i className="fas fa-camera"></i> Receipt
             </NavLink>
           </div>
           

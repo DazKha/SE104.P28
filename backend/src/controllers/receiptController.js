@@ -35,15 +35,16 @@ exports.confirmReceipt = async (req, res) => {
 
 exports.scanReceipt = async (req, res) => {
   try {
-    if (!req.file) {
+    if (!req.files || !req.files.image) {
       return res.status(400).json({ error: 'No image file uploaded' });
     }
 
-    // Xử lý memory buffer trực tiếp (không cần file system)
-    const imageBuffer = req.file.buffer;
-    const originalName = req.file.originalname;
-    const fileSize = req.file.size;
-    const mimeType = req.file.mimetype;
+    // Xử lý với express-fileupload format
+    const imageFile = req.files.image;
+    const imageBuffer = imageFile.data;
+    const originalName = imageFile.name;
+    const fileSize = imageFile.size;
+    const mimeType = imageFile.mimetype;
 
     console.log('Receipt uploaded:', { originalName, fileSize, mimeType });
 
@@ -70,7 +71,7 @@ exports.scanReceipt = async (req, res) => {
     let ocrData = null;
     let ocrError = null;
 
-    // Try to process with OCR service
+    // Try to process with OCR service (optional - fallback if fails)
     try {
       console.log('Starting OCR processing...');
       ocrData = await ocrService.recognize(imageBuffer, originalName, mimeType);
@@ -80,7 +81,7 @@ exports.scanReceipt = async (req, res) => {
       ocrError = error.message;
       
       // Continue with fallback (base64 storage without OCR data)
-      console.log('Continuing without OCR data due to error');
+      console.log('Continuing without OCR data due to error - this is expected if OCR service is not running');
     }
 
     // Prepare response data
