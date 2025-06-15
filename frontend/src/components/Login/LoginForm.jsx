@@ -148,7 +148,7 @@ const LoginForm = ({ onSuccess }) => {
         {errors.password && <span className="error-message">{errors.password}</span>}
       </div>
       
-      <div className="login-options">
+      {/* <div className="login-options">
         <div className="remember-me">
           <input
             type="checkbox"
@@ -163,7 +163,7 @@ const LoginForm = ({ onSuccess }) => {
         <Link to="/forgot-password" className="forgot-password">
           Forgot password?
         </Link>
-      </div>
+      </div> */}
       
       <button type="submit" className="submit-button" disabled={isSubmitting}>
         {isSubmitting ? 'Processing...' : 'Login'}

@@ -192,8 +192,8 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
   const handleSubmitTransaction = async (e) => {
     e.preventDefault();
     
-    if (!newTransaction.description || !newTransaction.category || !newTransaction.amount) {
-      alert('Please fill in all transaction details');
+    if (!newTransaction.category || !newTransaction.amount) {
+      alert('Please fill in category and amount');
       return;
     }
 
@@ -234,7 +234,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       amount: parseFloat(newTransaction.amount),
       date: newTransaction.date,
       category: newTransaction.category, // Will be converted to category_id in backend
-      note: newTransaction.description, // Backend expects 'note', not 'description'
+      note: newTransaction.note, // Backend expects 'note', not 'description'
       type: newTransaction.type,
       imagePath: imagePath,
       ocrData: ocrData
@@ -498,12 +498,33 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
               <div className="form-group">
                 <label>Date</label>
                 <input
-                  type="text"
+                  type="date"
                   name="date"
-                  value={newTransaction.date}
-                  onChange={handleInputChange}
+                  value={(() => {
+                    // Chuyển DD/MM/YYYY -> YYYY-MM-DD để hiển thị đúng trên input type=date
+                    const d = newTransaction.date;
+                    if (d && d.includes('/')) {
+                      const [day, month, year] = d.split('/');
+                      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                    }
+                    return d || '';
+                  })()}
+                  onChange={e => {
+                    // Chuyển YYYY-MM-DD -> DD/MM/YYYY để lưu vào state
+                    const v = e.target.value;
+                    if (v && v.includes('-')) {
+                      const [year, month, day] = v.split('-');
+                      handleInputChange({
+                        target: {
+                          name: 'date',
+                          value: `${day}/${month}/${year}`
+                        }
+                      });
+                    } else {
+                      handleInputChange(e);
+                    }
+                  }}
                   className="search-input"
-                  placeholder="DD/MM/YYYY"
                 />
               </div>
               <div className="form-group">
