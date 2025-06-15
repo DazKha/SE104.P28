@@ -36,10 +36,6 @@
             <NavLink to="/your-debt" className={({ isActive }) => isActive ? "active-link" : ""}>
               Your debt
             </NavLink>
-            
-            <NavLink to="/ocr" className={({ isActive }) => isActive ? "active-link" : ""}>
-              <i className="fas fa-camera"></i> Receipt
-            </NavLink>
           </div>
           
           <div className="user-section">

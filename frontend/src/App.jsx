@@ -7,7 +7,6 @@ import ExpensesPage from './components/ExpensesPage/ExpensesPage.jsx';
 import SavingWallet from './components/SavingWallet/SavingWallet.jsx';
 import LoansDebts from './components/LoansDebts/LoansDebts.jsx';
 import Budget from './components/Budget/Budget.jsx';
-import OCR from './components/OCR/OCR';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 import { BrowserRouter as Router, Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import './App.css';
@@ -52,10 +51,6 @@ function AppContent() {
           {/* Trang Budget */}
           <Route path="/budget" element={
             isLoggedIn ? <Budget /> : <Navigate to="/login" />
-          } />
-          {/* Trang OCR */}
-          <Route path="/ocr" element={
-            isLoggedIn ? <OCR /> : <Navigate to="/login" />
           } />
         </Routes>
       </div>

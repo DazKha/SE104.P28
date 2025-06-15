@@ -30,6 +30,8 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [processingOCR, setProcessingOCR] = useState(false);
+  const [error, setError] = useState(null);
   
   // Month/Year navigation state
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
@@ -55,6 +57,9 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
+
+  // Add state for OCR result
+  const [ocrResult, setOcrResult] = useState(null);
 
   // Close category popup when clicking outside
   useEffect(() => {
@@ -129,6 +134,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
   const handleImageSelect = async (e) => {
     const file = e.target.files[0];
     if (file) {
+      setError(null); // Reset error when selecting new image
       console.log('Original file size:', file.size / 1024 / 1024, 'MB');
       
       // Compress image if it's larger than 1MB
@@ -164,27 +170,100 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     }
   };
 
-  // Upload image to backend
+  // Upload image to backend only
   const uploadImage = async (imageFile) => {
     try {
-      const formData = new FormData();
-      formData.append('image', imageFile);
+      // Upload to backend
+      const backendFormData = new FormData();
+      backendFormData.append('image', imageFile);
 
-      const response = await fetch('http://localhost:3000/api/receipts/ocr', {
+      const backendResponse = await fetch('http://localhost:3000/api/receipts/ocr', {
         method: 'POST',
-        body: formData,
+        body: backendFormData,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to upload image');
+      if (!backendResponse.ok) {
+        throw new Error('Failed to upload image to backend');
       }
 
-      const result = await response.json();
-      console.log('Upload result:', result);
-      return result.data || {}; // Return file path + OCR data if available
+      const backendResult = await backendResponse.json();
+      console.log('Backend upload result:', backendResult);
+
+      return backendResult;
     } catch (error) {
       console.error('Error uploading image:', error);
       throw error;
+    }
+  };
+
+  // Process OCR separately
+  const processOCR = async (imageFile) => {
+    try {
+      setProcessingOCR(true);
+      
+      // Process OCR using the same method as OCR.jsx
+      const ocrFormData = new FormData();
+      ocrFormData.append('file', imageFile);
+
+      const ocrResponse = await fetch('https://616a-35-233-197-150.ngrok-free.app/ocr', {
+        method: 'POST',
+        body: ocrFormData,
+        headers: {
+          'Accept': 'application/json',
+        }
+      });
+
+      if (!ocrResponse.ok) {
+        const errorData = await ocrResponse.json().catch(() => null);
+        throw new Error(errorData?.error || `HTTP error! status: ${ocrResponse.status}`);
+      }
+
+      const ocrResult = await ocrResponse.json();
+      console.log('OCR result:', ocrResult);
+      
+      if (ocrResult.error) {
+        throw new Error(ocrResult.error);
+      }
+      
+      // Set OCR result to display
+      setOcrResult(ocrResult);
+
+      // If OCR data is available, fill the amount automatically
+      if (ocrResult && ocrResult.response_message) {
+        console.log('Full OCR Response:', JSON.stringify(ocrResult, null, 2));
+        
+        // Extract amount from response_message
+        try {
+          // Remove markdown code block and parse JSON
+          const jsonStr = ocrResult.response_message
+            .replace('```json\n', '')
+            .replace('\n```', '');
+          const parsedData = JSON.parse(jsonStr);
+          console.log('Parsed OCR Data:', parsedData);
+          
+          // Get total amount
+          const totalAmount = parsedData["Tổng số tiền"];
+          console.log('Total Amount:', totalAmount);
+          
+          if (totalAmount) {
+            setNewTransaction(prev => ({
+              ...prev,
+              amount: totalAmount.toString()
+            }));
+            console.log('Amount filled automatically:', totalAmount);
+          }
+        } catch (e) {
+          console.error('Failed to parse OCR data:', e);
+        }
+      }
+
+      return ocrResult;
+    } catch (error) {
+      console.error('Error processing OCR:', error);
+      setError(`OCR processing failed: ${error.message}`);
+      throw error;
+    } finally {
+      setProcessingOCR(false);
     }
   };
 
@@ -200,86 +279,48 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     let imagePath = null;
     let ocrData = null;
 
-    // Upload image if selected (new image)
-    if (selectedImage) {
-      try {
+    try {
+      if (selectedImage) {
         setUploadingImage(true);
-        console.log('Uploading receipt...');
-        const uploadResponse = await uploadImage(selectedImage);
-        console.log('Upload Response:', uploadResponse);
-        
-        // Handle response format correctly
-        if (uploadResponse.data && uploadResponse.data.receiptImage) {
-          imagePath = uploadResponse.data.receiptImage; // Base64 data URL
-          ocrData = uploadResponse.data; // Full OCR data
-        } else if (uploadResponse.receiptImage) {
-          imagePath = uploadResponse.receiptImage; // Fallback
-          ocrData = uploadResponse;
-        }
-        
-        console.log('Receipt processed successfully, imagePath:', imagePath);
-      } catch (error) {
-        alert('Failed to upload image. Transaction will be saved without image.');
-        console.error('Image upload error:', error);
-      } finally {
-        setUploadingImage(false);
+        const uploadResult = await uploadImage(selectedImage);
+        imagePath = uploadResult.data?.filePath;
+        // OCR processing is now manual via OCR button
       }
-    } else if (isEditingTransaction && imagePreview) {
-      // Keep existing image if editing and no new image selected
-      imagePath = editingTransaction.receipt_image || editingTransaction.imagePath || editingTransaction.receipt_path;
-    }
 
-    // Create transaction data
-    const transactionData = {
-      amount: parseFloat(newTransaction.amount),
-      date: newTransaction.date,
-      category: newTransaction.category, // Will be converted to category_id in backend
-      note: newTransaction.note, // Backend expects 'note', not 'description'
-      type: newTransaction.type,
-      imagePath: imagePath,
-      ocrData: ocrData
-    };
+      const transactionData = {
+        ...newTransaction,
+        imagePath,
+        ocrData
+      };
 
-    console.log('=== TRANSACTION SECTION SUBMIT ===');
-    console.log('Is editing:', isEditingTransaction);
-    console.log('Original newTransaction:', newTransaction);
-    console.log('Final transactionData:', transactionData);
-
-    if (isEditingTransaction) {
-      // Update existing transaction
-      if (onUpdateTransaction) {
-        console.log('Calling onUpdateTransaction with:', editingTransaction.id, transactionData);
+      if (isEditingTransaction) {
         await onUpdateTransaction(editingTransaction.id, transactionData);
-        console.log('Update completed, resetting form...');
-      }
-    } else {
-      // Add new transaction
-      if (onAddTransaction) {
+      } else {
         await onAddTransaction(transactionData);
       }
-    }
-    
-    // Reset form
-    setNewTransaction({
-      date: new Date().toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      }).replace(/\//g, '/'),
-      description: '',
-      category: expenseCategories[0],
-      amount: '',
-      type: 'outcome'
-    });
-    
-    // Reset states
-    setSelectedImage(null);
-    setImagePreview(null);
-    setIsAddingTransaction(false);
-    setIsEditingTransaction(false);
-    setEditingTransaction(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+
+      // Reset form
+      setNewTransaction({
+        date: new Date().toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }).replace(/\//g, '/'),
+        description: '',
+        category: expenseCategories[0],
+        amount: '',
+        type: 'outcome'
+      });
+      setSelectedImage(null);
+      setImagePreview(null);
+      setIsAddingTransaction(false);
+      setIsEditingTransaction(false);
+      setEditingTransaction(null);
+    } catch (error) {
+      console.error('Error submitting transaction:', error);
+      alert('Failed to submit transaction. Please try again.');
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -626,6 +667,17 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
                 <CameraIcon size={16} />
                 Add Image
               </button>
+              {selectedImage && (
+                <button 
+                  type="button" 
+                  onClick={() => processOCR(selectedImage)} 
+                  className="ocr-btn"
+                  disabled={processingOCR}
+                >
+                  <ImageIcon size={16} />
+                  {processingOCR ? 'Processing OCR...' : 'OCR'}
+                </button>
+              )}
               <button type="button" onClick={isEditingTransaction ? handleCancelEdit : () => setIsAddingTransaction(false)} className="cancel-btn">
                 Cancel
               </button>
@@ -633,6 +685,21 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
                 {uploadingImage ? 'Uploading...' : (isEditingTransaction ? 'Update Transaction' : 'Save Transaction')}
               </button>
             </div>
+
+            {/* Error display */}
+            {error && (
+              <div className="error-message" style={{ 
+                backgroundColor: '#fef2f2', 
+                border: '1px solid #fecaca',
+                borderRadius: '8px',
+                padding: '12px',
+                color: '#dc2626',
+                marginTop: '1rem'
+              }}>
+                <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '14px', fontWeight: '600' }}>Error:</h4>
+                <p style={{ margin: '0', fontSize: '14px' }}>{error}</p>
+              </div>
+            )}
           </form>
         </div>
       )}
@@ -814,6 +881,23 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
           </div>
         )}
       </div>
+
+      {/* Display OCR Result */}
+      {ocrResult && (
+        <div className="ocr-result">
+          <h3>Complete Server Response:</h3>
+          <pre style={{ 
+            backgroundColor: '#f5f5f5', 
+            padding: '10px', 
+            borderRadius: '5px',
+            overflow: 'auto',
+            maxHeight: '400px',
+            whiteSpace: 'pre-wrap'
+          }}>
+            {JSON.stringify(ocrResult, null, 2)}
+          </pre>
+        </div>
+      )}
     </div>
   );
 };
