@@ -689,14 +689,16 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
         </div>
 
         {displayedTransactions.length > 0 ? (
-          <div className="transactions-list">
-            {displayedTransactions.map((transaction, index) => (
-              <TransactionItem 
-                key={transaction.id || index} 
-                transaction={transaction} 
-                onDelete={handleDeleteTransaction}
-              />
-            ))}
+          <div className="transactions-list-container">
+            <div className="transactions-list">
+              {displayedTransactions.map((transaction, index) => (
+                <TransactionItem 
+                  key={transaction.id || index} 
+                  transaction={transaction} 
+                  onDelete={handleDeleteTransaction}
+                />
+              ))}
+            </div>
           </div>
         ) : (
           <div className="empty-state">

@@ -921,10 +921,35 @@
   color: #ffffff;
 }
 
+/* Scrollable Transactions Container */
+.transactions-list-container {
+  max-height: 400px; /* Chiều cao cho khoảng 5 transactions */
+  overflow-y: auto;
+}
+
 .transactions-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+/* Custom Scrollbar */
+.transactions-list-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.transactions-list-container::-webkit-scrollbar-track {
+  background: #f1f3f4;
+  border-radius: 3px;
+}
+
+.transactions-list-container::-webkit-scrollbar-thumb {
+  background: #c1c7cd;
+  border-radius: 3px;
+}
+
+.transactions-list-container::-webkit-scrollbar-thumb:hover {
+  background: #a8b2ba;
 }
 
 /* Empty State */
@@ -985,6 +1010,10 @@
 
   .picture-btn {
     align-self: flex-start;
+  }
+
+  .transactions-list-container {
+    max-height: 350px; /* Giảm chiều cao trên mobile */
   }
 }
 /* Button sizing for form actions */
