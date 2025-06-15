@@ -110,7 +110,7 @@ const ExpensesPage = () => {
         category: newTransaction.category, // Pass the selected category name
         note: newTransaction.description || '',
         type: newTransaction.type,
-        receipt_image: newTransaction.imagePath || null, // Base64 image data
+        receipt_image: newTransaction.receipt_image || null, // Use base64 image data from frontend
         receipt_data: newTransaction.ocrData ? JSON.stringify(newTransaction.ocrData) : null // OCR data as JSON string
       };
       
@@ -143,8 +143,8 @@ const ExpensesPage = () => {
         const transactionWithImage = {
           ...savedTransaction,
           // Preserve image data from original transaction if not returned by API
-          imagePath: savedTransaction.receipt_image || savedTransaction.imagePath || newTransaction.imagePath,
-          receipt_image: savedTransaction.receipt_image || newTransaction.imagePath
+          imagePath: savedTransaction.receipt_image || savedTransaction.imagePath || newTransaction.receipt_image,
+          receipt_image: savedTransaction.receipt_image || newTransaction.receipt_image
         };
         console.log('Adding transaction to state:', {
           id: transactionWithImage.id,
@@ -171,8 +171,8 @@ const ExpensesPage = () => {
         description: newTransaction.description || '',
         category: newTransaction.category || 'Uncategorized',
         type: newTransaction.type,
-        imagePath: newTransaction.imagePath || null, // For TransactionItem compatibility
-        receipt_image: newTransaction.imagePath || null, // For API compatibility
+        imagePath: newTransaction.receipt_image || null, // For TransactionItem compatibility
+        receipt_image: newTransaction.receipt_image || null, // For API compatibility
         receipt_data: newTransaction.ocrData ? JSON.stringify(newTransaction.ocrData) : null
       };
       

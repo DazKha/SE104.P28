@@ -271,6 +271,8 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
   const handleSubmitTransaction = async (e) => {
     e.preventDefault();
     
+    console.log('Submit transaction called, selectedImage:', selectedImage ? `${selectedImage.name} (${selectedImage.size} bytes)` : 'No image selected');
+    
     if (!newTransaction.category || !newTransaction.amount) {
       alert('Please fill in category and amount');
       return;
@@ -278,20 +280,49 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
 
     let imagePath = null;
     let ocrData = null;
+    let receiptImage = null;
 
     try {
       if (selectedImage) {
         setUploadingImage(true);
-        const uploadResult = await uploadImage(selectedImage);
-        imagePath = uploadResult.data?.filePath;
-        // OCR processing is now manual via OCR button
+        
+        // Convert image to base64 for storage in browser cache
+        receiptImage = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            resolve(e.target.result); // Return the base64 data URL
+          };
+          reader.onerror = () => {
+            resolve(null);
+          };
+          reader.readAsDataURL(selectedImage);
+        });
+        
+        console.log('Image converted to base64:', receiptImage ? 'Success' : 'Failed');
+        
+        try {
+          const uploadResult = await uploadImage(selectedImage);
+          imagePath = uploadResult.data?.filePath;
+        } catch (uploadError) {
+          console.warn('Upload failed, but continuing with base64 storage:', uploadError);
+        }
       }
 
       const transactionData = {
-        ...newTransaction,
+        amount: parseFloat(newTransaction.amount),
+        date: newTransaction.date,
+        category: newTransaction.category,
+        note: newTransaction.description,
+        type: newTransaction.type,
         imagePath,
+        receipt_image: receiptImage, // Add base64 image data
         ocrData
       };
+
+      console.log('Sending transaction data:', {
+        ...transactionData,
+        receipt_image: receiptImage ? 'Base64 data present' : 'No image data'
+      });
 
       if (isEditingTransaction) {
         await onUpdateTransaction(editingTransaction.id, transactionData);
@@ -882,22 +913,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
         )}
       </div>
 
-      {/* Display OCR Result */}
-      {ocrResult && (
-        <div className="ocr-result">
-          <h3>Complete Server Response:</h3>
-          <pre style={{ 
-            backgroundColor: '#f5f5f5', 
-            padding: '10px', 
-            borderRadius: '5px',
-            overflow: 'auto',
-            maxHeight: '400px',
-            whiteSpace: 'pre-wrap'
-          }}>
-            {JSON.stringify(ocrResult, null, 2)}
-          </pre>
-        </div>
-      )}
+
     </div>
   );
 };

@@ -72,6 +72,12 @@ exports.getPublicTransactions = (req, res) => {
 exports.createPublicTransaction = (req, res) => {
   const data = { ...req.body, user_id: 1 }; // Default user for testing
   
+  // Log received data for debugging
+  console.log('Received transaction data:', {
+    ...data,
+    receipt_image: data.receipt_image ? 'Base64 data received' : 'No image data'
+  });
+  
   // Validate input
   const validationErrors = validateTransactionData(data);
   if (validationErrors.length > 0) {
@@ -119,7 +125,9 @@ exports.createPublicTransaction = (req, res) => {
       note: data.note,
       type: data.type,
       description: data.note,
-      category: categoryName
+      category: categoryName,
+      receipt_image: data.receipt_image,
+      receipt_data: data.receipt_data
     });
   } catch (err) {
     console.error('Error creating transaction:', err);
