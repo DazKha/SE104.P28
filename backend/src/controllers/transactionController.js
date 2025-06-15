@@ -394,3 +394,92 @@ exports.search = (req, res) => {
     res.status(500).json({ error: 'Lỗi server khi tìm kiếm giao dịch' });
   }
 };
+
+// Public update transaction (no authentication)
+exports.updatePublicTransaction = (req, res) => {
+  try {
+    const transactionId = req.params.id;
+    const updateData = req.body;
+
+    console.log('Updating public transaction:', transactionId, updateData);
+
+    // Validate update data
+    const validationErrors = validateTransactionData(updateData);
+    if (validationErrors.length > 0) {
+      return res.status(400).json({ errors: validationErrors });
+    }
+
+    // Get category_id from category name if needed
+    let categoryId = updateData.category_id;
+    if (!categoryId && updateData.category) {
+      // Find category by name
+      const categoryQuery = `SELECT id FROM categories WHERE name = ?`;
+      const categoryStmt = db.prepare(categoryQuery);
+      const category = categoryStmt.get(updateData.category);
+      categoryId = category ? category.id : getDefaultCategoryId();
+    }
+
+    // Update the transaction (no user_id check for public API)
+    const updateQuery = `
+      UPDATE transactions
+      SET amount = ?,
+          date = ?,
+          category_id = ?,
+          note = ?,
+          type = ?
+      WHERE id = ?
+    `;
+    
+    const updateStmt = db.prepare(updateQuery);
+    const result = updateStmt.run(
+      updateData.amount,
+      updateData.date,
+      categoryId,
+      updateData.description || updateData.note || '',
+      updateData.type,
+      transactionId
+    );
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Transaction not found or failed to update' });
+    }
+
+    // Get the updated transaction
+    const getQuery = `
+      SELECT t.*, c.name as category_name
+      FROM transactions t
+      LEFT JOIN categories c ON t.category_id = c.id
+      WHERE t.id = ?
+    `;
+    const getStmt = db.prepare(getQuery);
+    const updatedTransaction = getStmt.get(transactionId);
+
+    res.json(updatedTransaction);
+  } catch (err) {
+    console.error('Error updating public transaction:', err);
+    res.status(500).json({ error: 'Failed to update transaction', details: err.message });
+  }
+};
+
+// Public delete transaction (no authentication)
+exports.deletePublicTransaction = (req, res) => {
+  try {
+    const transactionId = req.params.id;
+
+    console.log('Deleting public transaction:', transactionId);
+
+    // Delete the transaction (no user_id check for public API)
+    const deleteQuery = `DELETE FROM transactions WHERE id = ?`;
+    const deleteStmt = db.prepare(deleteQuery);
+    const result = deleteStmt.run(transactionId);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+
+    res.json({ message: 'Transaction deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting public transaction:', err);
+    res.status(500).json({ error: 'Failed to delete transaction', details: err.message });
+  }
+};

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { ArrowDownIcon, ArrowUpIcon, XIcon, ImageIcon } from 'lucide-react';
+import { ArrowDownIcon, ArrowUpIcon, XIcon, ImageIcon, EditIcon } from 'lucide-react';
 import './TransactionItem.css';
 
-const TransactionItem = ({ transaction, onDelete }) => {
+const TransactionItem = ({ transaction, onDelete, onEdit }) => {
   const [showImageModal, setShowImageModal] = useState(false);
 
   // Định dạng số tiền
@@ -14,7 +14,19 @@ const TransactionItem = ({ transaction, onDelete }) => {
   // Xử lý xóa giao dịch
   const handleDelete = (e) => {
     e.stopPropagation(); // Prevent triggering transaction click
-    onDelete(transaction.id);
+    if (onDelete && typeof onDelete === 'function') {
+      onDelete(transaction.id);
+    }
+  };
+
+  // Xử lý edit giao dịch
+  const handleEdit = (e) => {
+    e.stopPropagation(); // Prevent triggering transaction click
+    if (onEdit && typeof onEdit === 'function') {
+      onEdit(transaction);
+    } else {
+      console.error('onEdit is not a function:', onEdit);
+    }
   };
 
   // Xử lý click vào transaction
@@ -61,13 +73,22 @@ const TransactionItem = ({ transaction, onDelete }) => {
         <div className="transaction-actions">
           <div className="transaction-category">
             <span className="category-tag">{category}</span>
-            <button 
-              onClick={handleDelete} 
-              className="delete-button"
-              title="Delete transaction"
-            >
-              <XIcon size={16} />
-            </button>
+            <div className="action-buttons">
+              <button 
+                onClick={handleEdit} 
+                className="edit-button"
+                title="Edit transaction"
+              >
+                <EditIcon size={16} />
+              </button>
+              <button 
+                onClick={handleDelete} 
+                className="delete-button"
+                title="Delete transaction"
+              >
+                <XIcon size={16} />
+              </button>
+            </div>
           </div>
           <div className={`transaction-amount ${isIncome ? 'income' : 'expense'}`}>
             {isIncome ? '+' : '-'}{formatAmount(transaction.amount)} đ

@@ -22,6 +22,8 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
 
   // Main state
   const [isAddingTransaction, setIsAddingTransaction] = useState(false);
+  const [isEditingTransaction, setIsEditingTransaction] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState(null);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
@@ -186,8 +188,8 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     }
   };
 
-  // Handle adding new transaction
-  const handleAddTransaction = async (e) => {
+  // Handle adding/updating transaction
+  const handleSubmitTransaction = async (e) => {
     e.preventDefault();
     
     if (!newTransaction.description || !newTransaction.category || !newTransaction.amount) {
@@ -198,7 +200,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     let imagePath = null;
     let ocrData = null;
 
-    // Upload image if selected
+    // Upload image if selected (new image)
     if (selectedImage) {
       try {
         setUploadingImage(true);
@@ -222,17 +224,39 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       } finally {
         setUploadingImage(false);
       }
+    } else if (isEditingTransaction && imagePreview) {
+      // Keep existing image if editing and no new image selected
+      imagePath = editingTransaction.receipt_image || editingTransaction.imagePath || editingTransaction.receipt_path;
     }
 
-    // Create transaction data with image path
+    // Create transaction data
     const transactionData = {
-      ...newTransaction,
-      imagePath: imagePath, // Store image path instead of file object
-      ocrData: ocrData // Store OCR extracted data if available
+      amount: parseFloat(newTransaction.amount),
+      date: newTransaction.date,
+      category: newTransaction.category, // Will be converted to category_id in backend
+      note: newTransaction.description, // Backend expects 'note', not 'description'
+      type: newTransaction.type,
+      imagePath: imagePath,
+      ocrData: ocrData
     };
 
-    if (onAddTransaction) {
-      await onAddTransaction(transactionData);
+    console.log('=== TRANSACTION SECTION SUBMIT ===');
+    console.log('Is editing:', isEditingTransaction);
+    console.log('Original newTransaction:', newTransaction);
+    console.log('Final transactionData:', transactionData);
+
+    if (isEditingTransaction) {
+      // Update existing transaction
+      if (onUpdateTransaction) {
+        console.log('Calling onUpdateTransaction with:', editingTransaction.id, transactionData);
+        await onUpdateTransaction(editingTransaction.id, transactionData);
+        console.log('Update completed, resetting form...');
+      }
+    } else {
+      // Add new transaction
+      if (onAddTransaction) {
+        await onAddTransaction(transactionData);
+      }
     }
     
     // Reset form
@@ -243,25 +267,68 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
         year: 'numeric'
       }).replace(/\//g, '/'),
       description: '',
-      category: newTransaction.type === 'income' ? incomeCategories_extended[0] : expenseCategories[0],
+      category: expenseCategories[0],
       amount: '',
       type: 'outcome'
     });
     
-    // Reset image states
+    // Reset states
     setSelectedImage(null);
     setImagePreview(null);
+    setIsAddingTransaction(false);
+    setIsEditingTransaction(false);
+    setEditingTransaction(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    
-    setIsAddingTransaction(false);
   };
 
   // Handle delete transaction
   const handleDeleteTransaction = (id) => {
     if (onDeleteTransaction) {
       onDeleteTransaction(id);
+    }
+  };
+
+  // Handle edit transaction
+  const handleEditTransaction = (transaction) => {
+    setEditingTransaction(transaction);
+    setNewTransaction({
+      date: transaction.date,
+      description: transaction.note || transaction.description || '',
+      category: transaction.category_name || transaction.category || '',
+      amount: transaction.amount.toString(),
+      type: transaction.type === 'income' ? 'income' : 'outcome'
+    });
+    
+    // Set existing image if available
+    if (transaction.imagePath || transaction.receipt_path || transaction.receipt_image) {
+      setImagePreview(transaction.receipt_image || `http://localhost:3000/${transaction.receipt_path}` || transaction.imagePath);
+    }
+    
+    setIsAddingTransaction(false);
+    setIsEditingTransaction(true);
+  };
+
+  // Cancel edit
+  const handleCancelEdit = () => {
+    setIsEditingTransaction(false);
+    setEditingTransaction(null);
+    setNewTransaction({
+      date: new Date().toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }).replace(/\//g, '/'),
+      description: '',
+      category: expenseCategories[0],
+      amount: '',
+      type: 'outcome'
+    });
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -420,10 +487,13 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
         </button>
       </div>
 
-      {/* Add Transaction Form */}
-      {isAddingTransaction && (
+      {/* Add/Edit Transaction Form */}
+      {(isAddingTransaction || isEditingTransaction) && (
         <div className="transaction-form">
-          <form onSubmit={handleAddTransaction}>
+          <div className="form-header">
+            <h3>{isEditingTransaction ? 'Edit Transaction' : 'Add New Transaction'}</h3>
+          </div>
+          <form onSubmit={handleSubmitTransaction}>
             <div className="form-grid">
               <div className="form-group">
                 <label>Date</label>
@@ -535,11 +605,11 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
                 <CameraIcon size={16} />
                 Add Image
               </button>
-              <button type="button" onClick={() => setIsAddingTransaction(false)} className="cancel-btn">
+              <button type="button" onClick={isEditingTransaction ? handleCancelEdit : () => setIsAddingTransaction(false)} className="cancel-btn">
                 Cancel
               </button>
               <button type="submit" className="save-btn" disabled={uploadingImage}>
-                {uploadingImage ? 'Uploading...' : 'Save Transaction'}
+                {uploadingImage ? 'Uploading...' : (isEditingTransaction ? 'Update Transaction' : 'Save Transaction')}
               </button>
             </div>
           </form>
@@ -696,6 +766,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
                   key={transaction.id || index} 
                   transaction={transaction} 
                   onDelete={handleDeleteTransaction}
+                  onEdit={handleEditTransaction}
                 />
               ))}
             </div>

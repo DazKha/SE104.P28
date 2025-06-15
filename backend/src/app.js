@@ -39,6 +39,8 @@ const transactionController = require('./controllers/transactionController');
 // Public routes (no authentication required)
 app.get('/api/public/transactions', transactionController.getPublicTransactions);
 app.post('/api/public/transactions', transactionController.createPublicTransaction);
+app.put('/api/public/transactions/:id', transactionController.updatePublicTransaction);
+app.delete('/api/public/transactions/:id', transactionController.deletePublicTransaction);
 
 // Protected routes (require authentication)
 app.use('/api/auth', authRoutes);

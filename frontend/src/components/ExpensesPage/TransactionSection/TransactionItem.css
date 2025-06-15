@@ -104,6 +104,12 @@
   gap: 0.75rem;
 }
 
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .category-tag {
   background: #f3f4f6;
   color: #4b5563;
@@ -118,7 +124,11 @@
   background: #e5e7eb;
 }
 
+.edit-button,
 .delete-button {
+  background: none;
+  border: none;
+  cursor: pointer;
   color: #9ca3af;
   padding: 0.25rem;
   border-radius: 6px;
@@ -126,6 +136,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.edit-button:hover {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
 }
 
 .delete-button:hover {
@@ -178,8 +193,14 @@
     background: #4b5563;
   }
 
+  .edit-button,
   .delete-button {
     color: #6b7280;
+  }
+
+  .edit-button:hover {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
   }
 
   .delete-button:hover {

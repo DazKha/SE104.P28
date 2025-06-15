@@ -184,19 +184,75 @@ const ExpensesPage = () => {
   // Handle updating transaction
   const handleUpdateTransaction = async (id, updatedData) => {
     try {
+      console.log('=== HANDLE UPDATE TRANSACTION ===');
+      console.log('Transaction ID:', id);
+      console.log('Updated data from TransactionSection:', updatedData);
+      
+      // Store original transaction for balance calculation
+      const originalTransaction = transactions.find(t => t.id == id); // Use == for loose comparison
+      console.log('Original transaction:', originalTransaction);
+      
       const updatedTransaction = await transactionService.updateTransaction(id, updatedData);
+      console.log('Updated transaction response:', updatedTransaction);
+      
+      // Ensure the response has the right structure
+      const formattedUpdatedTransaction = {
+        id: updatedTransaction.id || parseInt(id), // Keep original ID format
+        amount: updatedTransaction.amount,
+        date: updatedTransaction.date,
+        note: updatedTransaction.note,
+        description: updatedTransaction.note, // For compatibility
+        category: updatedTransaction.category_name || updatedTransaction.category,
+        category_name: updatedTransaction.category_name,
+        type: updatedTransaction.type,
+        imagePath: updatedTransaction.imagePath || updatedTransaction.receipt_image,
+        receipt_image: updatedTransaction.receipt_image,
+        receipt_path: updatedTransaction.receipt_path
+      };
+      
+      console.log('Formatted updated transaction:', formattedUpdatedTransaction);
       
       // Update local state
-      setTransactions(prev => prev.map(transaction => 
-        transaction.id === id ? updatedTransaction : transaction
-      ));
+      setTransactions(prev => {
+        const newTransactions = prev.map(transaction => 
+          transaction.id == id ? formattedUpdatedTransaction : transaction // Use == for loose comparison
+        );
+        console.log('Updated transactions array:', newTransactions.length);
+        return newTransactions;
+      });
       
-      // Recalculate balance
-      const newBalance = transactions.reduce((sum, transaction) => {
-        return sum + (transaction.type === 'income' ? transaction.amount : -transaction.amount);
-      }, 0);
+      // Recalculate balance properly
+      if (originalTransaction) {
+        const originalBalanceEffect = originalTransaction.type === 'income' 
+          ? originalTransaction.amount 
+          : -originalTransaction.amount;
+        
+        const newBalanceEffect = formattedUpdatedTransaction.type === 'income' 
+          ? formattedUpdatedTransaction.amount 
+          : -formattedUpdatedTransaction.amount;
+        
+        const balanceDifference = newBalanceEffect - originalBalanceEffect;
+        
+        console.log('Balance calculation:', {
+          originalAmount: originalTransaction.amount,
+          originalType: originalTransaction.type,
+          originalEffect: originalBalanceEffect,
+          newAmount: formattedUpdatedTransaction.amount,
+          newType: formattedUpdatedTransaction.type,
+          newEffect: newBalanceEffect,
+          difference: balanceDifference
+        });
+        
+        setBalance(prev => {
+          const newBalance = prev + balanceDifference;
+          console.log('Balance updated from', prev, 'to', newBalance);
+          return newBalance;
+        });
+      }
       
-      setBalance(newBalance);
+      setError(null);
+      console.log('Transaction update completed successfully');
+      
     } catch (err) {
       setError('Failed to update transaction');
       console.error('Error updating transaction:', err);
