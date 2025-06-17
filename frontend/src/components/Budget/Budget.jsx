@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext.jsx';
 import { useDataReset } from '../../hooks/useDataReset.js';
 import CurrencyInput from '../common/CurrencyInput.jsx';
 import budgetService from '../../services/budgetService';
+import transactionService from '../../services/transactionService';
 import BudgetItem from './BudgetItem';
 import styles from './Budget.module.css';
 
@@ -23,7 +24,17 @@ function Budget() {
     setLoading(true);
     try {
       const data = await budgetService.getAll();
-      setBudgets(data);
+      const allTransactions = await transactionService.getAllTransactions();
+
+      // Tính used cho từng budget
+      const budgetsWithUsed = data.map(budget => {
+        const used = allTransactions
+          .filter(t => t.type === 'outcome' && t.date.startsWith(budget.month))
+          .reduce((sum, t) => sum + t.amount, 0);
+        return { ...budget, used };
+      });
+
+      setBudgets(budgetsWithUsed);
     } catch (err) {
       console.error('Error fetching budgets:', err);
       // // Fallback với mock data nếu lỗi
