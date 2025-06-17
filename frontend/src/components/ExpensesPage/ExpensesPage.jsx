@@ -5,6 +5,7 @@ import TransactionSection from './TransactionSection/index.jsx';
 import ReportSection from './ReportSection/ReportSection';
 import CurrentBalance from './CurrentBalance/CurrentBalance';
 import transactionService from '../../services/transactionService';
+import './ExpensesPage.css';
 
 const ExpensesPage = () => {
   const { isLoggedIn } = useAuth();
@@ -13,15 +14,19 @@ const ExpensesPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Debug log for re-renders
+  console.log('ExpensesPage render - transactions count:', transactions.length, 'balance:', balance);
+
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const data = await transactionService.getAllTransactions();
-      setTransactions(data);
+      const transactionsArray = Array.isArray(data) ? data : [];
+      setTransactions(transactionsArray);
       
       // Calculate balance from API data
-      const totalBalance = data.reduce((sum, transaction) => {
+      const totalBalance = transactionsArray.reduce((sum, transaction) => {
         return sum + (transaction.type === 'income' ? transaction.amount : -transaction.amount);
       }, 0);
       
@@ -32,7 +37,10 @@ const ExpensesPage = () => {
       // Fallback to localStorage if API fails
       const savedTransactions = localStorage.getItem('transactions');
       if (savedTransactions) {
-        setTransactions(JSON.parse(savedTransactions));
+        const parsed = JSON.parse(savedTransactions);
+        setTransactions(Array.isArray(parsed) ? parsed : []);
+      } else {
+        setTransactions([]);
       }
     } finally {
       setLoading(false);
@@ -57,8 +65,10 @@ const ExpensesPage = () => {
   // Handle adding new transaction
   const handleAddTransaction = async (newTransaction) => {
     try {
+      console.log('=== HANDLE ADD TRANSACTION START ===');
       console.log('Adding transaction in ExpensesPage:', newTransaction);
       console.log('Date received:', newTransaction.date, 'Type:', typeof newTransaction.date);
+      console.log('Current transactions count:', transactions.length);
       
       // Validate amount
       const amount = parseFloat(newTransaction.amount);
@@ -104,15 +114,22 @@ const ExpensesPage = () => {
       console.log('After conversion:', formattedDate);
       
       // Chuẩn bị dữ liệu cho API
+      console.log('=== EXPENSES PAGE - CHECKING DESCRIPTION/NOTE ===');
+      console.log('newTransaction.description:', newTransaction.description);
+      console.log('newTransaction.note:', newTransaction.note);
+      
       const transactionForAPI = {
         amount: Math.abs(amount),
         date: formattedDate,
-        category: newTransaction.category, // Pass the selected category name
-        note: newTransaction.description || '',
+        category: newTransaction.category, 
+        note: newTransaction.note || '', 
         type: newTransaction.type,
         receipt_image: newTransaction.receipt_image || null, // Use base64 image data from frontend
         receipt_data: newTransaction.ocrData ? JSON.stringify(newTransaction.ocrData) : null // OCR data as JSON string
       };
+      
+      console.log('=== EXPENSES PAGE - FINAL API DATA ===');
+      console.log('transactionForAPI.note:', transactionForAPI.note);
       
       console.log('Transaction data with image:', {
         hasImagePath: !!newTransaction.imagePath,
@@ -144,21 +161,32 @@ const ExpensesPage = () => {
           ...savedTransaction,
           // Preserve image data from original transaction if not returned by API
           imagePath: savedTransaction.receipt_image || savedTransaction.imagePath || newTransaction.receipt_image,
-          receipt_image: savedTransaction.receipt_image || newTransaction.receipt_image
+          receipt_image: savedTransaction.receipt_image || newTransaction.receipt_image,
+          // Ensure consistent field mapping
+          description: savedTransaction.description || savedTransaction.note || newTransaction.description,
+          category_name: savedTransaction.category || savedTransaction.category_name, // For display compatibility
         };
         console.log('Adding transaction to state:', {
           id: transactionWithImage.id,
           hasImagePath: !!transactionWithImage.imagePath,
-          hasReceiptImage: !!transactionWithImage.receipt_image
+          hasReceiptImage: !!transactionWithImage.receipt_image,
+          category: transactionWithImage.category,
+          description: transactionWithImage.description
         });
         const newTransactions = [transactionWithImage, ...prevTransactions];
+        console.log('Updated transactions count:', newTransactions.length);
         return newTransactions;
       });
       
       // Update balance
-      setBalance(prev => prev + (savedTransaction.type === 'income' ? savedTransaction.amount : -savedTransaction.amount));
+      setBalance(prev => {
+        const newBalance = prev + (savedTransaction.type === 'income' ? savedTransaction.amount : -savedTransaction.amount);
+        console.log('Balance updated from', prev, 'to', newBalance, 'for transaction type:', savedTransaction.type, 'amount:', savedTransaction.amount);
+        return newBalance;
+      });
       
       setError(null);
+      console.log('=== HANDLE ADD TRANSACTION SUCCESS ===');
     } catch (err) {
       setError('Failed to add transaction: ' + err.message);
       console.error('Error adding transaction:', err);
@@ -294,15 +322,12 @@ const ExpensesPage = () => {
   );
 
   return (
-    <div>
-      <div>
-        <div>
-          <CurrentBalance 
-            transactions={transactions}
-            onAddTransaction={handleAddTransaction}
-          />
+    <div className="expenses-page">
+      <div className="expenses-container">
+        <div className="section-wrapper">
+          <CurrentBalance />
         </div>
-        <div>
+        <div className="section-wrapper">
           <TransactionSection 
             transactions={transactions}
             onAddTransaction={handleAddTransaction}
@@ -310,7 +335,7 @@ const ExpensesPage = () => {
             onDeleteTransaction={handleDeleteTransaction}
           />
         </div>
-        <div>
+        <div className="section-wrapper">
           <ReportSection transactions={transactions} />
         </div>
       </div>

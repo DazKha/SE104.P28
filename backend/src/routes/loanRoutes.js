@@ -16,7 +16,12 @@ router.get('/', loanController.getLoans);
 router.put('/:id', loanController.updateLoan);
 
 // Update loan/debt status
-router.patch('/:id/status', loanController.updateStatus);
+router.patch('/:id/status', (req, res, next) => {
+  console.log('🛣️  LOAN ROUTE - PATCH /:id/status called');
+  console.log('Route params:', req.params);
+  console.log('Route body:', req.body);
+  next();
+}, loanController.updateStatus);
 
 // Delete a loan/debt
 router.delete('/:id', loanController.deleteLoan);

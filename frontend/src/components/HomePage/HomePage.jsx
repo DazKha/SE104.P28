@@ -17,7 +17,7 @@ const HomePage = () => {
       try {
         setIsLoading(true);
         const data = await transactionService.getAllTransactions();
-        setTransactions(data);
+        setTransactions(Array.isArray(data) ? data : []);
         setError(null);
       } catch (err) {
         console.error('Error fetching transactions:', err);
@@ -25,7 +25,10 @@ const HomePage = () => {
         // Fallback to localStorage if API fails
         const savedTransactions = localStorage.getItem('transactions');
         if (savedTransactions) {
-          setTransactions(JSON.parse(savedTransactions));
+          const parsed = JSON.parse(savedTransactions);
+          setTransactions(Array.isArray(parsed) ? parsed : []);
+        } else {
+          setTransactions([]);
         }
       } finally {
         setIsLoading(false);
@@ -37,6 +40,11 @@ const HomePage = () => {
 
   // Calculate balance whenever transactions change
   useEffect(() => {
+    if (!Array.isArray(transactions)) {
+      setBalance(0);
+      return;
+    }
+    
     const newBalance = transactions.reduce((total, transaction) => {
       const amount = parseFloat(transaction.amount);
       if (transaction.type === 'income') {
@@ -51,7 +59,7 @@ const HomePage = () => {
   }, [transactions]);
 
   // Lấy tất cả giao dịch gần đây (cả thu nhập và chi tiêu)
-  const recentTransactions = transactions.slice(0, 5).map(transaction => ({
+  const recentTransactions = (Array.isArray(transactions) ? transactions : []).slice(0, 5).map(transaction => ({
     id: transaction.id,
     date: transaction.date,
     description: transaction.note || transaction.description,

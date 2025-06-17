@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import AddTransaction from './AddTransaction/AddTransaction.jsx';
 import './CurrentBalance.css';
 import { useAuth } from '../../../contexts/AuthContext.jsx';
 
-const CurrentBalance = ({ onAddTransaction }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const CurrentBalance = () => {
   const [transactions, setTransactions] = useState([]);
   const [balance, setBalance] = useState(0);
   const [totalIncome, setTotalIncome] = useState(0);
@@ -32,12 +30,22 @@ const CurrentBalance = ({ onAddTransaction }) => {
         }
         return res.json();
       })
-      .then(data => setTransactions(data))
-      .catch(err => console.error('Error fetching transactions:', err));
+      .then(data => setTransactions(Array.isArray(data) ? data : []))
+      .catch(err => {
+        console.error('Error fetching transactions:', err);
+        setTransactions([]);
+      });
   }, [isLoggedIn]);
 
   // Tính balance, income, outcome mỗi khi transactions thay đổi
   useEffect(() => {
+    if (!Array.isArray(transactions)) {
+      setTotalIncome(0);
+      setTotalOutcome(0);
+      setBalance(0);
+      return;
+    }
+
     let income = 0;
     let outcome = 0;
 
@@ -61,48 +69,12 @@ const CurrentBalance = ({ onAddTransaction }) => {
     }).format(amount);
   };
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
-
-  const handleAddTransactionInternal = (transaction) => {
-    if (onAddTransaction) {
-      onAddTransaction(transaction);
-    }
-    
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    if (!token) {
-      console.error('No token found for refetching.');
-      handleCloseModal();
-      return;
-    }
-
-    // After adding, refetch transactions to update the balance
-    fetch('http://localhost:3000/api/transactions', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-      .then(res => {
-        if (!res.ok) {
-          if (res.status === 401) {
-            console.error('Unauthorized request after adding transaction.');
-          }
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then(data => setTransactions(data))
-      .catch(err => console.error('Error refetching transactions:', err));
-
-    handleCloseModal();
-  };
-
   return (
     <div className="current-balance__card">
       <div className="current-balance__header">
         <div>
-          <h2> Current Balance </h2>
-          <p> Update in real time</p>
+          <h2>Current Balance</h2>
+          <p>Update in real time</p>
         </div>
       </div>
 
@@ -110,7 +82,6 @@ const CurrentBalance = ({ onAddTransaction }) => {
         <span>
           {formatBalance(balance)}
         </span>
-        
       </div>
 
       {/* Thêm thông tin chi tiết */}
@@ -124,17 +95,10 @@ const CurrentBalance = ({ onAddTransaction }) => {
           <p>{formatBalance(totalOutcome)}</p>
         </div>
       </div>
-      <AddTransaction
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onAddTransaction={handleAddTransactionInternal}
-      />
     </div>
   );
 };
 
-CurrentBalance.propTypes = {
-  onAddTransaction: PropTypes.func
-};
+CurrentBalance.propTypes = {};
 
 export default CurrentBalance;

@@ -1,8 +1,13 @@
 const db = require('../database/db');
 
 // tạo transaction
-exports.createTransaction = (transactionData) => {
+exports.createTransaction = async (transactionData) => {
   const { user_id, amount, date, category_id, note, type, receipt_image, receipt_data } = transactionData;
+
+  console.log('=== TRANSACTION MODEL - CREATE TRANSACTION ===');
+  console.log('transactionData received:', transactionData);
+  console.log('note field value:', note);
+  console.log('note type:', typeof note);
 
   const query = `
     INSERT INTO transactions (user_id, amount, date, category_id, note, type, receipt_image, receipt_data)
@@ -10,11 +15,16 @@ exports.createTransaction = (transactionData) => {
   `;
 
   const stmt = db.prepare(query);
-  return stmt.run(user_id, amount, date, category_id, note, type, receipt_image, receipt_data);
+  const result = await stmt.run(user_id, amount, date, category_id, note, type, receipt_image, receipt_data);
+  
+  console.log('Transaction inserted with ID:', result.lastInsertRowid);
+  console.log('Note value inserted:', note);
+  
+  return result;
 };
 
 // READ ALL for user with optional month filter
-exports.getTransactionsByUser = (userId, month) => {
+exports.getTransactionsByUser = async (userId, month) => {
   let query = `
     SELECT t.*, c.name as category_name
     FROM transactions t
@@ -32,18 +42,18 @@ exports.getTransactionsByUser = (userId, month) => {
   query += ` ORDER BY t.date DESC`;
   
   const stmt = db.prepare(query);
-  return stmt.all(...params);
+  return await stmt.all(...params);
 };
 
 // READ ONE
-exports.getTransactionById = (id) => {
+exports.getTransactionById = async (id) => {
   const query = `SELECT * FROM transactions WHERE id = ?`;
   const stmt = db.prepare(query);
-  return stmt.get(id);
+  return await stmt.get(id);
 };
 
 // UPDATE
-exports.updateTransaction = (id, transactionData) => {
+exports.updateTransaction = async (id, transactionData) => {
   const {
     amount, date, category_id, note, type
   } = transactionData;
@@ -54,18 +64,18 @@ exports.updateTransaction = (id, transactionData) => {
     WHERE id = ?
   `;
   const stmt = db.prepare(query);
-  return stmt.run(amount, date, category_id, note, type, id);
+  return await stmt.run(amount, date, category_id, note, type, id);
 };
 
 // DELETE
-exports.deleteTransaction = (id) => {
+exports.deleteTransaction = async (id) => {
   const query = `DELETE FROM transactions WHERE id = ?`;
   const stmt = db.prepare(query);
-  return stmt.run(id);
+  return await stmt.run(id);
 };
 
 // Search transactions by note content
-exports.searchTransactionsByNote = (userId, searchTerm) => {
+exports.searchTransactionsByNote = async (userId, searchTerm) => {
   const query = `
     SELECT t.*, c.name as category_name
     FROM transactions t
@@ -75,11 +85,11 @@ exports.searchTransactionsByNote = (userId, searchTerm) => {
   `;
   const searchPattern = `%${searchTerm}%`;
   const stmt = db.prepare(query);
-  return stmt.all(userId, searchPattern);
+  return await stmt.all(userId, searchPattern);
 };
 
 // Get category ID by name
-exports.getCategoryIdByName = (categoryName) => {
+exports.getCategoryIdByName = async (categoryName) => {
   try {
     console.log('Getting category ID for:', categoryName);
     const query = `
@@ -88,7 +98,7 @@ exports.getCategoryIdByName = (categoryName) => {
       LIMIT 1
     `;
     const stmt = db.prepare(query);
-    const result = stmt.get(categoryName);
+    const result = await stmt.get(categoryName);
     console.log('Category lookup result:', result);
     return result ? result.id : null;
   } catch (err) {

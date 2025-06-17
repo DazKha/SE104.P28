@@ -1,4 +1,5 @@
 import axios from 'axios';
+import transactionService from './transactionService';
 
 const API_URL = 'http://localhost:3000/api/budgets';
 axios.defaults.withCredentials = true;
@@ -106,6 +107,34 @@ const budgetService = {
       console.log('Budget deleted successfully');
     } catch (error) {
       console.error('Error in budgetService.delete:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  calculateUsedAmount: async (month) => {
+    try {
+      const allTransactions = await transactionService.getAllTransactions();
+      console.log('All transactions:', allTransactions);
+      const filtered = allTransactions.filter(t => t.type === 'outcome' && t.date.startsWith(month));
+      console.log('Filtered transactions for month', month, filtered);
+      const usedAmount = filtered.reduce((sum, t) => sum + t.amount, 0);
+      return usedAmount;
+    } catch (error) {
+      console.error('Error calculating used amount:', error);
+      return 0;
+    }
+  },
+
+  getAllWithUsedAmount: async () => {
+    try {
+      const budgets = await budgetService.getAll();
+      const budgetsWithUsed = await Promise.all(budgets.map(async (budget) => {
+        const used = await budgetService.calculateUsedAmount(budget.month);
+        return { ...budget, used };
+      }));
+      return budgetsWithUsed;
+    } catch (error) {
+      console.error('Error getting budgets with used amount:', error);
       throw error;
     }
   }

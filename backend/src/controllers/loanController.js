@@ -108,25 +108,34 @@ exports.updateStatus = async (req, res) => {
     const { status } = req.body;
     const userId = req.userId;
 
+    console.log(`🔄 UPDATE STATUS - ID: ${id}, UserId: ${userId}, Status: ${status}`);
+    console.log('Request body:', req.body);
+    console.log('Request params:', req.params);
+
     // Validate status
     if (!['pending', 'paid'].includes(status)) {
+      console.log(`❌ INVALID STATUS: ${status}`);
       return res.status(400).json({
         message: 'Status must be either "pending" or "paid"'
       });
     }
 
     const updated = await Loan.updateStatus(id, userId, status);
+    console.log(`📝 UPDATE RESULT: ${updated}`);
 
     if (!updated) {
+      console.log(`❌ LOAN NOT FOUND - ID: ${id}, UserId: ${userId}`);
       return res.status(404).json({
         message: 'Loan/Debt not found'
       });
     }
 
+    console.log(`✅ STATUS UPDATED SUCCESSFULLY - ID: ${id}`);
     res.status(200).json({
       message: 'Status updated successfully'
     });
   } catch (error) {
+    console.error(`💥 ERROR UPDATING STATUS - ID: ${id}:`, error);
     res.status(500).json({
       message: 'Error updating status',
       error: error.message

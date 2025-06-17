@@ -44,15 +44,38 @@ class Loan {
     return result.changes > 0;
   }
 
-  static updateStatus(id, userId, status) {
-    const query = `
-      UPDATE loans_debts 
-      SET status = ?
-      WHERE id = ? AND user_id = ?
-    `;
-    const stmt = db.prepare(query);
-    const result = stmt.run(status, id, userId);
-    return result.changes > 0;
+  static async updateStatus(id, userId, status) {
+    console.log(`📝 LOAN MODEL - updateStatus called with id: ${id}, userId: ${userId}, status: ${status}`);
+    
+    try {
+      // First check if the loan exists and belongs to the user
+      const checkQuery = `
+        SELECT id FROM loans_debts 
+        WHERE id = ? AND user_id = ?
+      `;
+      const checkStmt = db.prepare(checkQuery);
+      const loan = await checkStmt.get(id, userId);
+      
+      if (!loan) {
+        console.log(`❌ LOAN NOT FOUND - ID: ${id}, UserId: ${userId}`);
+        return false;
+      }
+
+      // Then update the status
+      const updateQuery = `
+        UPDATE loans_debts 
+        SET status = ?
+        WHERE id = ? AND user_id = ?
+      `;
+      const updateStmt = db.prepare(updateQuery);
+      const result = await updateStmt.run(status, id, userId);
+      
+      console.log(`📝 LOAN MODEL - Update result:`, result);
+      return result.changes > 0;
+    } catch (error) {
+      console.error('Error in updateStatus:', error);
+      throw error;
+    }
   }
 
   static delete(id, userId) {

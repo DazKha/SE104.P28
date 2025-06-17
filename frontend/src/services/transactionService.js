@@ -57,22 +57,29 @@ const transactionService = {
   addTransaction: async (transaction) => {
     try {
       const token = getToken();
+      console.log('=== TRANSACTION SERVICE - ADD TRANSACTION ===');
       console.log('Token status:', token ? 'Found' : 'Not found');
-      console.log('Transaction data in service:', transaction);
+      console.log('Transaction data received in service:', transaction);
+      console.log('transaction.note:', transaction.note);
+      console.log('transaction.description:', transaction.description);
       
       if (!token) {
         // Use public API if no token
         console.log('Using PUBLIC API endpoint:', `${PUBLIC_API_URL}/transactions`);
+        console.log('Sending to backend:', JSON.stringify(transaction, null, 2));
         const response = await axios.post(`${PUBLIC_API_URL}/transactions`, transaction);
+        console.log('Backend response:', response.data);
         return response.data;
       }
 
       console.log('Using PRIVATE API endpoint:', `${API_URL}/transactions`);
+      console.log('Sending to backend:', JSON.stringify(transaction, null, 2));
       const response = await axios.post(`${API_URL}/transactions`, transaction, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
+      console.log('Backend response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error adding transaction:', error);

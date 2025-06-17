@@ -14,15 +14,13 @@
   "dependencies": {
     "axios": "^1.9.0",
     "bcryptjs": "^2.4.3",
-    "better-sqlite3": "^11.10.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.21.2",
     "express-fileupload": "^1.5.1",
     "form-data": "^4.0.3",
     "jsonwebtoken": "^9.0.2",
-    "multer": "^2.0.1",
-    "sqlite": "^5.1.1",
+    "multer": "^1.4.5-lts.1",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {

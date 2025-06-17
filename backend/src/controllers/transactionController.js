@@ -43,15 +43,15 @@ const validateTransactionData = (data) => {
 };
 
 // Hàm lấy ID của category "Uncategorized"
-const getDefaultCategoryId = () => {
+const getDefaultCategoryId = async () => {
   const stmt = db.prepare(`SELECT id FROM categories WHERE name = 'Uncategorized'`);
-  const row = stmt.get();
+  const row = await stmt.get();
   return row?.id || null;
 };
 
 // PUBLIC METHODS (No authentication required)
 // Hàm lấy tất cả transactions (public)
-exports.getPublicTransactions = (req, res) => {
+exports.getPublicTransactions = async (req, res) => {
   const { month } = req.query;
   const userId = 1; // Default user for testing
   
@@ -61,19 +61,27 @@ exports.getPublicTransactions = (req, res) => {
   }
 
   try {
-    const rows = Transaction.getTransactionsByUser(userId, month);
+    console.log('Fetching public transactions for user:', userId, 'month:', month);
+    const rows = await Transaction.getTransactionsByUser(userId, month);
+    console.log('Found public transactions:', rows.length);
     res.json(rows);
   } catch (err) {
+    console.error('Error fetching public transactions:', err);
     res.status(500).json({ error: 'Failed to fetch transactions' });
   }
 };
 
 // Hàm tạo transaction (public)
-exports.createPublicTransaction = (req, res) => {
+exports.createPublicTransaction = async (req, res) => {
   const data = { ...req.body, user_id: 1 }; // Default user for testing
   
   // Log received data for debugging
-  console.log('Received transaction data:', {
+  console.log('=== BACKEND - CREATE PUBLIC TRANSACTION ===');
+  console.log('Request body received:', req.body);
+  console.log('req.body.note (description field):', req.body.note);
+  console.log('req.body.description:', req.body.description);
+  console.log('data.note after spread:', data.note);
+  console.log('Full received transaction data:', {
     ...data,
     receipt_image: data.receipt_image ? 'Base64 data received' : 'No image data'
   });
@@ -87,17 +95,29 @@ exports.createPublicTransaction = (req, res) => {
   try {
     // Get category_id from category name if provided
     let category_id = data.category_id;
-    if (data.category && !category_id) {
+    
+    // If category_id is provided, validate it exists
+    if (category_id) {
+      console.log('Validating provided category_id:', category_id);
+      const categoryValidationStmt = db.prepare('SELECT id FROM categories WHERE id = ?');
+      const categoryExists = await categoryValidationStmt.get(category_id);
+      if (!categoryExists) {
+        console.log('Category_id', category_id, 'does not exist, using default');
+        category_id = await getDefaultCategoryId();
+      } else {
+        console.log('Category_id', category_id, 'is valid');
+      }
+    } else if (data.category && !category_id) {
       // Map category to database name if needed
       const mappedCategory = categoryMapping[data.category] || data.category;
       console.log('Looking up category:', mappedCategory);
-      category_id = Transaction.getCategoryIdByName(mappedCategory);
+      category_id = await Transaction.getCategoryIdByName(mappedCategory);
       console.log('Found category_id:', category_id);
     }
     
     if (!category_id) {
       console.log('No category_id found, using default category');
-      category_id = getDefaultCategoryId();
+      category_id = await getDefaultCategoryId();
     }
     
     if (!category_id) {
@@ -105,7 +125,7 @@ exports.createPublicTransaction = (req, res) => {
       return res.status(400).json({ error: 'Invalid category' });
     }
 
-    const result = Transaction.createTransaction({
+    const result = await Transaction.createTransaction({
       ...data,
       category_id
     });
@@ -113,7 +133,7 @@ exports.createPublicTransaction = (req, res) => {
     // Get category name from database
     const categoryQuery = `SELECT name FROM categories WHERE id = ?`;
     const categoryStmt = db.prepare(categoryQuery);
-    const categoryRow = categoryStmt.get(category_id);
+    const categoryRow = await categoryStmt.get(category_id);
     const categoryName = categoryRow ? categoryRow.name : 'Uncategorized';
     
     res.status(201).json({ 
@@ -136,7 +156,7 @@ exports.createPublicTransaction = (req, res) => {
 };
 
 // Hàm tạo transaction
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
   const data = { ...req.body, user_id: req.userId };
   
   // Validate input
@@ -148,17 +168,29 @@ exports.create = (req, res) => {
   try {
     // Get category_id from category name if provided
     let category_id = data.category_id;
-    if (data.category && !category_id) {
+    
+    // If category_id is provided, validate it exists
+    if (category_id) {
+      console.log('Validating provided category_id:', category_id);
+      const categoryValidationStmt = db.prepare('SELECT id FROM categories WHERE id = ?');
+      const categoryExists = await categoryValidationStmt.get(category_id);
+      if (!categoryExists) {
+        console.log('Category_id', category_id, 'does not exist, using default');
+        category_id = await getDefaultCategoryId();
+      } else {
+        console.log('Category_id', category_id, 'is valid');
+      }
+    } else if (data.category && !category_id) {
       // Map category to database name if needed
       const mappedCategory = categoryMapping[data.category] || data.category;
       console.log('Looking up category:', mappedCategory);
-      category_id = Transaction.getCategoryIdByName(mappedCategory);
+      category_id = await Transaction.getCategoryIdByName(mappedCategory);
       console.log('Found category_id:', category_id);
     }
     
     if (!category_id) {
       console.log('No category_id found, using default category');
-      category_id = getDefaultCategoryId();
+      category_id = await getDefaultCategoryId();
     }
     
     if (!category_id) {
@@ -166,7 +198,7 @@ exports.create = (req, res) => {
       return res.status(400).json({ error: 'Invalid category' });
     }
 
-    const result = Transaction.createTransaction({
+    const result = await Transaction.createTransaction({
       ...data,
       category_id
     });
@@ -187,7 +219,7 @@ exports.create = (req, res) => {
     // Get category name from database
     const categoryQuery = `SELECT name FROM categories WHERE id = ?`;
     const categoryStmt = db.prepare(categoryQuery);
-    const categoryRow = categoryStmt.get(category_id);
+    const categoryRow = await categoryStmt.get(category_id);
     const categoryName = categoryRow ? categoryRow.name : 'Uncategorized';
     
     res.status(201).json({ 
@@ -208,7 +240,7 @@ exports.create = (req, res) => {
 };
 
 // Hàm lấy tất cả transactions của user
-exports.getByUser = (req, res) => {
+exports.getByUser = async (req, res) => {
   try {
     const { month } = req.query;
     const userId = req.userId; // Lấy userId từ token đã verify
@@ -220,8 +252,8 @@ exports.getByUser = (req, res) => {
       return res.status(400).json({ error: 'Invalid month format. Use YYYY-MM format.' });
     }
 
-    const transactions = Transaction.getTransactionsByUser(userId, month);
-    console.log('Found transactions:', transactions);
+    const transactions = await Transaction.getTransactionsByUser(userId, month);
+    console.log('Found transactions:', transactions.length);
     
     res.json(transactions);
   } catch (err) {
@@ -404,7 +436,7 @@ exports.search = (req, res) => {
 };
 
 // Public update transaction (no authentication)
-exports.updatePublicTransaction = (req, res) => {
+exports.updatePublicTransaction = async (req, res) => {
   try {
     const transactionId = req.params.id;
     const updateData = req.body;
@@ -423,8 +455,8 @@ exports.updatePublicTransaction = (req, res) => {
       // Find category by name
       const categoryQuery = `SELECT id FROM categories WHERE name = ?`;
       const categoryStmt = db.prepare(categoryQuery);
-      const category = categoryStmt.get(updateData.category);
-      categoryId = category ? category.id : getDefaultCategoryId();
+      const category = await categoryStmt.get(updateData.category);
+      categoryId = category ? category.id : await getDefaultCategoryId();
     }
 
     // Update the transaction (no user_id check for public API)
@@ -439,7 +471,7 @@ exports.updatePublicTransaction = (req, res) => {
     `;
     
     const updateStmt = db.prepare(updateQuery);
-    const result = updateStmt.run(
+    const result = await updateStmt.run(
       updateData.amount,
       updateData.date,
       categoryId,
@@ -460,7 +492,7 @@ exports.updatePublicTransaction = (req, res) => {
       WHERE t.id = ?
     `;
     const getStmt = db.prepare(getQuery);
-    const updatedTransaction = getStmt.get(transactionId);
+    const updatedTransaction = await getStmt.get(transactionId);
 
     res.json(updatedTransaction);
   } catch (err) {
@@ -470,7 +502,7 @@ exports.updatePublicTransaction = (req, res) => {
 };
 
 // Public delete transaction (no authentication)
-exports.deletePublicTransaction = (req, res) => {
+exports.deletePublicTransaction = async (req, res) => {
   try {
     const transactionId = req.params.id;
 
@@ -479,7 +511,7 @@ exports.deletePublicTransaction = (req, res) => {
     // Delete the transaction (no user_id check for public API)
     const deleteQuery = `DELETE FROM transactions WHERE id = ?`;
     const deleteStmt = db.prepare(deleteQuery);
-    const result = deleteStmt.run(transactionId);
+    const result = await deleteStmt.run(transactionId);
 
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Transaction not found' });

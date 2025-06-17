@@ -78,10 +78,18 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
   // Handle input changes for new transaction
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewTransaction({
+    console.log('=== HANDLE INPUT CHANGE ===');
+    console.log('Input name:', name);
+    console.log('Input value:', value);
+    console.log('Current newTransaction before update:', newTransaction);
+    
+    const updatedTransaction = {
       ...newTransaction,
       [name]: name === 'amount' ? value : value
-    });
+    };
+    
+    console.log('Updated newTransaction after update:', updatedTransaction);
+    setNewTransaction(updatedTransaction);
   };
 
   // Handle transaction type change (income/expense)
@@ -318,12 +326,24 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
         receipt_image: receiptImage, // Add base64 image data
         ocrData
       };
+      
+      console.log('=== TRANSACTION DATA CREATED ===');
+      console.log('Raw transactionData object:', transactionData);
+      console.log('transactionData.note value:', transactionData.note);
+      console.log('transactionData.description value:', transactionData.description);
 
-      console.log('Sending transaction data:', {
-        ...transactionData,
-        receipt_image: receiptImage ? 'Base64 data present' : 'No image data'
-      });
+          console.log('=== TRANSACTION SECTION - PREPARING DATA ===');
+    console.log('Current newTransaction state:', newTransaction);
+    console.log('newTransaction.description:', newTransaction.description);
+    console.log('transactionData.note:', transactionData.note);
+    console.log('Full transactionData:', {
+      ...transactionData,
+      receipt_image: receiptImage ? 'Base64 data present' : 'No image data'
+    });
 
+      console.log('=== TRANSACTION SECTION - CALLING PARENT FUNCTION ===');
+      console.log('About to call parent with transactionData:', transactionData);
+      
       if (isEditingTransaction) {
         await onUpdateTransaction(editingTransaction.id, transactionData);
       } else {
@@ -549,13 +569,21 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     <div className="transaction-section">
       {/* Main Header */}
       <div className="section-header">
-        <h2 className="section-title">Transaction</h2>
+        <div className="section-title-container">
+          <h2 className="section-title">Transactions</h2>
+          <p className="section-subtitle">Manage your income and expenses</p>
+        </div>
         <button 
-          onClick={() => setIsAddingTransaction(!isAddingTransaction)}
-          className="add-btn"
+          onClick={() => {
+            console.log('=== ADD TRANSACTION BUTTON CLICKED ===');
+            console.log('Current isAddingTransaction:', isAddingTransaction);
+            console.log('Current newTransaction state:', newTransaction);
+            setIsAddingTransaction(!isAddingTransaction);
+          }}
+          className={`add-transaction-btn ${isAddingTransaction ? 'active' : ''}`}
         >
           <PlusIcon size={20} />
-          Add Transaction
+          {isAddingTransaction ? 'Cancel' : 'Add Transaction'}
         </button>
       </div>
 
@@ -564,11 +592,20 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
         <div className="transaction-form">
           <div className="form-header">
             <h3>{isEditingTransaction ? 'Edit Transaction' : 'Add New Transaction'}</h3>
+            {!isEditingTransaction && (
+              <button 
+                type="button" 
+                onClick={() => setIsAddingTransaction(false)}
+                className="close-form-btn"
+              >
+                ×
+              </button>
+            )}
           </div>
           <form onSubmit={handleSubmitTransaction}>
             <div className="form-grid">
               <div className="form-group">
-                <label>Date</label>
+                <label>Date *</label>
                 <input
                   type="date"
                   name="date"
@@ -596,22 +633,24 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
                       handleInputChange(e);
                     }
                   }}
-                  className="search-input"
+                  className="form-input"
+                  required
                 />
               </div>
               <div className="form-group">
-                <label>Description</label>
+                <label>Description *</label>
                 <input
                   type="text"
                   name="description"
                   value={newTransaction.description}
                   onChange={handleInputChange}
-                  className="search-input"
-                  placeholder="Transaction description"
+                  className="form-input"
+                  placeholder="Enter transaction description"
+                  required
                 />
               </div>
               <div className="form-group" ref={categoryRef}>
-                <label>Category</label>
+                <label>Category *</label>
                 <div className="category-select">
                   <button
                     type="button"
@@ -619,6 +658,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
                     onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                   >
                     {newTransaction.category || 'Select category'}
+                    <span className="category-arrow">▼</span>
                   </button>
                   {isCategoryOpen && (
                     <div className="category-popup">
@@ -640,25 +680,33 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
 
             <div className="form-grid">
               <div className="form-group">
-                <label>Amount (VND)</label>
+                <label>Amount (VND) *</label>
                 <CurrencyInput
-                  placeholder="Amount"
+                  placeholder="Enter amount"
                   value={newTransaction.amount}
                   onChange={(e) => setNewTransaction({ ...newTransaction, amount: e.target.value })}
-                  className="search-input"
+                  className="form-input"
+                  required
                 />
               </div>
               <div className="form-group">
-                <label>Type</label>
-                <select
-                  name="type"
-                  value={newTransaction.type}
-                  onChange={handleTypeChange}
-                  className="search-input"
-                >
-                  <option value="outcome">Expense</option>
-                  <option value="income">Income</option>
-                </select>
+                <label>Type *</label>
+                <div className="transaction-type-buttons">
+                  <button
+                    type="button"
+                    className={`type-btn ${newTransaction.type === 'income' ? 'active' : ''}`}
+                    onClick={() => handleTypeChange({ target: { value: 'income' } })}
+                  >
+                    Income
+                  </button>
+                  <button
+                    type="button"
+                    className={`type-btn ${newTransaction.type === 'outcome' ? 'active' : ''}`}
+                    onClick={() => handleTypeChange({ target: { value: 'outcome' } })}
+                  >
+                    Expense
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -690,45 +738,50 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
             />
 
             <div className="form-actions">
-              <button 
-                type="button" 
-                onClick={handleAddPictureClick} 
-                className="picture-btn"
-              >
-                <CameraIcon size={16} />
-                Add Image
-              </button>
-              {selectedImage && (
+              <div className="secondary-actions">
                 <button 
                   type="button" 
-                  onClick={() => processOCR(selectedImage)} 
-                  className="ocr-btn"
-                  disabled={processingOCR}
+                  onClick={handleAddPictureClick} 
+                  className="secondary-btn"
                 >
-                  <ImageIcon size={16} />
-                  {processingOCR ? 'Processing OCR...' : 'OCR'}
+                  <CameraIcon size={16} />
+                  Add Image
                 </button>
-              )}
-              <button type="button" onClick={isEditingTransaction ? handleCancelEdit : () => setIsAddingTransaction(false)} className="cancel-btn">
-                Cancel
-              </button>
-              <button type="submit" className="save-btn" disabled={uploadingImage}>
-                {uploadingImage ? 'Uploading...' : (isEditingTransaction ? 'Update Transaction' : 'Save Transaction')}
-              </button>
+                {selectedImage && (
+                  <button 
+                    type="button" 
+                    onClick={() => processOCR(selectedImage)} 
+                    className="secondary-btn"
+                    disabled={processingOCR}
+                  >
+                    <ImageIcon size={16} />
+                    {processingOCR ? 'Processing...' : 'OCR'}
+                  </button>
+                )}
+              </div>
+              <div className="primary-actions">
+                <button 
+                  type="button" 
+                  onClick={isEditingTransaction ? handleCancelEdit : () => setIsAddingTransaction(false)} 
+                  className="cancel-btn"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="save-btn" 
+                  disabled={uploadingImage || !newTransaction.amount || !newTransaction.description}
+                >
+                  {uploadingImage ? 'Uploading...' : (isEditingTransaction ? 'Update Transaction' : 'Save Transaction')}
+                </button>
+              </div>
             </div>
 
             {/* Error display */}
             {error && (
-              <div className="error-message" style={{ 
-                backgroundColor: '#fef2f2', 
-                border: '1px solid #fecaca',
-                borderRadius: '8px',
-                padding: '12px',
-                color: '#dc2626',
-                marginTop: '1rem'
-              }}>
-                <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '14px', fontWeight: '600' }}>Error:</h4>
-                <p style={{ margin: '0', fontSize: '14px' }}>{error}</p>
+              <div className="error-message">
+                <h4>Error:</h4>
+                <p>{error}</p>
               </div>
             )}
           </form>

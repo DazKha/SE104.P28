@@ -1,27 +1,20 @@
 const db = require('../database/db');
 
 const User = {
-  create: (user) => {
+  create: async (user) => {
     const { name, email, password } = user;
     const stmt = db.prepare('INSERT INTO users (name, email, password) VALUES (?, ?, ?)');
-    return stmt.run(name, email, password);
+    return await stmt.run(name, email, password);
   },
 
-  findByEmail: (email) => {
+  findByEmail: async (email) => {
     const stmt = db.prepare('SELECT * FROM users WHERE email = ?');
-    return stmt.get(email);
+    return await stmt.get(email);
   },
 
   getAllUsers: async () => {
-    return new Promise((resolve, reject) => {
-      db.all('SELECT id, name, email FROM users', [], (err, rows) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(rows);
-        }
-      });
-    });
+    const stmt = db.prepare('SELECT id, name, email FROM users');
+    return await stmt.all();
   }
 };
 
