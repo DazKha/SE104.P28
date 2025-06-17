@@ -205,7 +205,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       const ocrFormData = new FormData();
       ocrFormData.append('file', imageFile);
 
-      const ocrResponse = await fetch('https://616a-35-233-197-150.ngrok-free.app/ocr', {
+      const ocrResponse = await fetch('https://bb94-34-19-10-203.ngrok-free.app/ocr', {
         method: 'POST',
         body: ocrFormData,
         headers: {

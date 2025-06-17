@@ -108,7 +108,7 @@ const ExpensesPage = () => {
         amount: Math.abs(amount),
         date: formattedDate,
         category: newTransaction.category, // Pass the selected category name
-        note: newTransaction.description || '',
+        note: newTransaction.note || '',
         type: newTransaction.type,
         receipt_image: newTransaction.receipt_image || null, // Use base64 image data from frontend
         receipt_data: newTransaction.ocrData ? JSON.stringify(newTransaction.ocrData) : null // OCR data as JSON string
