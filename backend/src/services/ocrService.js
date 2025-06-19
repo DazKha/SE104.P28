@@ -3,7 +3,7 @@ const fs = require('fs');
 const FormData = require('form-data');
 
 // OCR service configuration
-const OCR_SERVICE_URL = process.env.OCR_SERVICE_URL || 'http://localhost:8000/ocr';
+const OCR_SERVICE_URL = process.env.OCR_SERVICE_URL || 'http://localhost:5555/ocr';
 const OCR_TIMEOUT = process.env.OCR_TIMEOUT || 30000; // 30 seconds
 
 /**

@@ -58,8 +58,8 @@ const HomePage = () => {
     setBalance(newBalance);
   }, [transactions]);
 
-  // Lấy tất cả giao dịch gần đây (cả thu nhập và chi tiêu)
-  const recentTransactions = (Array.isArray(transactions) ? transactions : []).slice(0, 5).map(transaction => ({
+  // Chuẩn bị tất cả giao dịch để RecentExpenses tự sort và lấy 5 giao dịch gần nhất
+  const recentTransactions = (Array.isArray(transactions) ? transactions : []).map(transaction => ({
     id: transaction.id,
     date: transaction.date,
     description: transaction.note || transaction.description,

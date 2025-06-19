@@ -39,7 +39,7 @@ exports.getTransactionsByUser = async (userId, month) => {
     params.push(month);
   }
 
-  query += ` ORDER BY t.date DESC`;
+  query += ` ORDER BY t.date ASC`;
   
   const stmt = db.prepare(query);
   return await stmt.all(...params);

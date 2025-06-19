@@ -213,7 +213,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       const ocrFormData = new FormData();
       ocrFormData.append('file', imageFile);
 
-      const ocrResponse = await fetch('https://616a-35-233-197-150.ngrok-free.app/ocr', {
+      const ocrResponse = await fetch('https://1455-35-197-96-146.ngrok-free.app/ocr', {
         method: 'POST',
         body: ocrFormData,
         headers: {
@@ -500,7 +500,6 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
         transaction.amount?.toString().includes(searchTerm)
       );
     }
-    
     // Sort by date
     const sorted = filtered.sort((a, b) => {
       const getDateForSort = (dateStr) => {
@@ -520,6 +519,25 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
 
     return sorted;
   };
+  //   // Sort by date
+  //   const sorted = filtered.sort((a, b) => {
+  //     const getDateForSort = (dateStr) => {
+  //       if (!dateStr) return '';
+        
+  //       if (dateStr.includes('/')) {
+  //         const [day, month, year] = dateStr.split('/');
+  //         return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  //       }
+  //       return dateStr;
+  //     };
+      
+  //     const dateA = getDateForSort(a.date);
+  //     const dateB = getDateForSort(b.date);
+  //     return dateB.localeCompare(dateA);
+  //   });
+
+  //   return sorted;
+  // };
 
   // Calculate monthly stats (for all transactions in the month, ignoring filters)
   const getMonthlyStats = () => {
