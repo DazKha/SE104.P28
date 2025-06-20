@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import TransactionItem from './TransactionItem.jsx';
 import CurrencyInput from '../../common/CurrencyInput.jsx';
+import { parseVietnameseAmount } from '../../../utils/parseVietnameseAmount.js';
 import { outcomeCategories, incomeCategories } from '../../../constants/categories.js';
 import { 
   PlusIcon, 
@@ -14,7 +15,7 @@ import {
   ImageIcon
 } from 'lucide-react';
 import './TransactionSection.css';
-const ocr_server_url = 'https://446f-34-87-190-254.ngrok-free.app/ocr'
+const ocr_server_url = 'https://4e22-34-82-78-47.ngrok-free.app/ocr'
 
 const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTransaction, onDeleteTransaction }) => {
   // Categories
@@ -214,7 +215,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       const ocrFormData = new FormData();
       ocrFormData.append('file', imageFile);
 
-      const ocrResponse = await fetch('https://446f-34-87-190-254.ngrok-free.app/ocr', {
+      const ocrResponse = await fetch(ocr_server_url, {
         method: 'POST',
         body: ocrFormData,
         headers: {
@@ -250,16 +251,49 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
           const parsedData = JSON.parse(jsonStr);
           console.log('Parsed OCR Data:', parsedData);
           
-          // Get total amount
-          const totalAmount = parsedData["Tổng số tiền"];
-          console.log('Total Amount:', totalAmount);
+          // Handle both array and object format
+          console.log('=== OCR AMOUNT PARSING ===');
+          console.log('1. Parsed data type:', Array.isArray(parsedData) ? 'Array' : 'Object');
+          console.log('2. Parsed data structure:', parsedData);
           
-          if (totalAmount) {
+          let totalAmountStr = null;
+          
+          if (Array.isArray(parsedData)) {
+            // Handle array format: search through all objects
+            for (const item of parsedData) {
+              if (item["Tổng số tiền"] !== undefined) {
+                totalAmountStr = item["Tổng số tiền"];
+                console.log('3. Found "Tổng số tiền" in array item:', totalAmountStr);
+                break;
+              }
+              // Alternative: look for "Tiền khách trả" if "Tổng số tiền" not found
+              if (item["Tiền khách trả"] !== undefined && !totalAmountStr) {
+                totalAmountStr = item["Tiền khách trả"];
+                console.log('3. Found "Tiền khách trả" as fallback:', totalAmountStr);
+              }
+            }
+          } else {
+            // Handle object format
+            totalAmountStr = parsedData["Tổng số tiền"] || parsedData["Tiền khách trả"];
+            console.log('3. Found amount in object:', totalAmountStr);
+          }
+          
+          console.log('4. Final amount string:', totalAmountStr);
+          console.log('5. Type of amount:', typeof totalAmountStr);
+          
+          if (totalAmountStr !== null && totalAmountStr !== undefined) {
+            // Parse Vietnamese format: remove dots (thousand separators)
+            const cleanAmount = parseVietnameseAmount(totalAmountStr);
+            console.log('6. Parsed amount:', cleanAmount);
+            console.log('7. Setting newTransaction.amount to:', cleanAmount.toString());
+            
             setNewTransaction(prev => ({
               ...prev,
-              amount: totalAmount.toString()
+              amount: cleanAmount.toString()
             }));
-            console.log('Amount filled automatically:', totalAmount);
+            console.log('8. Amount filled automatically:', cleanAmount);
+          } else {
+            console.log('6. No amount found in OCR data');
           }
         } catch (e) {
           console.error('Failed to parse OCR data:', e);
@@ -652,6 +686,8 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
                       handleInputChange(e);
                     }
                   }}
+
+                  
                   className="form-input"
                   required
                 />

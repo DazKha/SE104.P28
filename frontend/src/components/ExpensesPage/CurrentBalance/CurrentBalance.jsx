@@ -1,48 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import './CurrentBalance.css';
-import { useAuth } from '../../../contexts/AuthContext.jsx';
 
-const CurrentBalance = () => {
-  const [transactions, setTransactions] = useState([]);
-  const [balance, setBalance] = useState(0);
+const CurrentBalance = ({ balance = 0, transactions = [] }) => {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalOutcome, setTotalOutcome] = useState(0);
-  
-  const { isLoggedIn } = useAuth();
 
-  // Gọi API lấy transactions
-  useEffect(() => {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    if (!isLoggedIn || !token) return;
+  console.log('=== CURRENT BALANCE COMPONENT ===');
+  console.log('Received balance:', balance);
+  console.log('Received transactions count:', transactions.length);
 
-    fetch('http://localhost:3000/api/transactions', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-      .then(res => {
-        if (!res.ok) {
-          if (res.status === 401) {
-            console.error('Unauthorized request. Please log in.');
-          }
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then(data => setTransactions(Array.isArray(data) ? data : []))
-      .catch(err => {
-        console.error('Error fetching transactions:', err);
-        setTransactions([]);
-      });
-  }, [isLoggedIn]);
-
-  // Tính balance, income, outcome mỗi khi transactions thay đổi
+  // Tính income, outcome mỗi khi transactions thay đổi
   useEffect(() => {
     if (!Array.isArray(transactions)) {
       setTotalIncome(0);
       setTotalOutcome(0);
-      setBalance(0);
       return;
     }
 
@@ -56,7 +28,6 @@ const CurrentBalance = () => {
 
     setTotalIncome(income);
     setTotalOutcome(outcome);
-    setBalance(income - outcome);
   }, [transactions]);
   
   // Format balance to currency
@@ -99,6 +70,9 @@ const CurrentBalance = () => {
   );
 };
 
-CurrentBalance.propTypes = {};
+CurrentBalance.propTypes = {
+  balance: PropTypes.number,
+  transactions: PropTypes.array
+};
 
 export default CurrentBalance;

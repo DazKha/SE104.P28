@@ -25,7 +25,12 @@ const CurrencyInput = ({
   // Cập nhật display value khi value prop thay đổi
   useEffect(() => {
     if (value !== undefined && value !== null) {
-      setDisplayValue(formatNumber(value.toString()));
+      // Clean the value first to handle Vietnamese format from OCR
+      const cleanValue = value.toString()
+        .replace(/\./g, '')  // Remove dots from Vietnamese format (thousand separators)
+        .replace(/\D/g, ''); // Keep only digits
+      
+      setDisplayValue(formatNumber(cleanValue));
     }
   }, [value]);
 

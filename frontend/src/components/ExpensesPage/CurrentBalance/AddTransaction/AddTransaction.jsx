@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { expenseCategories, incomeCategories } from '../../../../constants/categories';
+import { parseVietnameseAmount } from '../../../../utils/parseVietnameseAmount.js';
 import './AddTransaction.css';
 
 const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
@@ -144,12 +145,46 @@ const AddTransaction = ({ isOpen, onClose, onAddTransaction }) => {
             .replace('\n```', '');
           const parsedData = JSON.parse(jsonStr);
           
-          const totalAmount = parsedData["Tổng số tiền"];
-          if (totalAmount) {
+          console.log('=== OCR AMOUNT PARSING (AddTransaction) ===');
+          console.log('1. Parsed data type:', Array.isArray(parsedData) ? 'Array' : 'Object');
+          console.log('2. Parsed data structure:', parsedData);
+          
+          let totalAmountStr = null;
+          
+          if (Array.isArray(parsedData)) {
+            // Handle array format: search through all objects
+            for (const item of parsedData) {
+              if (item["Tổng số tiền"] !== undefined) {
+                totalAmountStr = item["Tổng số tiền"];
+                console.log('3. Found "Tổng số tiền" in array item:', totalAmountStr);
+                break;
+              }
+              // Alternative: look for "Tiền khách trả" if "Tổng số tiền" not found
+              if (item["Tiền khách trả"] !== undefined && !totalAmountStr) {
+                totalAmountStr = item["Tiền khách trả"];
+                console.log('3. Found "Tiền khách trả" as fallback:', totalAmountStr);
+              }
+            }
+          } else {
+            // Handle object format
+            totalAmountStr = parsedData["Tổng số tiền"] || parsedData["Tiền khách trả"];
+            console.log('3. Found amount in object:', totalAmountStr);
+          }
+          
+          console.log('4. Final amount string:', totalAmountStr);
+          
+          if (totalAmountStr !== null && totalAmountStr !== undefined) {
+            // Parse Vietnamese format: remove dots (thousand separators)
+            const cleanAmount = parseVietnameseAmount(totalAmountStr);
+            console.log('5. Parsed amount:', cleanAmount);
+            
             setNewTransaction(prev => ({
               ...prev,
-              amount: totalAmount.toString()
+              amount: cleanAmount.toString()
             }));
+            console.log('6. Amount filled automatically:', cleanAmount);
+          } else {
+            console.log('5. No amount found in OCR data');
           }
         } catch (e) {
           console.error('Failed to parse OCR data:', e);

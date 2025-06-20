@@ -325,7 +325,10 @@ const ExpensesPage = () => {
     <div className="expenses-page">
       <div className="expenses-container">
         <div className="section-wrapper">
-          <CurrentBalance />
+          <CurrentBalance 
+            balance={balance}
+            transactions={transactions}
+          />
         </div>
         <div className="section-wrapper">
           <TransactionSection 
