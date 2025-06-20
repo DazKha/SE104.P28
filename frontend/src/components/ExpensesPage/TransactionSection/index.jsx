@@ -14,6 +14,7 @@ import {
   ImageIcon
 } from 'lucide-react';
 import './TransactionSection.css';
+const ocr_server_url = 'https://446f-34-87-190-254.ngrok-free.app/ocr'
 
 const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTransaction, onDeleteTransaction }) => {
   // Categories
@@ -185,7 +186,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       const backendFormData = new FormData();
       backendFormData.append('image', imageFile);
 
-      const backendResponse = await fetch('http://localhost:3000/api/receipts/ocr', {
+      const backendResponse = await fetch(ocr_server_url, {
         method: 'POST',
         body: backendFormData,
       });
@@ -213,7 +214,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       const ocrFormData = new FormData();
       ocrFormData.append('file', imageFile);
 
-      const ocrResponse = await fetch('https://1455-35-197-96-146.ngrok-free.app/ocr', {
+      const ocrResponse = await fetch('https://446f-34-87-190-254.ngrok-free.app/ocr', {
         method: 'POST',
         body: ocrFormData,
         headers: {

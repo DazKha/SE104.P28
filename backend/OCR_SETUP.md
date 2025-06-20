@@ -1,4 +1,5 @@
 # OCR Service Setup Guide
+thay url server ở /frontend/src/components/ExpensesPage/TransactionSection/index.jsx
 
 ## Cấu hình OCR Service
 
