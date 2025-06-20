@@ -15,7 +15,7 @@ import {
   ImageIcon
 } from 'lucide-react';
 import './TransactionSection.css';
-const ocr_server_url = 'https://4e22-34-82-78-47.ngrok-free.app/ocr'
+const ocr_server_url = 'https://466f-34-143-219-113.ngrok-free.app/ocr'
 
 const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTransaction, onDeleteTransaction }) => {
   // Categories

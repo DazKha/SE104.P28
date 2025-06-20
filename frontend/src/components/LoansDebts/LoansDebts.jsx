@@ -4,6 +4,7 @@ import { useDataReset } from '../../hooks/useDataReset.js';
 import CurrencyInput from '../common/CurrencyInput.jsx';
 import loanService from '../../services/loanService';
 import LoanDebtItem from './LoanDebtItem';
+import { parseVietnameseAmount } from '../../utils/parseVietnameseAmount';
 import styles from './LoansDebts.module.css';
 
 function LoansDebts() {
@@ -77,7 +78,7 @@ function LoansDebts() {
     
     try {
       await loanService.create({
-        amount: parseFloat(formData.amount),
+        amount: parseVietnameseAmount(formData.amount),
         person: formData.person,
         due_date: formData.due_date,
         type: formData.type
@@ -99,19 +100,34 @@ function LoansDebts() {
     
     try {
       const currentItem = items.find(i => i.id === editingItem);
-      await loanService.update(editingItem, {
-        amount: parseFloat(formData.amount),
+      const updateData = {
+        amount: parseVietnameseAmount(formData.amount),
         person: formData.person,
         due_date: formData.due_date,
         type: formData.type,
         status: currentItem?.status || 'pending'
-      });
+      };
+      
+      console.log('🔄 Updating loan/debt with data:', updateData);
+      console.log('🔄 Current formData:', formData);
+      console.log('🔄 Editing item ID:', editingItem);
+      
+      await loanService.update(editingItem, updateData);
       setEditingItem(null);
       setFormData({ amount: '', person: '', due_date: '', type: 'debt' });
       fetchItems();
     } catch (err) {
       console.error('Error updating loan/debt:', err);
-      alert('Error updating loan/debt. Please try again.');
+      console.error('Full error details:', {
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        message: err.message
+      });
+      
+      // Show specific error message if available
+      const errorMessage = err.response?.data?.message || err.message || 'Unknown error occurred';
+      alert(`Error updating loan/debt: ${errorMessage}`);
     }
   };
 
@@ -145,9 +161,9 @@ function LoansDebts() {
     if (item) {
       setEditingItem(itemId);
       setFormData({
-        amount: item.amount.toString(),
+        amount: item.amount.toString(), // CurrencyInput sẽ tự format
         person: item.person,
-        due_date: item.due_date,
+        due_date: formatDateForInput(item.due_date),
         type: item.type
       });
     }
@@ -196,7 +212,7 @@ function LoansDebts() {
             <input
               type="date"
               placeholder="Due date"
-              value={editingItem ? formatDateForInput(formData.due_date) : formData.due_date}
+              value={formData.due_date}
               onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
             />
             

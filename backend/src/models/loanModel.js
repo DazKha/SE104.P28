@@ -1,17 +1,17 @@
 const db = require('../database/db');
 
 class Loan {
-  static create({ user_id, amount, person, due_date, type }) {
+  static async create({ user_id, amount, person, due_date, type }) {
     const query = `
       INSERT INTO loans_debts (user_id, amount, person, due_date, type, status)
       VALUES (?, ?, ?, ?, ?, 'pending')
     `;
     const stmt = db.prepare(query);
-    const result = stmt.run(user_id, amount, person, due_date, type);
+    const result = await stmt.run(user_id, amount, person, due_date, type);
     return result.lastInsertRowid;
   }
 
-  static findByUser(userId, status = null) {
+  static async findByUser(userId, status = null) {
     let query = `
       SELECT * FROM loans_debts 
       WHERE user_id = ?
@@ -26,10 +26,22 @@ class Loan {
     query += ' ORDER BY due_date ASC';
     
     const stmt = db.prepare(query);
-    return stmt.all(...values);
+    return await stmt.all(...values);
   }
 
-  static update(id, userId, { amount, person, due_date, type, status }) {
+  static async findById(id, userId) {
+    const query = `
+      SELECT * FROM loans_debts 
+      WHERE id = ? AND user_id = ?
+    `;
+    const stmt = db.prepare(query);
+    return await stmt.get(id, userId);
+  }
+
+  static async update(id, userId, { amount, person, due_date, type, status }) {
+    console.log(`📝 LOAN MODEL - update called with id: ${id}, userId: ${userId}`);
+    console.log('📝 LOAN MODEL - update data:', { amount, person, due_date, type, status });
+    
     const query = `
       UPDATE loans_debts 
       SET amount = ?,
@@ -40,7 +52,11 @@ class Loan {
       WHERE id = ? AND user_id = ?
     `;
     const stmt = db.prepare(query);
-    const result = stmt.run(amount, person, due_date, type, status, id, userId);
+    const result = await stmt.run(amount, person, due_date, type, status, id, userId);
+    
+    console.log(`📝 LOAN MODEL - update result:`, result);
+    console.log(`📝 LOAN MODEL - changes: ${result.changes}`);
+    
     return result.changes > 0;
   }
 
@@ -78,13 +94,13 @@ class Loan {
     }
   }
 
-  static delete(id, userId) {
+  static async delete(id, userId) {
     const query = `
       DELETE FROM loans_debts 
       WHERE id = ? AND user_id = ?
     `;
     const stmt = db.prepare(query);
-    const result = stmt.run(id, userId);
+    const result = await stmt.run(id, userId);
     return result.changes > 0;
   }
 }

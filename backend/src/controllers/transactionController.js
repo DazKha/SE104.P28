@@ -31,8 +31,25 @@ const validateTransactionData = (data) => {
     errors.push('Amount must be a positive number');
   }
   
-  if (!data.date || isNaN(Date.parse(data.date))) {
-    errors.push('Date is invalid');
+  // Enhanced date validation to handle DD/MM/YYYY format
+  if (!data.date) {
+    errors.push('Date is required');
+  } else {
+    // Check if date is in DD/MM/YYYY format
+    const ddmmyyyyRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+    if (ddmmyyyyRegex.test(data.date)) {
+      // Parse DD/MM/YYYY format
+      const [day, month, year] = data.date.split('/');
+      const dateObj = new Date(year, month - 1, day);
+      
+      // Validate that the date is actually valid (e.g., not 32/13/2023)
+      if (dateObj.getDate() != day || dateObj.getMonth() != month - 1 || dateObj.getFullYear() != year) {
+        errors.push('Date is invalid');
+      }
+    } else if (isNaN(Date.parse(data.date))) {
+      // Fallback to standard Date.parse for other formats
+      errors.push('Date is invalid');
+    }
   }
   
   if (!data.type || !['income', 'outcome'].includes(data.type)) {

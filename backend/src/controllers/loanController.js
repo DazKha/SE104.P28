@@ -59,6 +59,17 @@ exports.updateLoan = async (req, res) => {
 
     console.log(`🔄 UPDATE LOAN - ID: ${id}, UserId: ${userId}, Data:`, req.body);
 
+    // First check if loan exists
+    const existingLoan = await Loan.findById(id, userId);
+    if (!existingLoan) {
+      console.log(`❌ LOAN NOT FOUND BEFORE UPDATE - ID: ${id}, UserId: ${userId}`);
+      return res.status(404).json({
+        message: 'Loan/Debt not found'
+      });
+    }
+
+    console.log(`✅ LOAN FOUND - ID: ${id}`, existingLoan);
+
     // Validate type if provided
     if (type && !['loan', 'debt'].includes(type)) {
       return res.status(400).json({
@@ -82,9 +93,9 @@ exports.updateLoan = async (req, res) => {
     });
 
     if (!updated) {
-      console.log(`❌ LOAN NOT FOUND - ID: ${id}, UserId: ${userId}`);
-      return res.status(404).json({
-        message: 'Loan/Debt not found'
+      console.log(`❌ LOAN UPDATE FAILED - ID: ${id}, UserId: ${userId}`);
+      return res.status(500).json({
+        message: 'Failed to update loan/debt'
       });
     }
 
