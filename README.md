@@ -4,22 +4,23 @@
   </a>
 </p>
 
-<h1 align="center"><b>NHẬP MÔN CÔNG NGHỆ PHẦN MỀM</b></h1>
+<h1 align="center"><b>Introduction to Software Engineering</b></h1>
 
-## GIỚI THIỆU MÔN HỌC
-* **Tên môn học:** Nhập môn Công nghệ phần mềm
-* **Mã môn học:** SE104
-* **Mã lớp:** SE104.P28
-* **Năm học:** HK2 (2024-2025)
-* **Giảng viên**: Ths.Đỗ Văn Tiến
+## COURSE INTRODUCTION
 
-## 👥 Team Members
+- **Course Title:** Introduction to Software Engineering  
+- **Course Code:** SE104  
+- **Class Code:** SE104.P28  
+- **Academic Year:** Semester 2 (2024–2025)  
+- **Instructor:** M.Sc. Do Van Tien
+  
+## Team Members
 
 - [Le Minh Kha - 23520664](https://github.com/DazKha) - Backend & Database Developer
 - [Nguyen Hai Dang - 23520228](https://github.com/Youngboyvungtau) - Frontend Developer
 - [Doan Viet Hoang - 23520515](https://github.com/VietHoagf) - OCR Integration & Image Processing
 
-## 🚀 Expense Management System
+## Expense Management System
 
 A full-stack expense tracking application built with React (Frontend) and Node.js/Express (Backend).
 
@@ -33,7 +34,7 @@ A full-stack expense tracking application built with React (Frontend) and Node.j
 - 📱 **Receipt OCR**: Upload and scan receipts
 - 🔐 **User Authentication**: Secure login/register system
 
-### 🛠️ Tech Stack
+### Tech Stack
 
 **Frontend:**
 - React 18
@@ -48,7 +49,7 @@ A full-stack expense tracking application built with React (Frontend) and Node.j
 - JWT Authentication
 - Multer for file uploads
 
-## 📦 Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 - Node.js (v16 or higher)
@@ -99,12 +100,12 @@ npm install
 npm start
 ```
 
-## 🌐 Access the Application
+## Access the Application
 
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:3000
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 SE104.P28/
@@ -128,7 +129,7 @@ SE104.P28/
 └── package.json            # Root package.json for concurrent running
 ```
 
-## 🔧 Available Scripts
+## Available Scripts
 
 From the root directory:
 
@@ -136,7 +137,7 @@ From the root directory:
 - `npm run client` - Start only the frontend
 - `npm run server` - Start only the backend
 
-## 🗄️ Database
+## Database
 
 The application uses SQLite3 for data storage. The database file is automatically created at `backend/data/expenses.db` on first run.
 
@@ -146,14 +147,14 @@ The application comes with sample data including:
 - Sample transactions
 - Pre-defined categories
 
-## 🔐 Authentication
+## Authentication
 
 The application uses JWT (JSON Web Tokens) for authentication. Users can:
 - Register new accounts
 - Login with email/password
 - Access protected routes
 
-## 📝 API Documentation
+## API Documentation
 
 ### Authentication Endpoints
 - `POST /api/auth/register` - Register new user
@@ -176,7 +177,7 @@ The application uses JWT (JSON Web Tokens) for authentication. Users can:
 - `PUT /api/loans_debts/:id` - Update loan/debt
 - `PATCH /api/loans_debts/:id/status` - Update status
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -204,7 +205,7 @@ The application uses JWT (JSON Web Tokens) for authentication. Users can:
    - Check CORS configuration in backend
    - Verify API URL in frontend services
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -212,7 +213,7 @@ The application uses JWT (JSON Web Tokens) for authentication. Users can:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is part of the SE104 course at University of Information Technology.
 
