@@ -1,11 +1,39 @@
 {
   "name": "expense-management-system",
+  "version": "1.0.0",
+  "description": "A full-stack expense tracking application built with React and Node.js",
+  "main": "setup.js",
   "scripts": {
+    "setup": "node setup.js",
     "client": "npm start --prefix frontend",
     "server": "npm start --prefix backend",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend",
+    "postinstall": "echo 'Run npm run setup to initialize the project'"
   },
+  "keywords": [
+    "expense-tracker",
+    "react",
+    "nodejs",
+    "express",
+    "sqlite",
+    "fullstack"
+  ],
+  "author": "SE104.P28 Team",
+  "license": "MIT",
   "devDependencies": {
     "concurrently": "^9.1.2"
-  }
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DazKha/SE104.P28.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DazKha/SE104.P28/issues"
+  },
+  "homepage": "https://github.com/DazKha/SE104.P28#readme"
 }
