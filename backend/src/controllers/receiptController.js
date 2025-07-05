@@ -1,5 +1,4 @@
 const Transaction = require('../models/transactionModel');
-const ocrService = require('../services/ocrService');
 
 exports.confirmReceipt = async (req, res) => {
   try {
@@ -68,56 +67,27 @@ exports.scanReceipt = async (req, res) => {
     const base64Image = imageBuffer.toString('base64');
     const dataUrl = `data:${mimeType};base64,${base64Image}`;
 
-    let ocrData = null;
-    let ocrError = null;
-
-    // Try to process with OCR service (optional - fallback if fails)
-    try {
-      console.log('Starting OCR processing...');
-      ocrData = await ocrService.recognize(imageBuffer, originalName, mimeType);
-      console.log('OCR processing completed successfully:', ocrData);
-    } catch (error) {
-      console.error('OCR processing failed:', error.message);
-      ocrError = error.message;
-      
-      // Continue with fallback (base64 storage without OCR data)
-      console.log('Continuing without OCR data due to error - this is expected if OCR service is not running');
-    }
-
-    // Prepare response data
+    // Prepare response data (without OCR processing)
     const responseData = {
       receiptImage: dataUrl,        // Base64 data URL for storage
       originalName: originalName,
       fileSize: fileSize,
       mimeType: mimeType,
-      processedAt: new Date().toISOString()
+      processedAt: new Date().toISOString(),
+      amount: 0,
+      date: new Date().toISOString().split('T')[0],
+      category: 'Uncategorized',
+      items: [],
+      confidence: 0,
+      ocrSuccess: false,
+      ocrError: 'OCR service not available'
     };
-
-    // Add OCR data if available
-    if (ocrData) {
-      responseData.amount = ocrData.amount || 0;
-      responseData.date = ocrData.date || new Date().toISOString().split('T')[0];
-      responseData.category = ocrData.category || 'Uncategorized';
-      responseData.items = ocrData.items || [];
-      responseData.confidence = ocrData.confidence || 0;
-      responseData.ocrSuccess = true;
-      responseData.ocrRawData = ocrData.rawData; // For debugging
-    } else {
-      // Fallback data when OCR fails
-      responseData.amount = 0;
-      responseData.date = new Date().toISOString().split('T')[0];
-      responseData.category = 'Uncategorized';
-      responseData.items = [];
-      responseData.confidence = 0;
-      responseData.ocrSuccess = false;
-      responseData.ocrError = ocrError;
-    }
 
     // Success response
     res.json({
-      message: ocrData ? 'Receipt processed successfully with OCR' : 'Receipt uploaded successfully (OCR failed)',
+      message: 'Receipt uploaded successfully (OCR not available)',
       data: responseData,
-      warnings: ocrError ? [`OCR processing failed: ${ocrError}`] : []
+      warnings: ['OCR processing is not available in this version']
     });
 
   } catch (err) {
@@ -130,25 +100,23 @@ exports.scanReceipt = async (req, res) => {
   }
 };
 
-// Health check endpoint for OCR service
+// Health check endpoint (simplified without OCR)
 exports.checkOcrHealth = async (req, res) => {
   try {
-    const config = ocrService.getConfig();
-    const isHealthy = await ocrService.healthCheck();
-    
     res.json({
-      message: 'OCR service status',
-      status: isHealthy ? 'healthy' : 'unhealthy',
+      message: 'Receipt service status',
+      status: 'healthy',
       config: {
-        serviceUrl: config.serviceUrl,
-        timeout: config.timeout,
-        isConfigured: config.isConfigured
+        serviceUrl: 'N/A',
+        timeout: 'N/A',
+        isConfigured: false
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      note: 'OCR service is not available in this version'
     });
   } catch (error) {
     res.status(500).json({
-      message: 'Failed to check OCR service health',
+      message: 'Failed to check service health',
       error: error.message,
       status: 'error'
     });

@@ -9,7 +9,9 @@
     "server": "npm start --prefix backend",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend",
-    "postinstall": "echo 'Run npm run setup to initialize the project'"
+    "postinstall": "echo 'Run npm run setup to initialize the project'",
+    "update-ocr": "node update-ocr-url.js",
+    "ocr-url": "node update-ocr-url.js"
   },
   "keywords": [
     "expense-tracker",

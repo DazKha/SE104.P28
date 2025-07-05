@@ -109,3 +109,7 @@ dist-ssr/
 
 # Uploads
 uploads/ 
+
+.DS_Store
+.idea/
+.vscode/

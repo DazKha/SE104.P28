@@ -42,6 +42,17 @@ cd ..
 npm run dev
 ```
 
+if cannot start, try running each part manually:
+```bash
+cd backend
+npm run dev
+```
+
+```bash
+cd frontend
+npm start
+```
+
 ## 🌐 Access Your App
 
 - **Frontend**: http://localhost:5173
@@ -62,7 +73,24 @@ Or register a new account!
 3. **Save Money**: Set savings goals
 4. **Manage Loans**: Track money you owe or are owed
 5. **View Reports**: See spending patterns and charts
-6. **Upload Receipts**: Scan and store receipts
+6. **Upload Receipts**: Scan and store receipts with OCR
+
+## 📱 OCR Setup (Optional)
+
+To enable receipt scanning with OCR:
+
+```bash
+# Navigate to OCR server
+cd ocr_server
+
+# Run Jupyter notebook
+jupyter notebook SERVER_OCR.ipynb
+
+# Execute all cells, copy the ngrok URL
+# Update frontend with: npm run update-ocr "YOUR_NEW_URL/ocr"
+```
+
+See [OCR Setup Guide](OCR_SETUP.md) and [OCR URL Management](OCR_URL_MANAGEMENT.md) for detailed instructions.
 
 ## 🐛 Troubleshooting
 

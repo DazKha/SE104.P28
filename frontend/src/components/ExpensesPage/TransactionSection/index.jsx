@@ -15,7 +15,7 @@ import {
   ImageIcon
 } from 'lucide-react';
 import './TransactionSection.css';
-const ocr_server_url = 'https://466f-34-143-219-113.ngrok-free.app/ocr'
+import { getOCRUrl, OCR_CONFIG } from '../../../config/ocrConfig.js';
 
 const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTransaction, onDeleteTransaction }) => {
   // Categories
@@ -180,31 +180,8 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
     }
   };
 
-  // Upload image to backend only
-  const uploadImage = async (imageFile) => {
-    try {
-      // Upload to backend
-      const backendFormData = new FormData();
-      backendFormData.append('image', imageFile);
-
-      const backendResponse = await fetch(ocr_server_url, {
-        method: 'POST',
-        body: backendFormData,
-      });
-
-      if (!backendResponse.ok) {
-        throw new Error('Failed to upload image to backend');
-      }
-
-      const backendResult = await backendResponse.json();
-      console.log('Backend upload result:', backendResult);
-
-      return backendResult;
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      throw error;
-    }
-  };
+  // Note: OCR processing is now handled directly by the frontend
+  // No backend upload needed for OCR functionality
 
   // Process OCR separately
   const processOCR = async (imageFile) => {
@@ -215,7 +192,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       const ocrFormData = new FormData();
       ocrFormData.append('file', imageFile);
 
-      const ocrResponse = await fetch(ocr_server_url, {
+      const ocrResponse = await fetch(getOCRUrl(), {
         method: 'POST',
         body: ocrFormData,
         headers: {
@@ -321,15 +298,13 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
       return;
     }
 
-    let imagePath = null;
-    let ocrData = null;
     let receiptImage = null;
 
     try {
       if (selectedImage) {
         setUploadingImage(true);
         
-        // Convert image to base64 for storage in browser cache
+        // Convert image to base64 for storage
         receiptImage = await new Promise((resolve) => {
           const reader = new FileReader();
           reader.onload = (e) => {
@@ -342,13 +317,6 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
         });
         
         console.log('Image converted to base64:', receiptImage ? 'Success' : 'Failed');
-        
-        try {
-          const uploadResult = await uploadImage(selectedImage);
-          imagePath = uploadResult.data?.filePath;
-        } catch (uploadError) {
-          console.warn('Upload failed, but continuing with base64 storage:', uploadError);
-        }
       }
 
       const transactionData = {
@@ -357,9 +325,7 @@ const TransactionSection = ({ transactions = [], onAddTransaction, onUpdateTrans
         category: newTransaction.category,
         note: newTransaction.description,
         type: newTransaction.type,
-        imagePath,
-        receipt_image: receiptImage, // Add base64 image data
-        ocrData
+        receipt_image: receiptImage // Add base64 image data
       };
       
       console.log('=== TRANSACTION DATA CREATED ===');

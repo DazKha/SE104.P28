@@ -31,7 +31,7 @@ A full-stack expense tracking application built with React (Frontend) and Node.j
 - 🏦 **Savings Goals**: Create and monitor savings targets
 - 💸 **Loans & Debts**: Track money you owe or are owed
 - 📈 **Reports & Analytics**: Visual charts and insights
-- 📱 **Receipt OCR**: Upload and scan receipts
+- 📱 **Receipt OCR**: Upload and scan receipts (see OCR Setup section below)
 - 🔐 **User Authentication**: Secure login/register system
 
 ### Tech Stack
@@ -154,6 +154,36 @@ The application uses JWT (JSON Web Tokens) for authentication. Users can:
 - Login with email/password
 - Access protected routes
 
+## OCR Receipt Scanning
+
+The application includes OCR (Optical Character Recognition) functionality for automatically extracting information from receipt images.
+
+### Setup OCR Server
+
+1. **Navigate to OCR directory:**
+   ```bash
+   cd ocr_server
+   ```
+
+2. **Run the Jupyter notebook:**
+   ```bash
+   jupyter notebook SERVER_OCR.ipynb
+   ```
+
+3. **Execute all cells** in the notebook
+
+4. **Copy the ngrok URL** from the output of the final cell
+
+5. **Update frontend configuration:**
+   ```bash
+   # Easy way (recommended)
+   npm run update-ocr "YOUR_NEW_NGROK_URL/ocr"
+   
+   # Or manually edit: frontend/src/config/ocrConfig.js
+   ```
+
+For detailed instructions, see [OCR URL Management](OCR_URL_MANAGEMENT.md) or [Quick Reference](OCR_QUICK_REFERENCE.md).
+
 ## API Documentation
 
 ### Authentication Endpoints
@@ -204,14 +234,6 @@ The application uses JWT (JSON Web Tokens) for authentication. Users can:
    - Ensure backend is running on port 3000
    - Check CORS configuration in backend
    - Verify API URL in frontend services
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## License
 
